@@ -1,0 +1,12 @@
+# Tiny demo fixtures only. Full milestone evaluation is owned by feature/eval-ui.
+questions:
+  - id: demo_top_customers
+    question: Who are the top 3 customers by total spending?
+    sql: >-
+      SELECT c.name, SUM(o.amount) AS total_spending
+      FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id
+      GROUP BY c.customer_id, c.name
+      ORDER BY total_spending DESC, c.customer_id LIMIT 3
+  - id: demo_customer_count
+    question: How many customers are there?
+    sql: SELECT COUNT(*) AS customer_count FROM customers

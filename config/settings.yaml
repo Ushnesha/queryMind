@@ -1,0 +1,17 @@
+database:
+  path: data/analytics.db
+
+model:
+  temperature: 0
+  provider: mock
+
+orchestrator:
+  max_repairs: 3
+  max_optimizer_rounds: 2
+
+schema:
+  default_mode: neo4j
+  top_k: 5
+
+evaluation:
+  trace_dir: eval/results
