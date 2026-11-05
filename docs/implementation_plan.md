@@ -1,6 +1,6 @@
 # QueryMind Milestone 2 — 4-Day Implementation Plan
 
-> **Purpose:** This is the single implementation handoff document for all five team members. Start from the shared `milestone2` bootstrap branch, create your assigned feature branch, implement only your owned component, preserve the shared interfaces, add tests, and open a PR back to `milestone2`.
+> **Purpose:** This is the single implementation handoff document for all five team members. Start from the shared `main` bootstrap branch, create your assigned feature branch, implement only your owned component, preserve the shared interfaces, add tests, and open a PR back to `main`.
 
 ---
 
@@ -81,9 +81,9 @@ The milestone is **not** intended to finish the entire final-project evaluation.
 
 ---
 
-# 1. What the `milestone2` Branch Represents
+# 1. What the `main` Branch Represents
 
-`milestone2` is the **shared integration contract**.
+`main` is the **shared integration contract**.
 
 It should contain the existing stakeholder baseline plus the QueryMind bootstrap skeleton. It is not expected to contain the completed Milestone 2 functionality yet.
 
@@ -140,8 +140,8 @@ docs/DEVELOPMENT.md
 Before beginning feature development, every member must run:
 
 ```bash
-git checkout milestone2
-git pull origin milestone2
+git checkout main
+git pull origin main
 pytest
 ```
 
@@ -259,8 +259,8 @@ Each member should avoid editing another member's owned files unless integration
 ## Branch
 
 ```bash
-git checkout milestone2
-git pull origin milestone2
+git checkout main
+git pull origin main
 git checkout -b feature/orchestrator
 ```
 
@@ -448,8 +448,8 @@ Member 1 is done when:
 ## Branch
 
 ```bash
-git checkout milestone2
-git pull origin milestone2
+git checkout main
+git pull origin main
 git checkout -b feature/schema-graph
 ```
 
@@ -596,8 +596,8 @@ A tie on the current three-table database is a valid preliminary result. Do not 
 ## Branch
 
 ```bash
-git checkout milestone2
-git pull origin milestone2
+git checkout main
+git pull origin main
 git checkout -b feature/verifiers
 ```
 
@@ -834,8 +834,8 @@ Result:
 ## Branch
 
 ```bash
-git checkout milestone2
-git pull origin milestone2
+git checkout main
+git pull origin main
 git checkout -b feature/optimizer
 ```
 
@@ -1001,8 +1001,8 @@ The original small database may be too fast to show meaningful wall-clock improv
 ## Branch
 
 ```bash
-git checkout milestone2
-git pull origin milestone2
+git checkout main
+git pull origin main
 git checkout -b feature/eval-ui
 ```
 
@@ -1227,7 +1227,7 @@ Never fill missing experimental values with expected numbers.
 Confirm:
 
 ```text
-1. Everyone starts from the same milestone2 commit.
+1. Everyone starts from the same main commit.
 2. pytest passes or known failures are documented.
 3. docs/INTERFACES.md is understood.
 4. Nobody is changing shared contracts independently.
@@ -1351,7 +1351,7 @@ Member 5:
 
 ### First merge window — Day 2 afternoon
 
-Open PRs into `milestone2`.
+Open PRs into `main`.
 
 Recommended integration order:
 
@@ -1366,8 +1366,8 @@ Recommended integration order:
 After every merge:
 
 ```bash
-git checkout milestone2
-git pull origin milestone2
+git checkout main
+git pull origin main
 pytest
 ```
 
@@ -1567,7 +1567,7 @@ result before == result after
 
 ### Final repository evidence
 
-By the end of Day 4, `milestone2` should contain or point to:
+By the end of Day 4, `main` should contain or point to:
 
 ```text
 [ ] Working Streamlit demo
@@ -1595,15 +1595,15 @@ By the end of Day 4, `milestone2` should contain or point to:
 
 # 10. Git Workflow
 
-No one develops directly on `main` or `milestone2`.
+No one develops directly on `main` or `main`.
 
 Start work:
 
 ```bash
-git checkout milestone2
-git pull origin milestone2
+git checkout main
+git pull origin main
 git checkout <your-feature-branch>
-git merge milestone2
+git merge main
 ```
 
 Before pushing:
@@ -1625,13 +1625,13 @@ git push origin feature/verifiers
 PR direction:
 
 ```text
-feature/* -> milestone2
+feature/* -> main
 ```
 
 Only after Milestone 2 is stable should the team consider:
 
 ```text
-milestone2 -> main
+main -> main
 ```
 
 Do not merge feature branches directly into one another unless there is an exceptional reason.
@@ -1923,8 +1923,8 @@ A smaller system that completes this sequence reliably is preferable to a larger
 ## Member 1
 
 ```bash
-git checkout milestone2
-git pull origin milestone2
+git checkout main
+git pull origin main
 git checkout -b feature/orchestrator
 # Read: docs/INTERFACES.md
 # Work: orchestrator + generator/repair + trace + integration
@@ -1934,8 +1934,8 @@ pytest
 ## Member 2
 
 ```bash
-git checkout milestone2
-git pull origin milestone2
+git checkout main
+git pull origin main
 git checkout -b feature/schema-graph
 # Read: docs/INTERFACES.md
 # Work: SQLite schema -> flat/Neo4j retrieval
@@ -1945,8 +1945,8 @@ pytest
 ## Member 3
 
 ```bash
-git checkout milestone2
-git pull origin milestone2
+git checkout main
+git pull origin main
 git checkout -b feature/verifiers
 # Read: docs/INTERFACES.md
 # Work: safety + syntax + semantic + result verifier
@@ -1956,8 +1956,8 @@ pytest
 ## Member 4
 
 ```bash
-git checkout milestone2
-git pull origin milestone2
+git checkout main
+git pull origin main
 git checkout -b feature/optimizer
 # Read: docs/INTERFACES.md
 # Work: EXPLAIN + optimizer + equality gate + timing
@@ -1967,8 +1967,8 @@ pytest
 ## Member 5
 
 ```bash
-git checkout milestone2
-git pull origin milestone2
+git checkout main
+git pull origin main
 git checkout -b feature/eval-ui
 # Read: docs/INTERFACES.md
 # Work: Streamlit + evaluation + b2 + ablation
