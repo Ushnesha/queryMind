@@ -1,8 +1,9 @@
 # Milestone 2 developer handoff
 
 All five feature branches should start from the same committed foundation. This
-checkout started without commits; commit the bootstrap first. No branches, commits,
-or remote changes are created automatically by the starter.
+checkout started without commits; review and commit any remaining bootstrap files
+before branching. No branches, commits, or remote changes are created by the
+starter application.
 
 ## Ownership
 
@@ -53,7 +54,8 @@ environment variables, never user question input or YAML.
 
 ## Create the five branches
 
-Review the untracked foundation, then create the initial commit:
+Review and commit the remaining foundation changes (the same commands also work
+for an initial commit in an empty clone):
 
 ```bash
 git status --short

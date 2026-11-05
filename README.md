@@ -55,6 +55,11 @@ cp .env.example .env
 make seed
 ```
 
+If Python 3.11 is managed by `uv` rather than available as `python3.11`, use
+`uv venv --python 3.11 .venv` and `uv pip install --python .venv/bin/python -r requirements.txt`
+for the environment creation and dependency installation steps. This is the
+method used to validate this checkout; its `.venv` is already prepared.
+
 Only pytest, PyYAML, python-dotenv, and Streamlit are direct dependencies. Existing
 package pins did not exist; these starter pins were validated on Python 3.11.15.
 Neo4j, LangGraph, sqlglot, and a live model SDK are deferred until a feature branch
