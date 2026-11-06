@@ -10,6 +10,8 @@ __pycache__/
 logs/*.jsonl
 data/*.db
 data/*.db-*
+/data/spider_data/
 eval/results/*.json
 eval/results/*.jsonl
 !eval/results/.gitkeep
+

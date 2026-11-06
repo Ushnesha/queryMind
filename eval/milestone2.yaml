@@ -1,0 +1,162 @@
+# New preliminary fixture: the repository originally contained two demo cases,
+# not the 17-question stakeholder set mentioned in the plan. Reference SQL uses
+# the committed customers/orders seed only. Tags fix paired experiment subsets.
+questions:
+  - id: E1
+    question: How many customers are there?
+    difficulty: easy
+    answerable: true
+    ambiguous: false
+    tags: [b2, ablation]
+    sql: SELECT COUNT(*) AS customer_count FROM customers
+  - id: E2
+    question: How many orders are there?
+    difficulty: easy
+    answerable: true
+    ambiguous: false
+    tags: [ablation]
+    sql: SELECT COUNT(*) AS order_count FROM orders
+  - id: E3
+    question: What is the total spending across all orders?
+    difficulty: easy
+    answerable: true
+    ambiguous: false
+    tags: [b2, ablation]
+    sql: SELECT SUM(amount) AS total_spending FROM orders
+  - id: E4
+    question: List all customer names alphabetically.
+    difficulty: easy
+    answerable: true
+    ambiguous: false
+    sql: SELECT name FROM customers ORDER BY name
+  - id: E5
+    question: What is the average order amount?
+    difficulty: easy
+    answerable: true
+    ambiguous: false
+    sql: SELECT AVG(amount) AS average_order_amount FROM orders
+  - id: H1
+    question: Who are the top 3 customers by total spending?
+    difficulty: hard
+    answerable: true
+    ambiguous: false
+    tags: [b2, ablation, schema]
+    expected_tables: [customers, orders]
+    expected_join_paths: [customers.customer_id = orders.customer_id]
+    sql: >-
+      SELECT c.name, SUM(o.amount) AS total_spending
+      FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id
+      GROUP BY c.customer_id, c.name
+      ORDER BY total_spending DESC, c.customer_id LIMIT 3
+  - id: H2
+    question: Which customers have never placed an order?
+    difficulty: hard
+    answerable: true
+    ambiguous: false
+    tags: [b2, ablation, schema]
+    expected_tables: [customers, orders]
+    expected_join_paths: [customers.customer_id = orders.customer_id]
+    sql: >-
+      SELECT c.name FROM customers AS c LEFT JOIN orders AS o
+      ON c.customer_id = o.customer_id WHERE o.order_id IS NULL ORDER BY c.name
+  - id: H3
+    question: What is the average order amount per customer who has ordered?
+    difficulty: hard
+    answerable: true
+    ambiguous: false
+    tags: [b2, ablation, schema]
+    expected_tables: [customers, orders]
+    expected_join_paths: [customers.customer_id = orders.customer_id]
+    sql: >-
+      SELECT c.name, AVG(o.amount) AS average_order_amount
+      FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id
+      GROUP BY c.customer_id, c.name ORDER BY c.name
+  - id: H4
+    question: How many orders has each customer placed, including those with no orders?
+    difficulty: hard
+    answerable: true
+    ambiguous: false
+    tags: [ablation, schema]
+    expected_tables: [customers, orders]
+    expected_join_paths: [customers.customer_id = orders.customer_id]
+    sql: >-
+      SELECT c.name, COUNT(o.order_id) AS order_count
+      FROM customers AS c LEFT JOIN orders AS o ON c.customer_id = o.customer_id
+      GROUP BY c.customer_id, c.name ORDER BY c.name
+  - id: H5
+    question: Which customers spent more than 100 in total?
+    difficulty: hard
+    answerable: true
+    ambiguous: false
+    tags: [schema]
+    expected_tables: [customers, orders]
+    expected_join_paths: [customers.customer_id = orders.customer_id]
+    sql: >-
+      SELECT c.name, SUM(o.amount) AS total_spending
+      FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id
+      GROUP BY c.customer_id, c.name HAVING SUM(o.amount) > 100 ORDER BY c.name
+  - id: H6
+    question: What is the latest order date for each customer who has ordered?
+    difficulty: hard
+    answerable: true
+    ambiguous: false
+    tags: [schema]
+    expected_tables: [customers, orders]
+    expected_join_paths: [customers.customer_id = orders.customer_id]
+    sql: >-
+      SELECT c.name, MAX(o.order_date) AS latest_order_date
+      FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id
+      GROUP BY c.customer_id, c.name ORDER BY c.name
+  - id: U1
+    question: What is the profit margin per product category?
+    difficulty: hard
+    answerable: false
+    ambiguous: false
+    missing_fields: [product cost, product category]
+    tags: [b2, ablation]
+  - id: U2
+    question: What is the average customer age?
+    difficulty: easy
+    answerable: false
+    ambiguous: false
+    missing_fields: [age]
+    tags: [ablation]
+  - id: U3
+    question: Which orders were delivered late?
+    difficulty: hard
+    answerable: false
+    ambiguous: false
+    missing_fields: [delivery date, promised delivery date]
+  - id: U4
+    question: What is the total inventory available per product?
+    difficulty: easy
+    answerable: false
+    ambiguous: false
+    missing_fields: [inventory, product]
+  - id: A1
+    question: Who are our best customers?
+    difficulty: hard
+    answerable: true
+    ambiguous: true
+    tags: [b2, ablation, schema]
+    reference_assumption: Best means top three by total spending.
+    expected_tables: [customers, orders]
+    expected_join_paths: [customers.customer_id = orders.customer_id]
+    sql: >-
+      SELECT c.name, SUM(o.amount) AS total_spending
+      FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id
+      GROUP BY c.customer_id, c.name
+      ORDER BY total_spending DESC, c.customer_id LIMIT 3
+  - id: A2
+    question: How much does each customer usually spend?
+    difficulty: hard
+    answerable: true
+    ambiguous: true
+    tags: [schema]
+    reference_assumption: Usually means arithmetic mean of order amounts for customers with orders.
+    expected_tables: [customers, orders]
+    expected_join_paths: [customers.customer_id = orders.customer_id]
+    sql: >-
+      SELECT c.name, AVG(o.amount) AS average_order_amount
+      FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id
+      GROUP BY c.customer_id, c.name ORDER BY c.name
