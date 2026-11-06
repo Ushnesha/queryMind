@@ -1,0 +1,313 @@
+{
+  "scope": "starter offline reference-SQL smoke evaluation",
+  "cases": [
+    {
+      "id": "demo_top_customers",
+      "question": "Who are the top 3 customers by total spending?",
+      "correct": true,
+      "state": {
+        "question": "Who are the top 3 customers by total spending?",
+        "schema_mode": "flat",
+        "schema_context": "TABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+        "sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+        "sql_history": [
+          "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3"
+        ],
+        "syntax_ok": true,
+        "syntax_error": "",
+        "safety_ok": true,
+        "semantic_ok": false,
+        "semantic_reason": "Starter input checks passed; semantic alignment is unverified.",
+        "answerable": true,
+        "missing_fields": [],
+        "assumptions": [
+          "The starter semantic verifier checks input structure only; alignment between the question and SQL has not been verified."
+        ],
+        "original_sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+        "optimized_sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+        "optimization_applied": false,
+        "original_plan": [
+          [
+            9,
+            0,
+            216,
+            "SCAN o"
+          ],
+          [
+            11,
+            0,
+            45,
+            "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+          ],
+          [
+            14,
+            0,
+            0,
+            "USE TEMP B-TREE FOR GROUP BY"
+          ],
+          [
+            62,
+            0,
+            0,
+            "USE TEMP B-TREE FOR ORDER BY"
+          ]
+        ],
+        "optimized_plan": [
+          [
+            9,
+            0,
+            216,
+            "SCAN o"
+          ],
+          [
+            11,
+            0,
+            45,
+            "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+          ],
+          [
+            14,
+            0,
+            0,
+            "USE TEMP B-TREE FOR GROUP BY"
+          ],
+          [
+            62,
+            0,
+            0,
+            "USE TEMP B-TREE FOR ORDER BY"
+          ]
+        ],
+        "rows": [
+          [
+            "Alice Chen",
+            300.0
+          ],
+          [
+            "Bob Smith",
+            175.0
+          ],
+          [
+            "Carol Davis",
+            75.0
+          ]
+        ],
+        "columns": [
+          "name",
+          "total_spending"
+        ],
+        "result_ok": false,
+        "result_warnings": [
+          "Starter result verification checks table shape only."
+        ],
+        "final_answer": "The query returned 3 row(s). See the result table and verification details.",
+        "repair_count": 0,
+        "optimizer_count": 1,
+        "trace": [
+          {
+            "node": "schema_retriever",
+            "status": "pass",
+            "latency_ms": 3.904,
+            "reason": ""
+          },
+          {
+            "node": "sql_generator",
+            "status": "pass",
+            "latency_ms": 0.085,
+            "reason": ""
+          },
+          {
+            "node": "safety_verifier",
+            "status": "pass",
+            "latency_ms": 0.284,
+            "reason": "Read-only guard passed."
+          },
+          {
+            "node": "syntax_verifier",
+            "status": "pass",
+            "latency_ms": 0.311,
+            "reason": "SQLite compilation passed."
+          },
+          {
+            "node": "semantic_verifier",
+            "status": "placeholder",
+            "latency_ms": 0.001,
+            "reason": "Starter input checks passed; semantic alignment is unverified."
+          },
+          {
+            "node": "optimizer",
+            "status": "pass",
+            "latency_ms": 0.223,
+            "reason": "Starter optimizer inspected the plan and kept SQL unchanged."
+          },
+          {
+            "node": "executor",
+            "status": "pass",
+            "latency_ms": 0.355,
+            "reason": ""
+          },
+          {
+            "node": "result_verifier",
+            "status": "placeholder",
+            "latency_ms": 0.004,
+            "reason": "Starter result verification checks table shape only."
+          },
+          {
+            "node": "response_generator",
+            "status": "pass",
+            "latency_ms": 0.001,
+            "reason": ""
+          }
+        ],
+        "metrics": {
+          "execution_time_ms": 0.2997498959302902,
+          "result_statistics": {
+            "row_count": 3,
+            "column_count": 2
+          },
+          "total_latency_ms": 5.726
+        },
+        "status": "success",
+        "error": ""
+      }
+    },
+    {
+      "id": "demo_customer_count",
+      "question": "How many customers are there?",
+      "correct": true,
+      "state": {
+        "question": "How many customers are there?",
+        "schema_mode": "flat",
+        "schema_context": "TABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+        "sql": "SELECT COUNT(*) AS customer_count FROM customers",
+        "sql_history": [
+          "SELECT COUNT(*) AS customer_count FROM customers"
+        ],
+        "syntax_ok": true,
+        "syntax_error": "",
+        "safety_ok": true,
+        "semantic_ok": false,
+        "semantic_reason": "Starter input checks passed; semantic alignment is unverified.",
+        "answerable": true,
+        "missing_fields": [],
+        "assumptions": [
+          "The starter semantic verifier checks input structure only; alignment between the question and SQL has not been verified."
+        ],
+        "original_sql": "SELECT COUNT(*) AS customer_count FROM customers",
+        "optimized_sql": "SELECT COUNT(*) AS customer_count FROM customers",
+        "optimization_applied": false,
+        "original_plan": [
+          [
+            4,
+            0,
+            0,
+            "SCAN customers"
+          ]
+        ],
+        "optimized_plan": [
+          [
+            4,
+            0,
+            0,
+            "SCAN customers"
+          ]
+        ],
+        "rows": [
+          [
+            4
+          ]
+        ],
+        "columns": [
+          "customer_count"
+        ],
+        "result_ok": false,
+        "result_warnings": [
+          "Starter result verification checks table shape only."
+        ],
+        "final_answer": "The query returned customer_count = 4. See verification details.",
+        "repair_count": 0,
+        "optimizer_count": 1,
+        "trace": [
+          {
+            "node": "schema_retriever",
+            "status": "pass",
+            "latency_ms": 0.207,
+            "reason": ""
+          },
+          {
+            "node": "sql_generator",
+            "status": "pass",
+            "latency_ms": 0.005,
+            "reason": ""
+          },
+          {
+            "node": "safety_verifier",
+            "status": "pass",
+            "latency_ms": 0.017,
+            "reason": "Read-only guard passed."
+          },
+          {
+            "node": "syntax_verifier",
+            "status": "pass",
+            "latency_ms": 0.167,
+            "reason": "SQLite compilation passed."
+          },
+          {
+            "node": "semantic_verifier",
+            "status": "placeholder",
+            "latency_ms": 0.001,
+            "reason": "Starter input checks passed; semantic alignment is unverified."
+          },
+          {
+            "node": "optimizer",
+            "status": "pass",
+            "latency_ms": 0.161,
+            "reason": "Starter optimizer inspected the plan and kept SQL unchanged."
+          },
+          {
+            "node": "executor",
+            "status": "pass",
+            "latency_ms": 0.155,
+            "reason": ""
+          },
+          {
+            "node": "result_verifier",
+            "status": "placeholder",
+            "latency_ms": 0.003,
+            "reason": "Starter result verification checks table shape only."
+          },
+          {
+            "node": "response_generator",
+            "status": "pass",
+            "latency_ms": 0.001,
+            "reason": ""
+          }
+        ],
+        "metrics": {
+          "execution_time_ms": 0.14087511226534843,
+          "result_statistics": {
+            "row_count": 1,
+            "column_count": 1
+          },
+          "total_latency_ms": 1.201
+        },
+        "status": "success",
+        "error": ""
+      }
+    }
+  ],
+  "metrics": {
+    "run_count": 2,
+    "successful_runs": 2,
+    "refused_runs": 0,
+    "error_runs": 0,
+    "success_rate": 1.0,
+    "total_rows": 4,
+    "mean_total_latency_ms": 3.4635,
+    "mean_execution_time_ms": 0.22031250409781933,
+    "case_count": 2,
+    "scored_cases": 2,
+    "correct_cases": 2,
+    "result_accuracy": 1.0
+  }
+}

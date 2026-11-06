@@ -1,0 +1,3 @@
+# Optional feature/schema-graph driver. Base offline tests do not require it.
+# Official package release: https://pypi.org/project/neo4j/6.4.1/
+neo4j==6.4.1

@@ -33,12 +33,13 @@ Current behavior:
 - SQL generation uses an offline mock for two question templates: “Who are the top
   3 customers by total spending?” (also supports other positive N up to 99) and
   “How many customers are there?”. Other questions produce an explicit refusal.
-- `neo4j` mode explicitly falls back to flat SQLite schema. Neo4j is internal
+- `neo4j` mode retrieves relevant schema and FK paths from a configured graph,
+  with an explicit flat fallback when unavailable. Neo4j is internal
   infrastructure; the interactive input is a natural-language question.
 - Semantic and result checks are labeled placeholders. Successful execution does
   not imply that question alignment or answer correctness was verified.
 - The optimizer inspects `EXPLAIN QUERY PLAN` and returns unchanged SQL. Graph
-  building emits an offline metadata payload. b2 is an explicit unimplemented
+  building supports offline payloads and explicit Neo4j upload. b2 is an unimplemented
   contract; evaluation and ablation commands are small smoke runs.
 
 ### Offline setup
@@ -62,9 +63,10 @@ method used to validate this checkout; its `.venv` is already prepared.
 
 Only pytest, PyYAML, python-dotenv, and Streamlit are direct dependencies. Existing
 package pins did not exist; these starter pins were validated on Python 3.11.15.
-Neo4j, LangGraph, sqlglot, and a live model SDK are deferred until a feature branch
-uses them. Model configuration defaults to `mock`; the example API environment
-variables reserve the future provider boundary and are not used by the starter.
+The optional Neo4j driver is pinned in `requirements-schema.txt`. LangGraph and
+sqlglot remain deferred. Main-pipeline model configuration defaults to `mock`.
+The schema experiment separately supports the configured ASU completion model
+without changing the orchestrator's provider registry.
 
 `make seed` creates a deterministic fixture with four customers and six orders. It
 leaves an existing database untouched. The query path never creates or writes a
@@ -130,6 +132,31 @@ make ablation      # Five switch configurations on one demo question
 make schema-graph  # Offline graph metadata; does not upload to Neo4j
 make benchmark     # Unchanged SQL plans, timings and result equality
 ```
+
+### Schema graph and Spider comparison
+
+The `feature/schema-graph` implementation introspects SQLite tables, columns,
+composite keys and indexes; uploads a versioned Neo4j graph; and retrieves
+question-relevant tables with FK bridge paths. Its public `retrieve()` contract
+is unchanged. Unit tests use mocks and local graphs, with no live services.
+
+```bash
+uv pip install --python .venv/bin/python -r requirements-schema.txt
+# Set NEO4J_PASSWORD in your ignored .env, then start local Neo4j if needed:
+docker compose -f compose.neo4j.yaml up -d
+
+# Offline diagnostic, no credentials:
+python -m scripts.benchmark_schema_retrieval --backend local_graph
+# Real Neo4j + ASU completion model, with credentials configured:
+python -m scripts.benchmark_schema_retrieval --backend neo4j --generate
+```
+
+Set `SPIDER_DATA_ROOT=data/spider_data` for the multi-database experiment.
+`SQLITE_DB` must identify one SQLite file, never `data/spider_data/*`. The fixed
+ten-question sample, information boundaries, exact metrics and observed results
+are documented in [SCHEMA_EXPERIMENT.md](docs/SCHEMA_EXPERIMENT.md). The live ASU
+comparison scored 6/10 correct results for both modes; Neo4j supplied about half
+the estimated schema tokens and had higher retrieval latency.
 
 Generated databases, JSONL logs, and evaluation output are ignored. The deterministic
 seeder, two-case YAML fixture, and empty artifact directories are committed source.
