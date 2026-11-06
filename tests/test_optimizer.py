@@ -1,6 +1,7 @@
 """Optimizer contract and shared equality semantics."""
 
 import json
+import sqlite3
 
 from src.optimizer import compare_results, explain_query_plan, optimize_sql
 
@@ -60,3 +61,58 @@ def test_plan_improved_rules() -> None:
     assert plan_improved(_plan("SCAN t", "USE TEMP B-TREE FOR DISTINCT"), _plan("SCAN t"))
     assert not plan_improved(_plan("SCAN t"), _plan("SCAN t"))
     assert not plan_improved(_plan("SEARCH t USING INDEX i (a=?)"), _plan("SCAN t"))
+
+
+# ---- equality gate ----
+import pytest
+
+from src.optimizer.equality import has_top_level_order_by, results_equal, run_limited
+
+
+def test_compare_results_order_floats_and_nulls() -> None:
+    from src.optimizer.equality import compare_results as cmp
+
+    assert cmp([[1], [2]], ["a"], [[2], [1]], ["a"])
+    assert not cmp([[1], [2]], ["a"], [[2], [1]], ["a"], ordered=True)
+    assert cmp([[0.1 + 0.2]], ["a"], [[0.3]], ["a"])
+    assert cmp([[None], [1]], ["a"], [[1], [None]], ["a"])
+    assert not cmp([[None]], ["a"], [[0]], ["a"])
+
+
+def test_top_level_order_by_detection() -> None:
+    assert has_top_level_order_by("SELECT a FROM t ORDER BY a")
+    assert not has_top_level_order_by("SELECT a FROM (SELECT a FROM t ORDER BY a)")
+    assert not has_top_level_order_by("SELECT 'order by' FROM t")
+
+
+def test_results_equal_same_and_different(db_path) -> None:
+    a = "SELECT name FROM customers WHERE customer_id IN (SELECT customer_id FROM orders)"
+    b = "SELECT DISTINCT c.name FROM customers c JOIN orders o ON c.customer_id = o.customer_id"
+    assert results_equal(a, b, db_path)
+    assert not results_equal(a, "SELECT name FROM customers", db_path)
+
+
+def test_results_equal_respects_order_by(db_path) -> None:
+    asc = "SELECT name FROM customers ORDER BY name"
+    desc = "SELECT name FROM customers ORDER BY name DESC"
+    assert not results_equal(asc, desc, db_path)
+    assert results_equal("SELECT name FROM customers", desc, db_path)  # no ORDER BY: unordered
+
+
+def test_results_equal_false_on_unsafe_or_bad_sql(db_path) -> None:
+    ok = "SELECT 1"
+    assert not results_equal(ok, "DROP TABLE customers", db_path)
+    assert not results_equal(ok, "SELECT 1; SELECT 2", db_path)
+    assert not results_equal(ok, "SELECT nope FROM nowhere", db_path)
+
+
+SLOW = (
+    "WITH RECURSIVE c(x) AS (SELECT 1 UNION ALL SELECT x + 1 FROM c WHERE x < 100000000) "
+    "SELECT COUNT(*) FROM c"
+)
+
+
+def test_timeout_is_enforced(db_path) -> None:
+    with pytest.raises(sqlite3.OperationalError):
+        run_limited(SLOW, db_path, timeout_s=0.2)
+    assert not results_equal("SELECT 1", SLOW, db_path, timeout_s=0.2)
