@@ -66,25 +66,26 @@ def run_querymind(
         "original_sql": "", "optimized_sql": "", "optimization_applied": False,
         "original_plan": [], "optimized_plan": [], "rows": [], "columns": [],
         "result_ok": False, "result_warnings": [], "final_answer": "",
-        "repair_count": 0, "optimizer_count": 0, "trace": [], "metrics": {},
+        "repair_count": 0, "optimizer_count": 0, "trace": [],
+        "metrics": {"llm_calls": 0},
         "status": "success", "error": "",
     }
 
-    def call_node(name: str, callback: Callable[[], T]) -> T:
+    def call_node(name: str, callback: Callable[[], T], *, iteration: int | None = None) -> T:
         node_start = perf_counter()
         try:
             result = callback()
         except Exception as exc:
-            add_trace(state, name, "error", (perf_counter() - node_start) * 1000, str(exc))
+            add_trace(state, name, "error", (perf_counter() - node_start) * 1000, str(exc), iteration=iteration)
             raise
-        add_trace(state, name, "pass", (perf_counter() - node_start) * 1000)
+        add_trace(state, name, "pass", (perf_counter() - node_start) * 1000, iteration=iteration)
         return result
 
     def describe(status: str, reason: str) -> None:
         state["trace"][-1].update(status=status, reason=reason)
 
-    def skipped(name: str, reason: str = "Disabled for ablation.") -> None:
-        add_trace(state, name, "skipped", 0.0, reason)
+    def skipped(name: str, reason: str = "Disabled for ablation.", *, iteration: int | None = None) -> None:
+        add_trace(state, name, "skipped", 0.0, reason, iteration=iteration)
 
     def refuse(reason: str) -> None:
         state.update(status="refused", answerable=False, semantic_reason=reason)
@@ -109,50 +110,78 @@ def run_querymind(
             describe("placeholder", "Neo4j retrieval is deferred; using flat SQLite schema offline.")
         feedback = ""
         while True:
+            attempt = state["repair_count"] + 1
+            # Counts SQL generation/provider invocations through nodes.generate_sql (initial generation and repairs)
+            state["metrics"]["llm_calls"] = state["metrics"].get("llm_calls", 0) + 1
             try:
                 state["sql"] = call_node("sql_generator", lambda: nodes.generate_sql(
                     question, state["schema_context"], provider=sql_provider, feedback=feedback or None
-                )).strip()
+                ), iteration=attempt).strip()
             except ValueError as exc:
                 refuse(str(exc))
                 return _finish(state, nodes, started)
             state["sql_history"].append(state["sql"])
-            safety = call_node("safety_verifier", lambda: nodes.check_safety(state["sql"]))
+
+            # 1. Safety check (mandatory lexical / policy guard)
+            safety = call_node("safety_verifier", lambda: nodes.check_safety(state["sql"]), iteration=attempt)
             state["safety_ok"] = bool(safety["ok"])
             describe("pass" if safety["ok"] else "fail", safety.get("error") or "Read-only guard passed.")
             failure = "" if safety["ok"] else (safety.get("error") or "Read-only safety verification failed.")
+
+            # 2. Syntax check (SQLite EXPLAIN on protected connection)
             if safety["ok"] and enable_syntax:
-                syntax = call_node("syntax_verifier", lambda: nodes.check_syntax(state["sql"], db_path=database_path))
+                syntax = call_node("syntax_verifier", lambda: nodes.check_syntax(state["sql"], db_path=database_path), iteration=attempt)
                 state["syntax_ok"] = bool(syntax["ok"])
                 failure = "" if syntax["ok"] else (syntax.get("error") or "SQLite syntax verification failed.")
                 describe("pass" if syntax["ok"] else "fail", failure or "SQLite compilation passed.")
             elif not enable_syntax:
-                skipped("syntax_verifier")
+                skipped("syntax_verifier", iteration=attempt)
             state["syntax_error"] = failure
+
+            # 3. Semantic check (if safety and syntax pass)
+            if safety["ok"] and not failure:
+                if enable_semantic:
+                    semantic = call_node("semantic_verifier", lambda: nodes.verify_semantics(
+                        question, state["sql"], state["schema_context"]
+                    ), iteration=attempt)
+                    placeholder = semantic.get("status") == "placeholder"
+                    state.update(
+                        semantic_ok=bool(semantic["matches_question"] and semantic["answerable"] and not placeholder),
+                        semantic_reason=semantic["reason"],
+                        answerable=bool(semantic["answerable"]),
+                        missing_fields=list(semantic["missing_fields"]),
+                        assumptions=list(semantic["assumptions"]),
+                    )
+                    describe("placeholder" if placeholder else ("pass" if state["semantic_ok"] else "fail"), semantic["reason"])
+
+                    # If missing required data: refuse immediately without burning repairs
+                    if not semantic["answerable"]:
+                        refuse(semantic["reason"])
+                        return _finish(state, nodes, started)
+
+                    # If semantic mismatch: trigger repair
+                    if not semantic["matches_question"]:
+                        failure = semantic["reason"]
+                else:
+                    state["semantic_reason"] = "Semantic verification disabled for ablation."
+                    skipped("semantic_verifier", iteration=attempt)
+
+            # If all enabled checks passed: query is verified, proceed to optimization/execution
             if safety["ok"] and not failure:
                 break
+
+            # Handle verification failure (safety, syntax, or semantic mismatch)
             if state["repair_count"] >= config.orchestrator.max_repairs:
                 refuse("SQL verification failed after the configured repair limit: " + failure)
                 return _finish(state, nodes, started)
+
             state["repair_count"] += 1
             feedback = f"Previous SQL:\n{state['sql']}\n\nVerification failure:\n{failure}"
-            add_trace(state, "repair", "retry", 0.0, f"Repair attempt {state['repair_count']}: {failure}")
-
-        if enable_semantic:
-            semantic = call_node("semantic_verifier", lambda: nodes.verify_semantics(question, state["sql"], state["schema_context"]))
-            placeholder = semantic.get("status") == "placeholder"
-            state.update(
-                semantic_ok=bool(semantic["matches_question"] and semantic["answerable"] and not placeholder),
-                semantic_reason=semantic["reason"], answerable=bool(semantic["answerable"]),
-                missing_fields=list(semantic["missing_fields"]), assumptions=list(semantic["assumptions"]),
+            add_trace(
+                state, "repair", "retry", 0.0,
+                f"Repair attempt {state['repair_count']}: {failure}",
+                iteration=state["repair_count"] + 1,
             )
-            describe("placeholder" if placeholder else ("pass" if state["semantic_ok"] else "fail"), semantic["reason"])
-            if not semantic["answerable"] or not semantic["matches_question"]:
-                refuse(semantic["reason"])
-                return _finish(state, nodes, started)
-        else:
-            state["semantic_reason"] = "Semantic verification disabled for ablation."
-            skipped("semantic_verifier")
 
         state["original_sql"] = state["sql"]
         if enable_optimizer and config.orchestrator.max_optimizer_rounds:

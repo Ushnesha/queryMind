@@ -134,3 +134,196 @@ def test_jsonl_trace_can_round_trip(db_path, tmp_path) -> None:
     path = tmp_path / "runs.jsonl"
     write_jsonl(path, state)
     assert json.loads(path.read_text())["rows"] == state["rows"]
+
+
+def test_semantic_mismatch_routes_to_repair_and_succeeds(db_path) -> None:
+    calls = []
+
+    def fake_generator(*args, feedback=None, **kwargs) -> str:
+        calls.append(feedback)
+        return "SELECT 2 AS value" if feedback else "SELECT 1 AS value"
+
+    def fake_semantics(q, sql, schema):
+        if "1" in sql:
+            return {
+                "matches_question": False,
+                "answerable": True,
+                "missing_fields": [],
+                "assumptions": [],
+                "reason": "Query does not filter by target category.",
+            }
+        return {
+            "matches_question": True,
+            "answerable": True,
+            "missing_fields": [],
+            "assumptions": ["Category filter verified."],
+            "reason": "Query semantics match.",
+        }
+
+    nodes = replace(Components(), generate_sql=fake_generator, verify_semantics=fake_semantics)
+    state = run_querymind(QUESTION, db_path=db_path, components=nodes)
+    assert state["status"] == "success"
+    assert state["repair_count"] == 1
+    assert state["metrics"]["llm_calls"] == 2
+    assert state["sql"] == "SELECT 2 AS value"
+    assert state["assumptions"] == ["Category filter verified."]
+    assert "category" in calls[1].lower()
+    assert any(event["node"] == "executor" for event in state["trace"])
+
+
+def test_syntax_failure_then_semantic_mismatch_recovers(db_path) -> None:
+    attempt = 0
+
+    def fake_generator(*args, **kwargs) -> str:
+        nonlocal attempt
+        attempt += 1
+        if attempt == 1:
+            return "SELECT nonexistent FROM customers"  # syntax fail
+        if attempt == 2:
+            return "SELECT 1 AS value"  # syntax pass, semantic fail
+        return "SELECT 2 AS value"  # syntax pass, semantic pass
+
+    def fake_semantics(q, sql, schema):
+        if "1" in sql:
+            return {
+                "matches_question": False,
+                "answerable": True,
+                "missing_fields": [],
+                "assumptions": [],
+                "reason": "Missing expected grouping.",
+            }
+        return {
+            "matches_question": True,
+            "answerable": True,
+            "missing_fields": [],
+            "assumptions": ["Valid grouping."],
+            "reason": "Semantic match.",
+        }
+
+    nodes = replace(Components(), generate_sql=fake_generator, verify_semantics=fake_semantics)
+    state = run_querymind(QUESTION, db_path=db_path, components=nodes)
+    assert state["status"] == "success"
+    assert state["repair_count"] == 2
+    assert state["metrics"]["llm_calls"] == 3
+    assert state["sql"] == "SELECT 2 AS value"
+
+
+def test_shared_repair_budget_exhaustion_mixing_syntax_and_semantics(db_path) -> None:
+    attempt = 0
+
+    def fake_generator(*args, **kwargs) -> str:
+        nonlocal attempt
+        attempt += 1
+        if attempt % 2 == 1:
+            return "SELECT nonexistent FROM customers"  # syntax fail on attempts 1 and 3
+        return "SELECT 1 AS value"  # syntax pass, semantic fail on attempts 2 and 4
+
+    def fake_semantics(q, sql, schema):
+        return {
+            "matches_question": False,
+            "answerable": True,
+            "missing_fields": [],
+            "assumptions": [],
+            "reason": "Semantic mismatch.",
+        }
+
+    nodes = replace(Components(), generate_sql=fake_generator, verify_semantics=fake_semantics)
+    state = run_querymind(QUESTION, db_path=db_path, components=nodes)
+    assert state["status"] == "refused"
+    assert state["repair_count"] == 3
+    assert state["metrics"]["llm_calls"] == 4
+    assert len(state["sql_history"]) == 4
+    assert not any(event["node"] == "executor" for event in state["trace"])
+
+
+def test_semantic_unanswerable_refuses_immediately_without_repair(db_path) -> None:
+    gen_count = 0
+
+    def fake_generator(*args, **kwargs) -> str:
+        nonlocal gen_count
+        gen_count += 1
+        return "SELECT 1 AS value"
+
+    def fake_semantics(q, sql, schema):
+        return {
+            "matches_question": False,
+            "answerable": False,
+            "missing_fields": ["cost"],
+            "assumptions": [],
+            "reason": "Profit margin requires cost information not in schema.",
+        }
+
+    nodes = replace(Components(), generate_sql=fake_generator, verify_semantics=fake_semantics)
+    state = run_querymind(QUESTION, db_path=db_path, components=nodes)
+    assert state["status"] == "refused"
+    assert state["repair_count"] == 0
+    assert state["metrics"]["llm_calls"] == 1
+    assert gen_count == 1
+    assert state["missing_fields"] == ["cost"]
+    assert not any(event["node"] == "executor" for event in state["trace"])
+
+
+def test_llm_calls_metric_tracking(db_path) -> None:
+    # 1. Happy path: exactly 1 LLM call
+    state_smoke = run_querymind(QUESTION, schema_mode="flat", db_path=db_path)
+    assert state_smoke["metrics"]["llm_calls"] == 1
+
+    # 2. Empty question: 0 LLM calls
+    state_empty = run_querymind("", db_path=db_path)
+    assert state_empty["metrics"]["llm_calls"] == 0
+
+    # 3. 1 repair: 2 LLM calls
+    state_repair = run_querymind(
+        QUESTION,
+        db_path=db_path,
+        components=replace(
+            Components(),
+            generate_sql=lambda *args, feedback=None, **kwargs: (
+                "SELECT 1 AS value" if feedback else "SELECT absent FROM customers"
+            ),
+        ),
+    )
+    assert state_repair["metrics"]["llm_calls"] == 2
+
+
+def test_trace_iteration_enrichment(db_path) -> None:
+    attempt = 0
+
+    def fake_generator(*args, **kwargs) -> str:
+        nonlocal attempt
+        attempt += 1
+        return "SELECT 1 AS value" if attempt > 1 else "SELECT absent FROM customers"
+
+    nodes = replace(Components(), generate_sql=fake_generator)
+    state = run_querymind(QUESTION, db_path=db_path, components=nodes)
+
+    gen_events = [e for e in state["trace"] if e["node"] == "sql_generator"]
+    assert len(gen_events) == 2
+    assert gen_events[0]["iteration"] == 1
+    assert gen_events[1]["iteration"] == 2
+
+    retry_events = [e for e in state["trace"] if e["status"] == "retry"]
+    assert len(retry_events) == 1
+    assert retry_events[0]["iteration"] == 2  # retry points to upcoming attempt 2
+
+    # Non-loop nodes should omit iteration
+    schema_events = [e for e in state["trace"] if e["node"] == "schema_retriever"]
+    assert "iteration" not in schema_events[0]
+
+
+def test_semantic_disabled_ablation_skips_semantic_repair(db_path) -> None:
+    nodes = replace(
+        Components(),
+        generate_sql=lambda *args, **kwargs: "SELECT 1 AS value",
+        verify_semantics=lambda *args: {
+            "matches_question": False,
+            "answerable": False,
+            "missing_fields": ["fake"],
+            "assumptions": [],
+            "reason": "Would fail if called.",
+        },
+    )
+    state = run_querymind(QUESTION, db_path=db_path, components=nodes, enable_semantic=False)
+    assert state["status"] == "success"
+    assert any(e["node"] == "semantic_verifier" and e["status"] == "skipped" for e in state["trace"])
+
