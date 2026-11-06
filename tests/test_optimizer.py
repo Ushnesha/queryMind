@@ -12,6 +12,10 @@ def test_optimizer_preserves_sql_and_returns_plan(db_path) -> None:
     assert result["sql"] == sql
     assert result["plan_before"]
     assert result["plan_before"] == result["plan_after"]
+    assert result["original_sql"] == result["optimized_sql"] == sql
+    assert result["equality_ok"] is None
+    assert result["llm_calls"] == 0
+    assert isinstance(result["latency_ms"], int)
     json.dumps(result)
 
 
