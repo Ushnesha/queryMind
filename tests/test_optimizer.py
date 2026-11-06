@@ -116,3 +116,83 @@ def test_timeout_is_enforced(db_path) -> None:
     with pytest.raises(sqlite3.OperationalError):
         run_limited(SLOW, db_path, timeout_s=0.2)
     assert not results_equal("SELECT 1", SLOW, db_path, timeout_s=0.2)
+
+
+# ---- optimize_sql end to end with a mocked LLM ----
+import json as _json
+from src.optimizer import optimize_sql as _opt
+
+IN_SQL = "SELECT name FROM customers WHERE customer_id IN (SELECT customer_id FROM orders)"
+GOOD = "SELECT DISTINCT c.name FROM customers c JOIN orders o ON c.customer_id = o.customer_id"
+
+
+class FakeLLM:
+    def __init__(self, reply="", error=None):
+        self.reply, self.error, self.calls = reply, error, 0
+
+    def __call__(self, prompt):
+        self.calls += 1
+        if self.error:
+            raise self.error
+        return self.reply
+
+
+def reply(sql):
+    return _json.dumps({"sql": sql, "reason": "join instead of subquery"})
+
+
+def run(db_path, llm, sql=IN_SQL, **kw):
+    return _opt(sql, "Which customers ordered?", "schema", db_path=db_path, llm=llm, **kw)
+
+
+def test_good_plan_no_llm_call(db_path) -> None:
+    llm = FakeLLM(reply(GOOD))
+    out = run(db_path, llm, sql="SELECT name FROM customers WHERE customer_id = 1")
+    assert llm.calls == 0 and out["changed"] is False and out["llm_calls"] == 0
+    assert out["equality_ok"] is None
+
+
+def test_equal_rewrite_accepted(db_path) -> None:
+    llm = FakeLLM(reply(GOOD))
+    out = run(db_path, llm)
+    assert out["changed"] and out["sql"] == out["optimized_sql"] == GOOD
+    assert out["original_sql"] == IN_SQL and out["equality_ok"] is True and out["llm_calls"] == 1
+    assert out["plan_after"]
+
+
+def test_different_rewrite_rejected(db_path) -> None:
+    out = run(db_path, FakeLLM(reply("SELECT name FROM customers")))
+    assert not out["changed"] and out["sql"] == IN_SQL and out["equality_ok"] is False
+    assert out["optimized_sql"] == IN_SQL
+
+
+@pytest.mark.parametrize(
+    "bad", ["DELETE FROM orders", "SELECT 1; DROP TABLE orders", "SELECT x FROM nowhere"]
+)
+def test_unsafe_or_invalid_rewrite_rejected(db_path, bad) -> None:
+    out = run(db_path, FakeLLM(reply(bad)))
+    assert not out["changed"] and out["sql"] == IN_SQL and out["equality_ok"] is None
+
+
+@pytest.mark.parametrize(
+    "llm", [FakeLLM("garbage"), FakeLLM("{}"), FakeLLM(error=RuntimeError("down"))]
+)
+def test_llm_failure_returns_original(db_path, llm) -> None:
+    out = run(db_path, llm)
+    assert not out["changed"] and out["sql"] == IN_SQL
+
+
+def test_slow_rewrite_hits_time_limit(db_path) -> None:
+    out = run(db_path, FakeLLM(reply(SLOW)), timeout_s=0.2)
+    assert not out["changed"] and out["sql"] == IN_SQL
+
+
+def test_one_llm_attempt_per_call(db_path) -> None:
+    llm = FakeLLM(reply("SELECT name FROM customers"))  # rejected, but no retry inside
+    run(db_path, llm)
+    assert llm.calls == 1
+
+
+def test_optimize_never_raises_on_bad_input(db_path, tmp_path) -> None:
+    assert not _opt("not sql", "q", "s", db_path=db_path)["changed"]
+    assert not _opt(IN_SQL, "q", "s", db_path=tmp_path / "missing.db")["changed"]
