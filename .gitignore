@@ -10,6 +10,8 @@ __pycache__/
 logs/*.jsonl
 data/*.db
 data/*.db-*
-eval/results/*.json
-eval/results/*.jsonl
+# eval/results/*.json
+# eval/results/*.jsonl
+# eval/results/schema_spider_*.md
 !eval/results/.gitkeep
+data/
