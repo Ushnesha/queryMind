@@ -135,7 +135,7 @@ def run_querymind(
                 refuse("SQL verification failed after the configured repair limit: " + failure)
                 return _finish(state, nodes, started)
             state["repair_count"] += 1
-            feedback = failure
+            feedback = f"Previous SQL:\n{state['sql']}\n\nVerification failure:\n{failure}"
             add_trace(state, "repair", "retry", 0.0, f"Repair attempt {state['repair_count']}: {failure}")
 
         if enable_semantic:
