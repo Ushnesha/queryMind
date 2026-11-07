@@ -9,11 +9,19 @@ from src.verifiers import check_safety
 @pytest.mark.parametrize(
     "sql",
     [
+        "INSERT INTO customers (name) VALUES ('x')",
         "DELETE FROM customers",
         "UPDATE customers SET name = 'changed'",
+        "DROP TABLE customers",
+        "ALTER TABLE customers ADD COLUMN age INTEGER",
+        "CREATE TABLE copy AS SELECT * FROM customers",
+        "REPLACE INTO customers (customer_id, name) VALUES (1, 'x')",
         "SELECT 1; DROP TABLE customers",
+        "SELECT 1; SELECT 2",
         "PRAGMA writable_schema = ON",
         "ATTACH DATABASE ':memory:' AS other",
+        "WITH t AS (SELECT 1) DELETE FROM customers",
+        "SELECT load_extension('evil')",
     ],
 )
 def test_safety_rejects_mutation(sql: str) -> None:
@@ -22,8 +30,18 @@ def test_safety_rejects_mutation(sql: str) -> None:
     assert isinstance(result["error"], str)
 
 
-def test_safety_accepts_read_query() -> None:
-    assert check_safety("SELECT 1") == {"ok": True, "error": None}
+@pytest.mark.parametrize(
+    "sql",
+    [
+        "SELECT 1",
+        "SELECT 1;",
+        "WITH totals AS (SELECT 1 AS n) SELECT n FROM totals",
+        "SELECT 'DELETE FROM customers' AS harmless_text",
+        "select name from customers -- drop table customers",
+    ],
+)
+def test_safety_accepts_read_query(sql: str) -> None:
+    assert check_safety(sql) == {"ok": True, "error": None}
 
 
 def test_execution_enforces_safety_even_without_verifier(db_path) -> None:
