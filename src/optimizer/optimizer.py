@@ -35,21 +35,23 @@ class OptimizationResult(TypedDict):
 
 
 def call_llm(prompt: str) -> str:
-    """Minimal OpenAI-compatible chat call. Reads the env vars from .env or the shell."""
+    """Minimal OpenAI-compatible chat call. Reads the env vars from .env or the shell.
+
+    Key: OPENAI_API_KEY, else OPENCODE_API_KEY. Base URL defaults to api.openai.com.
+    """
     from dotenv import load_dotenv
 
     load_dotenv()
+    key = os.environ.get("OPENAI_API_KEY") or os.environ["OPENCODE_API_KEY"]
     request = urllib.request.Request(
-        os.environ["OPENCODE_BASE_URL"].rstrip("/") + "/chat/completions",
+        os.environ.get("OPENCODE_BASE_URL", "https://api.openai.com/v1").rstrip("/")
+        + "/chat/completions",
         data=json.dumps({
-            "model": os.environ["COMPLETION_MODEL"],
+            "model": os.environ.get("COMPLETION_MODEL", "gpt-4o-mini"),
             "temperature": 0,
             "messages": [{"role": "user", "content": prompt}],
         }).encode(),
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + os.environ["OPENCODE_API_KEY"],
-        },
+        headers={"Content-Type": "application/json", "Authorization": "Bearer " + key},
     )
     with urllib.request.urlopen(request, timeout=60) as response:
         return json.load(response)["choices"][0]["message"]["content"]
