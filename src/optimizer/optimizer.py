@@ -14,7 +14,7 @@ from src.db import connect_readonly, validate_readonly
 from src.verifiers.syntax import check_syntax
 
 from .equality import TIMEOUT_S, results_equal
-from .explain import explain_query_plan, plan_signals
+from .explain import explain_query_plan, plan_improved, plan_signals
 
 LARGE_TABLE_ROWS = 1000  # a full SCAN only counts as a problem above this size
 
@@ -167,10 +167,15 @@ def _attempt(
     if not result["equality_ok"]:
         result["reason"] = f"Rewrite rejected ({trigger}): results differ, errored or timed out."
         return
+    # Equality on one database is not proof, so also demand a better plan.
+    plan_after = explain_query_plan(candidate, db_path=db_path)
+    if not plan_improved(result["plan_before"], plan_after):
+        result["reason"] = f"Rewrite rejected ({trigger}): results equal but plan not improved."
+        return
     result.update(
         changed=True,
         sql=candidate,
         optimized_sql=candidate,
-        plan_after=explain_query_plan(candidate, db_path=db_path),
+        plan_after=plan_after,
         reason=f"{trigger}: {why}",
     )

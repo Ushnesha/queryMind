@@ -152,12 +152,27 @@ def test_good_plan_no_llm_call(db_path) -> None:
     assert out["equality_ok"] is None
 
 
-def test_equal_rewrite_accepted(db_path) -> None:
-    llm = FakeLLM(reply(GOOD))
-    out = run(db_path, llm)
-    assert out["changed"] and out["sql"] == out["optimized_sql"] == GOOD
-    assert out["original_sql"] == IN_SQL and out["equality_ok"] is True and out["llm_calls"] == 1
-    assert out["plan_after"]
+CORR_SQL = (
+    "SELECT name FROM customers c WHERE "
+    "(SELECT COUNT(*) FROM orders o WHERE o.customer_id = c.customer_id) > 1"
+)
+CORR_GOOD = (
+    "SELECT c.name FROM customers c JOIN "
+    "(SELECT customer_id FROM orders GROUP BY customer_id HAVING COUNT(*) > 1) o "
+    "ON c.customer_id = o.customer_id"
+)
+
+
+def test_equal_rewrite_with_better_plan_accepted(db_path) -> None:
+    out = run(db_path, FakeLLM(reply(CORR_GOOD)), sql=CORR_SQL)
+    assert out["changed"] and out["sql"] == out["optimized_sql"] == CORR_GOOD
+    assert out["original_sql"] == CORR_SQL and out["equality_ok"] is True and out["llm_calls"] == 1
+    assert out["plan_after"] != out["plan_before"]
+
+
+def test_equal_rewrite_same_plan_quality_rejected(db_path) -> None:
+    out = run(db_path, FakeLLM(reply(GOOD)))  # equal rows, but the plan is not better
+    assert not out["changed"] and out["equality_ok"] is True
 
 
 def test_different_rewrite_rejected(db_path) -> None:
@@ -206,3 +221,10 @@ def test_non_utf8_text_does_not_break_equality(tmp_path) -> None:
     conn.commit()
     conn.close()
     assert results_equal("SELECT a FROM t", "SELECT a FROM t ORDER BY a", path)
+
+
+def test_equal_rewrite_without_plan_improvement_rejected(db_path) -> None:
+    worse = IN_SQL + " ORDER BY customer_id"  # same rows, adds a sort, plan not better
+    out = run(db_path, FakeLLM(reply(worse)))
+    assert not out["changed"] and out["sql"] == IN_SQL
+    assert out["equality_ok"] is True and "plan not improved" in out["reason"]

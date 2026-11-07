@@ -5,9 +5,9 @@ Databases: flight_2, world_1, wta_1. FK indexes added to copies: True. 1 warm-up
 | Metric | Value |
 | --- | --- |
 | queries_considered | 30 |
-| queries_rewritten | 2 |
-| equality_maintained | 2/2 |
-| plan_improved | 0/2 |
-| median_ms_before_rewritten | 7.25 |
-| median_ms_after_rewritten | 7.44 |
+| queries_rewritten | 0 |
+| equality_maintained | 0/0 |
+| plan_improved | 0/0 |
+| median_ms_before_rewritten | None |
+| median_ms_after_rewritten | None |
 | llm_calls | 4 |

@@ -1,11 +1,11 @@
 {
   "summary": {
     "label": "PRELIMINARY: optimizer-only, Spider dev gold SQL, small subset",
-    "index_fks_on_copies": false,
+    "index_fks_on_copies": true,
     "indexes_added": {
-      "wta_1": 0,
-      "world_1": 0,
-      "flight_2": 0
+      "wta_1": 3,
+      "world_1": 2,
+      "flight_2": 2
     },
     "databases": [
       "flight_2",
@@ -13,11 +13,11 @@
       "wta_1"
     ],
     "queries_considered": 30,
-    "queries_rewritten": 2,
-    "equality_maintained": "2/2",
-    "plan_improved": "0/2",
-    "median_ms_before_rewritten": 8.68,
-    "median_ms_after_rewritten": 8.97,
+    "queries_rewritten": 0,
+    "equality_maintained": "0/0",
+    "plan_improved": "0/0",
+    "median_ms_before_rewritten": null,
+    "median_ms_after_rewritten": null,
     "llm_calls": 4,
     "timing": "1 warm-up + 5 runs, median; time limit 30.0s"
   },
@@ -29,7 +29,7 @@
       "changed": false,
       "reason": "Rewrite rejected (full scan of large table players (20662 rows)): results differ, errored or timed out.",
       "llm_calls": 1,
-      "optimizer_ms": 2254,
+      "optimizer_ms": 2011,
       "optimized_sql": "SELECT count(*) FROM players"
     },
     {
@@ -39,7 +39,7 @@
       "changed": false,
       "reason": "Rewrite rejected (full scan of large table players (20662 rows)): results differ, errored or timed out.",
       "llm_calls": 1,
-      "optimizer_ms": 1765,
+      "optimizer_ms": 1692,
       "optimized_sql": "SELECT count(*) FROM players"
     },
     {
@@ -66,29 +66,21 @@
       "db_id": "wta_1",
       "question": "List the first name and birth date of all players from the country with code USA.",
       "original_sql": "SELECT first_name ,  birth_date FROM players WHERE country_code  =  'USA'",
-      "changed": true,
-      "reason": "full scan of large table players (20662 rows): Adding COLLATE NOCASE can speed up filtering on country_code if the column is not case-sensitive and an index exists; otherwise, the original query is already optimal for this schema and table size.",
+      "changed": false,
+      "reason": "Rewrite rejected (full scan of large table players (20662 rows)): results equal but plan not improved.",
       "llm_calls": 1,
-      "optimizer_ms": 1957,
-      "optimized_sql": "SELECT first_name, birth_date FROM players WHERE country_code = 'USA' COLLATE NOCASE",
-      "before_ms": 11.339499847963452,
-      "after_ms": 10.127099929377437,
-      "plan_improved": false,
-      "equal": true
+      "optimizer_ms": 1836,
+      "optimized_sql": "SELECT first_name ,  birth_date FROM players WHERE country_code  =  'USA'"
     },
     {
       "db_id": "wta_1",
       "question": "What are the first names and birth dates of players from the USA?",
       "original_sql": "SELECT first_name ,  birth_date FROM players WHERE country_code  =  'USA'",
-      "changed": true,
-      "reason": "full scan of large table players (20662 rows): Adding COLLATE NOCASE can speed up filtering on country_code if the column is not case-sensitive and an index exists; otherwise, the original query is already optimal for this simple filter.",
+      "changed": false,
+      "reason": "Rewrite rejected (full scan of large table players (20662 rows)): results equal but plan not improved.",
       "llm_calls": 1,
-      "optimizer_ms": 2591,
-      "optimized_sql": "SELECT first_name, birth_date FROM players WHERE country_code = 'USA' COLLATE NOCASE",
-      "before_ms": 6.025000009685755,
-      "after_ms": 7.816000143066049,
-      "plan_improved": false,
-      "equal": true
+      "optimizer_ms": 2001,
+      "optimized_sql": "SELECT first_name ,  birth_date FROM players WHERE country_code  =  'USA'"
     },
     {
       "db_id": "wta_1",
@@ -97,7 +89,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 4,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT avg(loser_age) ,  avg(winner_age) FROM matches"
     },
     {
@@ -107,7 +99,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 1,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT avg(loser_age) ,  avg(winner_age) FROM matches"
     },
     {
@@ -117,7 +109,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 1,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT avg(winner_rank) FROM matches"
     },
     {
@@ -127,7 +119,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 1,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT avg(winner_rank) FROM matches"
     },
     {
@@ -137,7 +129,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 2,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT Name FROM country WHERE IndepYear  >  1950"
     },
     {
@@ -147,7 +139,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 1,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT Name FROM country WHERE IndepYear  >  1950"
     },
     {
@@ -157,7 +149,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 1,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT count(*) FROM country WHERE GovernmentForm  =  \"Republic\""
     },
     {
@@ -167,7 +159,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 1,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT count(*) FROM country WHERE GovernmentForm  =  \"Republic\""
     },
     {
@@ -177,7 +169,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 1,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT sum(SurfaceArea) FROM country WHERE Region  =  \"Caribbean\""
     },
     {
@@ -187,7 +179,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 1,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT sum(SurfaceArea) FROM country WHERE Region  =  \"Caribbean\""
     },
     {
@@ -197,7 +189,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 1,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT Continent FROM country WHERE Name  =  \"Anguilla\""
     },
     {
@@ -207,7 +199,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 1,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT Continent FROM country WHERE Name  =  \"Anguilla\""
     },
     {
@@ -217,7 +209,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 1,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT Region FROM country AS T1 JOIN city AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.Name  =  \"Kabul\""
     },
     {
@@ -227,7 +219,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 1,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT Region FROM country AS T1 JOIN city AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.Name  =  \"Kabul\""
     },
     {
@@ -237,7 +229,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 2,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT Country FROM AIRLINES WHERE Airline  =  \"JetBlue Airways\""
     },
     {
@@ -247,7 +239,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 1,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT Country FROM AIRLINES WHERE Airline  =  \"JetBlue Airways\""
     },
     {
@@ -257,7 +249,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 1,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT Abbreviation FROM AIRLINES WHERE Airline  =  \"JetBlue Airways\""
     },
     {
@@ -267,7 +259,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 1,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT Abbreviation FROM AIRLINES WHERE Airline  =  \"JetBlue Airways\""
     },
     {
@@ -277,7 +269,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 1,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT Airline ,  Abbreviation FROM AIRLINES WHERE Country  =  \"USA\""
     },
     {
@@ -287,7 +279,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 1,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT Airline ,  Abbreviation FROM AIRLINES WHERE Country  =  \"USA\""
     },
     {
@@ -297,7 +289,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 1,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT AirportCode ,  AirportName FROM AIRPORTS WHERE city  =  \"Anthony\""
     },
     {
@@ -307,7 +299,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 1,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT AirportCode ,  AirportName FROM AIRPORTS WHERE city  =  \"Anthony\""
     },
     {
@@ -317,7 +309,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 1,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT count(*) FROM AIRLINES"
     },
     {
@@ -327,7 +319,7 @@
       "changed": false,
       "reason": "Plan already reasonable; no rewrite attempted.",
       "llm_calls": 0,
-      "optimizer_ms": 1,
+      "optimizer_ms": 0,
       "optimized_sql": "SELECT count(*) FROM AIRLINES"
     }
   ]
