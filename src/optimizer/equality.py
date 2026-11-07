@@ -67,6 +67,7 @@ def run_limited(
     guarded = validate_readonly(sql)
     deadline = monotonic() + timeout_s
     with closing(connect_readonly(db_path)) as connection:
+        connection.text_factory = lambda b: b.decode(errors="ignore")  # Spider has non-UTF8 text
         # SQLite calls this every 10000 VM steps; returning 1 aborts the query.
         connection.set_progress_handler(lambda: 1 if monotonic() > deadline else 0, 10000)
         cursor = connection.execute(guarded)

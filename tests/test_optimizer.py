@@ -196,3 +196,13 @@ def test_one_llm_attempt_per_call(db_path) -> None:
 def test_optimize_never_raises_on_bad_input(db_path, tmp_path) -> None:
     assert not _opt("not sql", "q", "s", db_path=db_path)["changed"]
     assert not _opt(IN_SQL, "q", "s", db_path=tmp_path / "missing.db")["changed"]
+
+
+def test_non_utf8_text_does_not_break_equality(tmp_path) -> None:
+    path = tmp_path / "bad.db"
+    conn = sqlite3.connect(path)
+    conn.execute("CREATE TABLE t(a)")
+    conn.execute("INSERT INTO t VALUES (CAST(x'ff41' AS TEXT))")
+    conn.commit()
+    conn.close()
+    assert results_equal("SELECT a FROM t", "SELECT a FROM t ORDER BY a", path)
