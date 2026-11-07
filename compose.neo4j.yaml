@@ -1,0 +1,14 @@
+# Local development only. The password is read from your ignored .env file.
+services:
+  neo4j:
+    image: neo4j:2026.10.1
+    ports:
+      - "127.0.0.1:7474:7474"
+      - "127.0.0.1:7687:7687"
+    environment:
+      NEO4J_AUTH: "neo4j/${NEO4J_PASSWORD:?Set NEO4J_PASSWORD in .env before starting Neo4j}"
+    volumes:
+      - querymind_neo4j_data:/data
+
+volumes:
+  querymind_neo4j_data:

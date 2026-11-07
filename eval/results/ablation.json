@@ -1,0 +1,825 @@
+{
+  "scope": "single-question ablation switch smoke test; not a completed experiment",
+  "question": "Who are the top 3 customers by total spending?",
+  "variants": {
+    "all_enabled": {
+      "flags": {
+        "enable_syntax": true,
+        "enable_semantic": true,
+        "enable_optimizer": true,
+        "enable_result_verifier": true
+      },
+      "state": {
+        "question": "Who are the top 3 customers by total spending?",
+        "schema_mode": "flat",
+        "schema_context": "TABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+        "sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+        "sql_history": [
+          "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3"
+        ],
+        "syntax_ok": true,
+        "syntax_error": "",
+        "safety_ok": true,
+        "semantic_ok": false,
+        "semantic_reason": "Starter input checks passed; semantic alignment is unverified.",
+        "answerable": true,
+        "missing_fields": [],
+        "assumptions": [
+          "The starter semantic verifier checks input structure only; alignment between the question and SQL has not been verified."
+        ],
+        "original_sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+        "optimized_sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+        "optimization_applied": false,
+        "original_plan": [
+          [
+            9,
+            0,
+            216,
+            "SCAN o"
+          ],
+          [
+            11,
+            0,
+            45,
+            "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+          ],
+          [
+            14,
+            0,
+            0,
+            "USE TEMP B-TREE FOR GROUP BY"
+          ],
+          [
+            62,
+            0,
+            0,
+            "USE TEMP B-TREE FOR ORDER BY"
+          ]
+        ],
+        "optimized_plan": [
+          [
+            9,
+            0,
+            216,
+            "SCAN o"
+          ],
+          [
+            11,
+            0,
+            45,
+            "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+          ],
+          [
+            14,
+            0,
+            0,
+            "USE TEMP B-TREE FOR GROUP BY"
+          ],
+          [
+            62,
+            0,
+            0,
+            "USE TEMP B-TREE FOR ORDER BY"
+          ]
+        ],
+        "rows": [
+          [
+            "Alice Chen",
+            300.0
+          ],
+          [
+            "Bob Smith",
+            175.0
+          ],
+          [
+            "Carol Davis",
+            75.0
+          ]
+        ],
+        "columns": [
+          "name",
+          "total_spending"
+        ],
+        "result_ok": false,
+        "result_warnings": [
+          "Starter result verification checks table shape only."
+        ],
+        "final_answer": "The query returned 3 row(s). See the result table and verification details.",
+        "repair_count": 0,
+        "optimizer_count": 1,
+        "trace": [
+          {
+            "node": "schema_retriever",
+            "status": "pass",
+            "latency_ms": 0.433,
+            "reason": ""
+          },
+          {
+            "node": "sql_generator",
+            "status": "pass",
+            "latency_ms": 0.064,
+            "reason": ""
+          },
+          {
+            "node": "safety_verifier",
+            "status": "pass",
+            "latency_ms": 0.272,
+            "reason": "Read-only guard passed."
+          },
+          {
+            "node": "syntax_verifier",
+            "status": "pass",
+            "latency_ms": 0.283,
+            "reason": "SQLite compilation passed."
+          },
+          {
+            "node": "semantic_verifier",
+            "status": "placeholder",
+            "latency_ms": 0.001,
+            "reason": "Starter input checks passed; semantic alignment is unverified."
+          },
+          {
+            "node": "optimizer",
+            "status": "pass",
+            "latency_ms": 0.242,
+            "reason": "Starter optimizer inspected the plan and kept SQL unchanged."
+          },
+          {
+            "node": "executor",
+            "status": "pass",
+            "latency_ms": 0.239,
+            "reason": ""
+          },
+          {
+            "node": "result_verifier",
+            "status": "placeholder",
+            "latency_ms": 0.003,
+            "reason": "Starter result verification checks table shape only."
+          },
+          {
+            "node": "response_generator",
+            "status": "pass",
+            "latency_ms": 0.001,
+            "reason": ""
+          }
+        ],
+        "metrics": {
+          "execution_time_ms": 0.18529081717133522,
+          "result_statistics": {
+            "row_count": 3,
+            "column_count": 2
+          },
+          "total_latency_ms": 2.211
+        },
+        "status": "success",
+        "error": ""
+      }
+    },
+    "without_syntax": {
+      "flags": {
+        "enable_syntax": false,
+        "enable_semantic": true,
+        "enable_optimizer": true,
+        "enable_result_verifier": true
+      },
+      "state": {
+        "question": "Who are the top 3 customers by total spending?",
+        "schema_mode": "flat",
+        "schema_context": "TABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+        "sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+        "sql_history": [
+          "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3"
+        ],
+        "syntax_ok": false,
+        "syntax_error": "",
+        "safety_ok": true,
+        "semantic_ok": false,
+        "semantic_reason": "Starter input checks passed; semantic alignment is unverified.",
+        "answerable": true,
+        "missing_fields": [],
+        "assumptions": [
+          "The starter semantic verifier checks input structure only; alignment between the question and SQL has not been verified."
+        ],
+        "original_sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+        "optimized_sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+        "optimization_applied": false,
+        "original_plan": [
+          [
+            9,
+            0,
+            216,
+            "SCAN o"
+          ],
+          [
+            11,
+            0,
+            45,
+            "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+          ],
+          [
+            14,
+            0,
+            0,
+            "USE TEMP B-TREE FOR GROUP BY"
+          ],
+          [
+            62,
+            0,
+            0,
+            "USE TEMP B-TREE FOR ORDER BY"
+          ]
+        ],
+        "optimized_plan": [
+          [
+            9,
+            0,
+            216,
+            "SCAN o"
+          ],
+          [
+            11,
+            0,
+            45,
+            "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+          ],
+          [
+            14,
+            0,
+            0,
+            "USE TEMP B-TREE FOR GROUP BY"
+          ],
+          [
+            62,
+            0,
+            0,
+            "USE TEMP B-TREE FOR ORDER BY"
+          ]
+        ],
+        "rows": [
+          [
+            "Alice Chen",
+            300.0
+          ],
+          [
+            "Bob Smith",
+            175.0
+          ],
+          [
+            "Carol Davis",
+            75.0
+          ]
+        ],
+        "columns": [
+          "name",
+          "total_spending"
+        ],
+        "result_ok": false,
+        "result_warnings": [
+          "Starter result verification checks table shape only."
+        ],
+        "final_answer": "The query returned 3 row(s). See the result table and verification details.",
+        "repair_count": 0,
+        "optimizer_count": 1,
+        "trace": [
+          {
+            "node": "schema_retriever",
+            "status": "pass",
+            "latency_ms": 0.197,
+            "reason": ""
+          },
+          {
+            "node": "sql_generator",
+            "status": "pass",
+            "latency_ms": 0.005,
+            "reason": ""
+          },
+          {
+            "node": "safety_verifier",
+            "status": "pass",
+            "latency_ms": 0.054,
+            "reason": "Read-only guard passed."
+          },
+          {
+            "node": "syntax_verifier",
+            "status": "skipped",
+            "latency_ms": 0.0,
+            "reason": "Disabled for ablation."
+          },
+          {
+            "node": "semantic_verifier",
+            "status": "placeholder",
+            "latency_ms": 0.001,
+            "reason": "Starter input checks passed; semantic alignment is unverified."
+          },
+          {
+            "node": "optimizer",
+            "status": "pass",
+            "latency_ms": 0.201,
+            "reason": "Starter optimizer inspected the plan and kept SQL unchanged."
+          },
+          {
+            "node": "executor",
+            "status": "pass",
+            "latency_ms": 0.235,
+            "reason": ""
+          },
+          {
+            "node": "result_verifier",
+            "status": "placeholder",
+            "latency_ms": 0.003,
+            "reason": "Starter result verification checks table shape only."
+          },
+          {
+            "node": "response_generator",
+            "status": "pass",
+            "latency_ms": 0.001,
+            "reason": ""
+          }
+        ],
+        "metrics": {
+          "execution_time_ms": 0.18195784650743008,
+          "result_statistics": {
+            "row_count": 3,
+            "column_count": 2
+          },
+          "total_latency_ms": 1.197
+        },
+        "status": "success",
+        "error": ""
+      }
+    },
+    "without_semantic": {
+      "flags": {
+        "enable_syntax": true,
+        "enable_semantic": false,
+        "enable_optimizer": true,
+        "enable_result_verifier": true
+      },
+      "state": {
+        "question": "Who are the top 3 customers by total spending?",
+        "schema_mode": "flat",
+        "schema_context": "TABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+        "sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+        "sql_history": [
+          "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3"
+        ],
+        "syntax_ok": true,
+        "syntax_error": "",
+        "safety_ok": true,
+        "semantic_ok": false,
+        "semantic_reason": "Semantic verification disabled for ablation.",
+        "answerable": true,
+        "missing_fields": [],
+        "assumptions": [],
+        "original_sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+        "optimized_sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+        "optimization_applied": false,
+        "original_plan": [
+          [
+            9,
+            0,
+            216,
+            "SCAN o"
+          ],
+          [
+            11,
+            0,
+            45,
+            "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+          ],
+          [
+            14,
+            0,
+            0,
+            "USE TEMP B-TREE FOR GROUP BY"
+          ],
+          [
+            62,
+            0,
+            0,
+            "USE TEMP B-TREE FOR ORDER BY"
+          ]
+        ],
+        "optimized_plan": [
+          [
+            9,
+            0,
+            216,
+            "SCAN o"
+          ],
+          [
+            11,
+            0,
+            45,
+            "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+          ],
+          [
+            14,
+            0,
+            0,
+            "USE TEMP B-TREE FOR GROUP BY"
+          ],
+          [
+            62,
+            0,
+            0,
+            "USE TEMP B-TREE FOR ORDER BY"
+          ]
+        ],
+        "rows": [
+          [
+            "Alice Chen",
+            300.0
+          ],
+          [
+            "Bob Smith",
+            175.0
+          ],
+          [
+            "Carol Davis",
+            75.0
+          ]
+        ],
+        "columns": [
+          "name",
+          "total_spending"
+        ],
+        "result_ok": false,
+        "result_warnings": [
+          "Starter result verification checks table shape only."
+        ],
+        "final_answer": "The query returned 3 row(s). See the result table and verification details.",
+        "repair_count": 0,
+        "optimizer_count": 1,
+        "trace": [
+          {
+            "node": "schema_retriever",
+            "status": "pass",
+            "latency_ms": 0.222,
+            "reason": ""
+          },
+          {
+            "node": "sql_generator",
+            "status": "pass",
+            "latency_ms": 0.004,
+            "reason": ""
+          },
+          {
+            "node": "safety_verifier",
+            "status": "pass",
+            "latency_ms": 0.052,
+            "reason": "Read-only guard passed."
+          },
+          {
+            "node": "syntax_verifier",
+            "status": "pass",
+            "latency_ms": 0.239,
+            "reason": "SQLite compilation passed."
+          },
+          {
+            "node": "semantic_verifier",
+            "status": "skipped",
+            "latency_ms": 0.0,
+            "reason": "Disabled for ablation."
+          },
+          {
+            "node": "optimizer",
+            "status": "pass",
+            "latency_ms": 0.199,
+            "reason": "Starter optimizer inspected the plan and kept SQL unchanged."
+          },
+          {
+            "node": "executor",
+            "status": "pass",
+            "latency_ms": 0.202,
+            "reason": ""
+          },
+          {
+            "node": "result_verifier",
+            "status": "placeholder",
+            "latency_ms": 0.002,
+            "reason": "Starter result verification checks table shape only."
+          },
+          {
+            "node": "response_generator",
+            "status": "pass",
+            "latency_ms": 0.001,
+            "reason": ""
+          }
+        ],
+        "metrics": {
+          "execution_time_ms": 0.15700003132224083,
+          "result_statistics": {
+            "row_count": 3,
+            "column_count": 2
+          },
+          "total_latency_ms": 1.397
+        },
+        "status": "success",
+        "error": ""
+      }
+    },
+    "without_optimizer": {
+      "flags": {
+        "enable_syntax": true,
+        "enable_semantic": true,
+        "enable_optimizer": false,
+        "enable_result_verifier": true
+      },
+      "state": {
+        "question": "Who are the top 3 customers by total spending?",
+        "schema_mode": "flat",
+        "schema_context": "TABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+        "sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+        "sql_history": [
+          "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3"
+        ],
+        "syntax_ok": true,
+        "syntax_error": "",
+        "safety_ok": true,
+        "semantic_ok": false,
+        "semantic_reason": "Starter input checks passed; semantic alignment is unverified.",
+        "answerable": true,
+        "missing_fields": [],
+        "assumptions": [
+          "The starter semantic verifier checks input structure only; alignment between the question and SQL has not been verified."
+        ],
+        "original_sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+        "optimized_sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+        "optimization_applied": false,
+        "original_plan": [],
+        "optimized_plan": [],
+        "rows": [
+          [
+            "Alice Chen",
+            300.0
+          ],
+          [
+            "Bob Smith",
+            175.0
+          ],
+          [
+            "Carol Davis",
+            75.0
+          ]
+        ],
+        "columns": [
+          "name",
+          "total_spending"
+        ],
+        "result_ok": false,
+        "result_warnings": [
+          "Starter result verification checks table shape only."
+        ],
+        "final_answer": "The query returned 3 row(s). See the result table and verification details.",
+        "repair_count": 0,
+        "optimizer_count": 0,
+        "trace": [
+          {
+            "node": "schema_retriever",
+            "status": "pass",
+            "latency_ms": 0.29,
+            "reason": ""
+          },
+          {
+            "node": "sql_generator",
+            "status": "pass",
+            "latency_ms": 0.016,
+            "reason": ""
+          },
+          {
+            "node": "safety_verifier",
+            "status": "pass",
+            "latency_ms": 0.057,
+            "reason": "Read-only guard passed."
+          },
+          {
+            "node": "syntax_verifier",
+            "status": "pass",
+            "latency_ms": 0.354,
+            "reason": "SQLite compilation passed."
+          },
+          {
+            "node": "semantic_verifier",
+            "status": "placeholder",
+            "latency_ms": 0.001,
+            "reason": "Starter input checks passed; semantic alignment is unverified."
+          },
+          {
+            "node": "optimizer",
+            "status": "skipped",
+            "latency_ms": 0.0,
+            "reason": "Disabled for ablation or optimizer budget is zero."
+          },
+          {
+            "node": "executor",
+            "status": "pass",
+            "latency_ms": 0.243,
+            "reason": ""
+          },
+          {
+            "node": "result_verifier",
+            "status": "placeholder",
+            "latency_ms": 0.004,
+            "reason": "Starter result verification checks table shape only."
+          },
+          {
+            "node": "response_generator",
+            "status": "pass",
+            "latency_ms": 0.001,
+            "reason": ""
+          }
+        ],
+        "metrics": {
+          "execution_time_ms": 0.19641686230897903,
+          "result_statistics": {
+            "row_count": 3,
+            "column_count": 2
+          },
+          "total_latency_ms": 1.471
+        },
+        "status": "success",
+        "error": ""
+      }
+    },
+    "without_result_verifier": {
+      "flags": {
+        "enable_syntax": true,
+        "enable_semantic": true,
+        "enable_optimizer": true,
+        "enable_result_verifier": false
+      },
+      "state": {
+        "question": "Who are the top 3 customers by total spending?",
+        "schema_mode": "flat",
+        "schema_context": "TABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+        "sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+        "sql_history": [
+          "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3"
+        ],
+        "syntax_ok": true,
+        "syntax_error": "",
+        "safety_ok": true,
+        "semantic_ok": false,
+        "semantic_reason": "Starter input checks passed; semantic alignment is unverified.",
+        "answerable": true,
+        "missing_fields": [],
+        "assumptions": [
+          "The starter semantic verifier checks input structure only; alignment between the question and SQL has not been verified."
+        ],
+        "original_sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+        "optimized_sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+        "optimization_applied": false,
+        "original_plan": [
+          [
+            9,
+            0,
+            216,
+            "SCAN o"
+          ],
+          [
+            11,
+            0,
+            45,
+            "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+          ],
+          [
+            14,
+            0,
+            0,
+            "USE TEMP B-TREE FOR GROUP BY"
+          ],
+          [
+            62,
+            0,
+            0,
+            "USE TEMP B-TREE FOR ORDER BY"
+          ]
+        ],
+        "optimized_plan": [
+          [
+            9,
+            0,
+            216,
+            "SCAN o"
+          ],
+          [
+            11,
+            0,
+            45,
+            "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+          ],
+          [
+            14,
+            0,
+            0,
+            "USE TEMP B-TREE FOR GROUP BY"
+          ],
+          [
+            62,
+            0,
+            0,
+            "USE TEMP B-TREE FOR ORDER BY"
+          ]
+        ],
+        "rows": [
+          [
+            "Alice Chen",
+            300.0
+          ],
+          [
+            "Bob Smith",
+            175.0
+          ],
+          [
+            "Carol Davis",
+            75.0
+          ]
+        ],
+        "columns": [
+          "name",
+          "total_spending"
+        ],
+        "result_ok": false,
+        "result_warnings": [
+          "Result verification disabled for ablation."
+        ],
+        "final_answer": "The query returned 3 row(s). See the result table and verification details.",
+        "repair_count": 0,
+        "optimizer_count": 1,
+        "trace": [
+          {
+            "node": "schema_retriever",
+            "status": "pass",
+            "latency_ms": 0.21,
+            "reason": ""
+          },
+          {
+            "node": "sql_generator",
+            "status": "pass",
+            "latency_ms": 0.004,
+            "reason": ""
+          },
+          {
+            "node": "safety_verifier",
+            "status": "pass",
+            "latency_ms": 0.047,
+            "reason": "Read-only guard passed."
+          },
+          {
+            "node": "syntax_verifier",
+            "status": "pass",
+            "latency_ms": 0.243,
+            "reason": "SQLite compilation passed."
+          },
+          {
+            "node": "semantic_verifier",
+            "status": "placeholder",
+            "latency_ms": 0.001,
+            "reason": "Starter input checks passed; semantic alignment is unverified."
+          },
+          {
+            "node": "optimizer",
+            "status": "pass",
+            "latency_ms": 0.203,
+            "reason": "Starter optimizer inspected the plan and kept SQL unchanged."
+          },
+          {
+            "node": "executor",
+            "status": "pass",
+            "latency_ms": 0.219,
+            "reason": ""
+          },
+          {
+            "node": "result_verifier",
+            "status": "skipped",
+            "latency_ms": 0.0,
+            "reason": "Disabled for ablation."
+          },
+          {
+            "node": "response_generator",
+            "status": "pass",
+            "latency_ms": 0.001,
+            "reason": ""
+          }
+        ],
+        "metrics": {
+          "execution_time_ms": 0.1729161012917757,
+          "total_latency_ms": 1.447
+        },
+        "status": "success",
+        "error": ""
+      }
+    }
+  },
+  "metrics": {
+    "run_count": 5,
+    "successful_runs": 5,
+    "refused_runs": 0,
+    "error_runs": 0,
+    "success_rate": 1.0,
+    "total_rows": 15,
+    "mean_total_latency_ms": 1.5446,
+    "mean_execution_time_ms": 0.17871633172035217
+  }
+}

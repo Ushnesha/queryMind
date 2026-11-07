@@ -48,16 +48,51 @@ Signatures:
 retrieve_schema(question: str, mode: str = "neo4j", *, db_path=None, top_k: int = 5) -> str
 SchemaRetriever.retrieve(question: str, top_k: int = 5) -> str
 FlatSchemaRetriever(db_path=None)
-Neo4jSchemaRetriever(db_path=None)
+Neo4jSchemaRetriever(db_path=None, *, driver=None, database=None, strict=False, backend="neo4j")
 ```
 
-Retrieval returns a schema string containing table/column/foreign-key information.
-`mode` must be `flat` or `neo4j`; positive `top_k` is reserved for later selective
-retrieval. Flat retrieval currently returns the complete schema. Neo4j retrieval
-uses the same local schema with a visible placeholder prefix and a
-`fallback_reason` attribute. No driver/server is needed. `build_schema_graph(db_path)`
-in `src.schema.build_graph` returns a JSON-safe metadata payload with
-`status='offline_payload_only'`; it does not connect to Neo4j.
+Retrieval returns a schema string containing tables, columns/types, primary keys,
+foreign keys, and indexes. `mode` must be `flat` or `neo4j`. Flat retrieval returns
+the complete schema. Neo4j retrieval ranks identifiers from the question, takes
+up to `top_k` seed tables, and includes intermediate tables from native Neo4j
+shortest paths. Path expansion may exceed `top_k`; every selected table retains
+all its columns. Both modes use the same text formatter.
+
+Both retrievers additionally expose `retrieve_with_metadata(question, top_k=5)`
+returning `RetrievalResult(context, tables, columns, relationships, backend,
+latency_ms, schema_id, seed_tables, fallback_reason)`. `columns` are qualified
+names; relationships identify column-level FKs. `.metrics` and `.to_dict()` return
+JSON-compatible instrumentation. Default token counts are labeled lexical
+estimates, not the configured model's tokenizer.
+
+The live backend loads versioned graph metadata and calls Neo4j's `shortestPath`
+over `HAS_COLUMN|REFERENCES`, bounded at 32 relationships. It preserves bridge
+tables even where a path passes through their columns. `strict=True` refuses
+missing credentials, unavailable graphs, or service failures instead of silently
+substituting flat schema. The default non-strict path preserves the original
+starter fallback prefix and reports `backend='flat_fallback'` when unconfigured.
+Unknown questions with no identifier matches return the full available schema
+with an explicit reason. `backend='local_graph'` selects a Python BFS diagnostic;
+it is never reported as live Neo4j evidence.
+
+`build_schema_graph(db_path, *, database_id=None)` in `src.schema.build_graph`
+uses read-only SQLite metadata PRAGMAs and returns a JSON payload including
+tables/columns/indexes, composite FK edges, database ID, schema fingerprint, and
+schema ID. `src.schema.neo4j_store.upload_schema_graph(payload, *, driver,
+database=None)` idempotently uploads the requested Table/Column/Index graph plus
+version metadata using parameterized `MERGE`. It preserves existing versions and
+unrelated graph data. `load_schema_graph` reads a version back; `expand_join_paths`
+performs native graph path expansion. Callers own supplied drivers. The optional
+SDK is installed from `requirements-schema.txt`; imports and ordinary tests make
+no service calls. Only explicit CLI entry points load `.env`.
+
+The controlled ten-question Spider experiment lives under `src/schema/` to avoid
+changing Developer 5's evaluation code. See
+[SCHEMA_EXPERIMENT.md](SCHEMA_EXPERIMENT.md) for controls, metrics, local Neo4j
+setup, and measured diagnostic/live results. The completed ten-question ASU run
+scored 6/10 correct results in both arms, with about half the estimated schema
+context for Neo4j and higher retrieval latency. Its full evidence and caveats are
+recorded in that document.
 
 ## SQL generation and provider
 

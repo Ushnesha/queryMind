@@ -8,10 +8,23 @@ from src.state import AgentState
 
 
 def add_trace(
-    state: AgentState, node: str, status: str, latency_ms: float, reason: str = ""
+    state: AgentState,
+    node: str,
+    status: str,
+    latency_ms: float,
+    reason: str = "",
+    *,
+    iteration: int | None = None,
 ) -> None:
     """Append one serializable node event to a run."""
-    event = {"node": node, "status": status, "latency_ms": round(latency_ms, 3), "reason": reason}
+    event: dict[str, Any] = {
+        "node": node,
+        "status": status,
+        "latency_ms": round(latency_ms, 3),
+        "reason": reason,
+    }
+    if iteration is not None:
+        event["iteration"] = iteration
     json.dumps(event, allow_nan=False)
     state.setdefault("trace", []).append(event)
 

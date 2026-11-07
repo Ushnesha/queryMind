@@ -3,10 +3,10 @@
 from pathlib import Path
 
 from src.schema.flat_retriever import FlatSchemaRetriever
-from src.schema.interface import SchemaRetriever
-from src.schema.neo4j_retriever import Neo4jSchemaRetriever
+from src.schema.interface import RetrievalResult, SchemaRetriever
+from src.schema.neo4j_retriever import Neo4jSchemaRetriever, Neo4jUnavailableError
 
-__all__ = ["SchemaRetriever", "FlatSchemaRetriever", "Neo4jSchemaRetriever", "retrieve_schema"]
+__all__ = ["SchemaRetriever", "RetrievalResult", "FlatSchemaRetriever", "Neo4jSchemaRetriever", "Neo4jUnavailableError", "retrieve_schema"]
 
 
 def retrieve_schema(
@@ -16,7 +16,7 @@ def retrieve_schema(
     db_path: str | Path | None = None,
     top_k: int = 5,
 ) -> str:
-    """Retrieve flat schema or the explicitly labeled offline Neo4j fallback."""
+    """Retrieve full flat schema or relevant Neo4j schema with explicit fallback."""
     if mode == "flat":
         retriever: SchemaRetriever = FlatSchemaRetriever(db_path)
     elif mode == "neo4j":
