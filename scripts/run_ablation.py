@@ -25,6 +25,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--jsonl", type=Path)
     parser.add_argument("--markdown", type=Path)
     args = parser.parse_args(argv)
+    from dotenv import load_dotenv
+
+    load_dotenv(PROJECT_ROOT / ".env", override=False)
     try:
         questions = args.question if args.question is not None else select_questions(load_questions(args.questions), "ablation", args.limit)
         report = run_ablation(questions, db_path=args.db_path, include_syntax=args.include_syntax)

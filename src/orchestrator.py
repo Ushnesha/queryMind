@@ -8,9 +8,9 @@ from typing import Any, Callable, TypeVar
 from src.agents import generate_response, generate_sql
 from src.config import Settings, load_settings, resolve_path
 from src.db import execute_sql
-from src.llm import SQLProvider, get_provider
+from src.llm import MockProvider, SQLProvider, get_provider, model_call_count
 from src.optimizer import optimize_sql
-from src.schema import retrieve_schema
+from src.schema import retrieve_schema, retrieve_schema_with_metadata
 from src.state import AgentState
 from src.trace import add_trace
 from src.verifiers import check_safety, check_syntax, verify_result, verify_semantics
@@ -50,11 +50,10 @@ def run_querymind(
     settings: Settings | None = None,
     components: Components | None = None,
 ) -> AgentState:
-    """Run the offline starter, returning a JSON-safe state even on node failure.
+    """Run the integrated pipeline, returning JSON-safe state even on node failure.
 
     Disabling syntax analysis never disables the read-only execution guard.
-    Placeholder verification does not set semantic_ok/result_ok to True.
-    No database is created, external API called, or trace file written here.
+    The configured provider controls model access; mock mode stays offline.
     """
     started = perf_counter()
     nodes = components or Components()
@@ -67,17 +66,26 @@ def run_querymind(
         "original_plan": [], "optimized_plan": [], "rows": [], "columns": [],
         "result_ok": False, "result_warnings": [], "final_answer": "",
         "repair_count": 0, "optimizer_count": 0, "trace": [],
-        "metrics": {"llm_calls": 0},
+        "metrics": {"llm_calls": 0, "generation_calls": 0},
         "status": "success", "error": "",
     }
 
+    sql_provider = None
+
     def call_node(name: str, callback: Callable[[], T], *, iteration: int | None = None) -> T:
         node_start = perf_counter()
+        before = model_call_count(sql_provider) if sql_provider is not None else 0
         try:
             result = callback()
         except Exception as exc:
             add_trace(state, name, "error", (perf_counter() - node_start) * 1000, str(exc), iteration=iteration)
             raise
+        finally:
+            after = model_call_count(sql_provider) if sql_provider is not None else 0
+            if before is None or after is None:
+                state["metrics"]["llm_calls"] = None
+            elif state["metrics"]["llm_calls"] is not None:
+                state["metrics"]["llm_calls"] += max(0, after - before)
         add_trace(state, name, "pass", (perf_counter() - node_start) * 1000, iteration=iteration)
         return result
 
@@ -103,16 +111,29 @@ def run_querymind(
         database_path = resolve_path(db_path) if db_path is not None else config.database.path
         sql_provider = provider or get_provider(config.model.provider)
         state["schema_mode"] = mode
-        state["schema_context"] = call_node("schema_retriever", lambda: nodes.retrieve_schema(
-            question, mode=mode, db_path=database_path, top_k=config.schema.top_k
-        ))
+        def retrieve() -> str:
+            if nodes.retrieve_schema is not retrieve_schema:
+                return nodes.retrieve_schema(question, mode=mode, db_path=database_path, top_k=config.schema.top_k)
+            retrieved = retrieve_schema_with_metadata(question, mode=mode, db_path=database_path, top_k=config.schema.top_k)
+            state["metrics"].update(
+                retrieval=retrieved.metrics,
+                retrieved_tables=retrieved.tables,
+                retrieved_join_paths=[
+                    " = ".join(sorted((f"{edge['from_table']}.{edge['from_column']}",
+                                       f"{edge['to_table']}.{edge['to_column']}")))
+                    for edge in retrieved.relationships
+                ],
+            )
+            return retrieved.context
+
+        state["schema_context"] = call_node("schema_retriever", retrieve)
         if "Neo4j retrieval is a starter placeholder" in state["schema_context"]:
-            describe("placeholder", "Neo4j retrieval is deferred; using flat SQLite schema offline.")
+            describe("fallback", state["metrics"].get("retrieval", {}).get("fallback_reason")
+                     or "Neo4j unavailable; using flat SQLite schema.")
         feedback = ""
         while True:
             attempt = state["repair_count"] + 1
-            # Counts SQL generation/provider invocations through nodes.generate_sql (initial generation and repairs)
-            state["metrics"]["llm_calls"] = state["metrics"].get("llm_calls", 0) + 1
+            state["metrics"]["generation_calls"] += 1
             try:
                 state["sql"] = call_node("sql_generator", lambda: nodes.generate_sql(
                     question, state["schema_context"], provider=sql_provider, feedback=feedback or None
@@ -121,6 +142,10 @@ def run_querymind(
                 refuse(str(exc))
                 return _finish(state, nodes, started)
             state["sql_history"].append(state["sql"])
+            if state["sql"].upper().startswith("NOT_ANSWERABLE:"):
+                state["missing_fields"] = [field.strip() for field in state["sql"].split(":", 1)[1].split(",") if field.strip()]
+                refuse("Required data is missing: " + ", ".join(state["missing_fields"]))
+                return _finish(state, nodes, started)
 
             # 1. Safety check (mandatory lexical / policy guard)
             safety = call_node("safety_verifier", lambda: nodes.check_safety(state["sql"]), iteration=attempt)
@@ -142,7 +167,10 @@ def run_querymind(
             if safety["ok"] and not failure:
                 if enable_semantic:
                     semantic = call_node("semantic_verifier", lambda: nodes.verify_semantics(
-                        question, state["sql"], state["schema_context"]
+                        question, state["sql"], state["schema_context"],
+                        **({"provider": sql_provider, "use_llm": not getattr(sql_provider, "is_mock", False)
+                            and not isinstance(sql_provider, MockProvider)}
+                           if nodes.verify_semantics is verify_semantics else {})
                     ), iteration=attempt)
                     placeholder = semantic.get("status") == "placeholder"
                     state.update(
@@ -187,8 +215,11 @@ def run_querymind(
         if enable_optimizer and config.orchestrator.max_optimizer_rounds:
             for _ in range(config.orchestrator.max_optimizer_rounds):
                 optimized = call_node("optimizer", lambda: nodes.optimize_sql(
-                    state["sql"], question, state["schema_context"], db_path=database_path
+                    state["sql"], question, state["schema_context"], db_path=database_path,
+                    **({"provider": sql_provider} if nodes.optimize_sql is optimize_sql else {})
                 ))
+                if optimized["changed"]:
+                    state["metrics"]["optimizer_result_equal"] = optimized.get("equality_ok")
                 state["optimizer_count"] += 1
                 if state["optimizer_count"] == 1:
                     state["original_plan"] = optimized["plan_before"]
@@ -212,7 +243,12 @@ def run_querymind(
         state.update(rows=execution["rows"], columns=execution["columns"])
         state["metrics"]["execution_time_ms"] = execution["execution_time_ms"]
         if enable_result_verifier:
-            result = call_node("result_verifier", lambda: nodes.verify_result(question, state["sql"], state["rows"], state["columns"]))
+            result = call_node("result_verifier", lambda: nodes.verify_result(
+                question, state["sql"], state["rows"], state["columns"],
+                **({"schema_context": state["schema_context"], "provider": sql_provider,
+                    "use_llm": not getattr(sql_provider, "is_mock", False) and not isinstance(sql_provider, MockProvider)}
+                   if nodes.verify_result is verify_result else {})
+            ))
             placeholder = result.get("status") == "placeholder"
             state["result_ok"] = bool(result["ok"] and not placeholder)
             state["result_warnings"] = list(result["warnings"])

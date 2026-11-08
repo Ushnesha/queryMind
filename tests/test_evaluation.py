@@ -67,7 +67,8 @@ def test_provider_call_accounting_is_instrumented_not_assumed(db_path: Path) -> 
 
     questions = [{"id": "E1", "question": "Count", "sql": "SELECT COUNT(*) AS customer_count FROM customers"}]
     report = run_evaluation(questions, db_path=db_path, provider=Provider())
-    assert report["cases"][0]["llm_calls"] == 2
+    # Generation plus the semantic and result judges use the shared provider.
+    assert report["cases"][0]["llm_calls"] == 6
     assert report["cases"][0]["generation_calls"] == 1
 
 
@@ -148,13 +149,14 @@ def test_ablation_multiquestion_reports_are_paired(db_path: Path) -> None:
     assert report["variants"]["without_semantic"]["cases"][0]["state"]["semantic_reason"].startswith("Semantic verification disabled")
 
 
-def test_schema_comparison_does_not_fabricate_retrieval_accuracy(db_path: Path) -> None:
+def test_schema_comparison_uses_retrieval_metadata(db_path: Path) -> None:
     questions = [{"id": "E1", "question": "How many customers?", "sql": "SELECT COUNT(*) AS customer_count FROM customers", "expected_tables": ["customers"]}]
     report = run_schema_comparison(questions, db_path=db_path)
     assert set(report["variants"]) == {"flat", "neo4j"}
     assert report["variants"]["neo4j"]["metrics"]["fallback_runs"] == 1
     for variant in report["variants"].values():
-        assert variant["metrics"]["correct_tables_rate"] is None
+        assert variant["metrics"]["correct_tables_rate"] == 1.0
+        assert variant["metrics"]["correct_tables_scored"] == 1
         assert variant["metrics"]["correct_join_path_rate"] is None
         assert variant["metrics"]["mean_schema_context_chars"] > 0
         assert variant["metrics"]["mean_retrieval_latency_ms"] >= 0

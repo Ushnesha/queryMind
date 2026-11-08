@@ -96,7 +96,7 @@ def render_report(report: dict[str, Any]) -> str:
             lines.append("| " + " | ".join(_display(row.get(k)) for k in ("metric", "flat", "neo4j")) + " |")
     lines.extend(["", "## Interpretation", "",
                   "Mock generations do not call an LLM and are deterministic; repeated agreement does not establish a self-consistency benefit. "
-                  "Placeholder semantic/result checks and a Neo4j fallback must not be interpreted as validated components. "
+                  "Deterministic semantic checks are limited to their implemented rules; flat fallback does not validate Neo4j retrieval. "
                   "A successful answer to a labelled unanswerable question is the fabrication proxy; generic unsupported-question refusals are not informed missing-field refusals. "
                   "Accuracy uses exact column labels and unordered row multisets from the shared scorer. Ambiguous references document one interpretation. "
                   "Latency is a single local observation per question, not a repeated model benchmark.", ""])
@@ -155,6 +155,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--jsonl", type=Path)
     parser.add_argument("--markdown", type=Path)
     args = parser.parse_args(argv)
+    from dotenv import load_dotenv
+
+    load_dotenv(PROJECT_ROOT / ".env", override=False)
     try:
         if args.samples < 1:
             raise ValueError("--samples must be positive")

@@ -14,4 +14,5 @@ data/*.db-*
 # eval/results/*.jsonl
 # eval/results/schema_spider_*.md
 !eval/results/.gitkeep
+eval/results/integrated/
 data/

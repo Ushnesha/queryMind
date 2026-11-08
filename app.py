@@ -3,13 +3,16 @@
 from __future__ import annotations
 
 import streamlit as st
+from dotenv import load_dotenv
 
+from src.config import PROJECT_ROOT, load_settings
 from src.orchestrator import run_querymind
 from src.state import AgentState
 
 
 def main() -> None:
     """Ask a question and retain its result across Streamlit reruns."""
+    load_dotenv(PROJECT_ROOT / ".env", override=False)
     st.set_page_config(page_title="QueryMind", page_icon="🔎", layout="wide")
     st.title("QueryMind")
     st.caption("Ask a business question and inspect the answer, SQL, and verification.")
@@ -24,7 +27,7 @@ def main() -> None:
             return
         try:
             with st.spinner("Running QueryMind…"):
-                state = run_querymind(question.strip(), schema_mode="flat")
+                state = run_querymind(question.strip(), schema_mode=load_settings().schema.default_mode)
         except (FileNotFoundError, ValueError, RuntimeError) as exc:
             st.session_state.pop("querymind_result", None)
             st.error(f"QueryMind could not run: {exc}")

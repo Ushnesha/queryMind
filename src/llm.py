@@ -43,6 +43,14 @@ class MockProvider:
         )
 
 
+def model_call_count(provider: SQLProvider) -> int | None:
+    """Return measured API attempts; unknown provider counters stay unknown."""
+    if isinstance(provider, MockProvider) or getattr(provider, "is_mock", False) is True:
+        return 0
+    value = getattr(provider, "llm_calls", None)
+    return value if isinstance(value, int) and not isinstance(value, bool) and value >= 0 else None
+
+
 class OpenAICompatibleProvider:
     """OpenAI-compatible chat completion provider using the standard library."""
 
@@ -59,6 +67,7 @@ class OpenAICompatibleProvider:
         self.model = model
         self.temperature = temperature
         self.timeout = timeout
+        self.llm_calls = 0
 
     def _resolve_api_key(self) -> str:
         key = (
@@ -124,6 +133,7 @@ class OpenAICompatibleProvider:
         )
 
         try:
+            self.llm_calls += 1
             with urllib.request.urlopen(req, timeout=self.timeout) as response:
                 body = response.read().decode("utf-8")
                 res_json = json.loads(body)

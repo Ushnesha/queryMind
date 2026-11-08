@@ -2,9 +2,8 @@
 
 **A Self-Correcting Agentic Text-to-SQL Assistant with Query Optimization**
 
-Academic capstone repository. This Milestone 2 foundation gives five developers
-stable interfaces and an offline, runnable integration path. It does not implement
-the completed research system.
+Academic capstone repository. The five Milestone 2 components are integrated
+into one runnable Text-to-SQL pipeline, with offline tests and preliminary evaluation.
 
 ## Repository starting point
 
@@ -26,21 +25,23 @@ Optional node switches support ablation. SQLite execution always enforces its ow
 read-only guard, even when syntax analysis is disabled. Repair attempts are capped
 at three and optimizer calls at two. Imports create no databases or network calls.
 
-Current behavior:
+Current integrated behavior:
 
-- SQLite schema introspection, guarded execution, syntax compilation, result
-  normalization, and JSONL traces work locally.
-- SQL generation uses an offline mock for two question templates: “Who are the top
-  3 customers by total spending?” (also supports other positive N up to 99) and
-  “How many customers are there?”. Other questions produce an explicit refusal.
-- `neo4j` mode retrieves relevant schema and FK paths from a configured graph,
-  with an explicit flat fallback when unavailable. Neo4j is internal
-  infrastructure; the interactive input is a natural-language question.
-- Semantic and result checks are labeled placeholders. Successful execution does
-  not imply that question alignment or answer correctness was verified.
-- The optimizer inspects `EXPLAIN QUERY PLAN` and returns unchanged SQL. Graph
-  building supports offline payloads and explicit Neo4j upload. b2 is an unimplemented
-  contract; evaluation and ablation commands are small smoke runs.
+- All five feature implementations are merged into `main`: orchestration,
+  schema retrieval, verification, optimization, and evaluation/Streamlit.
+- SQL generation and bounded repair use the shared mock or OpenAI-compatible
+  provider. Safety, SQLite compilation, deterministic semantic checks, result
+  sanity checks, and optional model judges run through the same pipeline.
+- Neo4j retrieval uses a schema generated from SQLite and records table, join,
+  size, latency, and backend metadata. An unavailable graph produces an explicit
+  flat-schema fallback.
+- Optimizer candidates must pass read-only validation, result equality, and a
+  query-plan improvement gate. Mock mode never calls a model for rewrites.
+- The evaluation harness supports b1, b2-small (three-sample result voting),
+  QueryMind, node ablations, schema comparisons, and JSON/JSONL replay.
+- The offline mock supports customer-count and top-N customer-spending questions.
+  Use a live provider for broader natural-language coverage. Unsupported mock
+  questions are generic refusals, not evidence that missing fields were detected.
 
 ### Offline setup
 
@@ -61,12 +62,11 @@ If Python 3.11 is managed by `uv` rather than available as `python3.11`, use
 for the environment creation and dependency installation steps. This is the
 method used to validate this checkout; its `.venv` is already prepared.
 
-Only pytest, PyYAML, python-dotenv, and Streamlit are direct dependencies. Existing
-package pins did not exist; these starter pins were validated on Python 3.11.15.
-The optional Neo4j driver is pinned in `requirements-schema.txt`. LangGraph and
-sqlglot remain deferred. Main-pipeline model configuration defaults to `mock`.
-The schema experiment separately supports the configured ASU completion model
-without changing the orchestrator's provider registry.
+Base dependencies are pinned in `requirements.txt`; Neo4j support is optional:
+
+```bash
+.venv/bin/python -m pip install -r requirements-schema.txt
+```
 
 `make seed` creates a deterministic fixture with four customers and six orders. It
 leaves an existing database untouched. The query path never creates or writes a
@@ -97,17 +97,18 @@ python -m src.baseline --question "How many customers are there?"
 make verify-data
 ```
 
-### Running QueryMind skeleton
+### Running QueryMind
 
 ```bash
 make demo
-python -m src.run --question "Who are the top 3 customers by total spending?" --schema-mode flat
-python -m src.run --question "How many customers are there?" --schema-mode neo4j
+SQLITE_DB=data/analytics.db python -m src.run --question "Who are the top 3 customers by total spending?" --schema-mode flat
+SQLITE_DB=data/analytics.db python -m src.run --question "How many customers are there?" --schema-mode neo4j
 ```
 
 CLI JSON includes the answer, rows, columns, SQL history, assumptions, verification
 flags, warnings, trace, and timing. `status=success` means execution completed;
-placeholder semantic/result checks leave `semantic_ok` and `result_ok` false.
+verification flags report the completed enabled checks. Deterministic semantic
+checks cover specific cues and missing concepts; they do not prove arbitrary SQL correctness.
 `status=refused` includes unsupported mock questions and exhausted repairs;
 `status=error` indicates a runtime failure. The CLI exits 1 for errors and 0 for
 completed/refused runs. Optional `--trace PATH` appends a complete JSONL record.
@@ -118,51 +119,51 @@ completed/refused runs. Optional `--trace PATH` appends a complete JSONL record.
 make seed
 make ui
 # Equivalent after activation:
-streamlit run app.py
+SQLITE_DB=data/analytics.db streamlit run app.py
 ```
 
 The UI displays the answer, table, SQL, assumptions, missing fields, verification
 status/warnings, and expandable trace. It uses only the public orchestrator API.
 
-### Starter utilities
+### Integrated experiments
 
 ```bash
-make eval          # Two reference-SQL demo cases; also available as make score
-make ablation      # Five switch configurations on one demo question
-make schema-graph  # Offline graph metadata; does not upload to Neo4j
-make benchmark     # Unchanged SQL plans, timings and result equality
+make eval          # Paired b1/b2-small/QueryMind plus full 17-case b1/QueryMind
+make ablation      # Ten cases across six configurations
+make schema-graph  # Inspect the demo SQLite schema without uploading
+make benchmark     # 30 Spider optimizer cases; requires data/spider_data
+.venv/bin/python -m scripts.run_eval --schema-comparison --db-path data/analytics.db --output eval/results/integrated/schema.json --markdown eval/results/integrated/schema.md
 ```
 
-### Schema graph and Spider comparison
+Fresh reports go into ignored `eval/results/integrated/`; historical branch
+reports remain intact. Mock accuracy measures its two supported templates,
+not live-model quality. See [INTEGRATION.md](docs/INTEGRATION.md) for validation.
 
-The `feature/schema-graph` implementation introspects SQLite tables, columns,
-composite keys and indexes; uploads a versioned Neo4j graph; and retrieves
-question-relevant tables with FK bridge paths. Its public `retrieve()` contract
-is unchanged. Unit tests use mocks and local graphs, with no live services.
+### Model and graph configuration
+
+Keep credentials in `.env`. Set `model.provider: openai` (or `opencode`) in
+`config/settings.yaml` to enable the existing live provider. Configure its
+base URL, API key, and model using the environment names in `.env.example`.
+The optimizer and both judges use that same provider. The default remains `mock`.
+
+The UI loads `.env` and uses `schema.default_mode` from the settings file.
+`make ui` explicitly selects `data/analytics.db` because the mock and milestone
+fixture use customers/orders. This also avoids an existing `.env` database
+selection silently redirecting the demo to a Spider schema. For a different
+prepared database, use `make ui DEMO_DB=path/to/database.sqlite` with a live model.
+The seeder preserves any existing database.
+
+For actual Neo4j retrieval, configure `NEO4J_URI`, `NEO4J_USER`, and
+`NEO4J_PASSWORD`, start the local service if needed, and upload the demo schema:
 
 ```bash
-uv pip install --python .venv/bin/python -r requirements-schema.txt
-# Set NEO4J_PASSWORD in your ignored .env, then start local Neo4j if needed:
 docker compose -f compose.neo4j.yaml up -d
-
-# Offline diagnostic, no credentials:
-python -m scripts.benchmark_schema_retrieval --backend local_graph
-# Real Neo4j + ASU completion model, with credentials configured:
-python -m scripts.benchmark_schema_retrieval --backend neo4j --generate
+.venv/bin/python -m scripts.build_schema_graph --db data/analytics.db --upload
+make ui
 ```
 
-Set `SPIDER_DATA_ROOT=data/spider_data` for the multi-database experiment.
-`SQLITE_DB` must identify one SQLite file, never `data/spider_data/*`. The fixed
-ten-question sample, information boundaries, exact metrics and observed results
-are documented in [SCHEMA_EXPERIMENT.md](docs/SCHEMA_EXPERIMENT.md). The live ASU
-comparison scored 6/10 correct results for both modes; Neo4j supplied about half
-the estimated schema tokens and had higher retrieval latency.
-
-Generated databases, JSONL logs, and evaluation output are ignored. The deterministic
-seeder, two-case YAML fixture, and empty artifact directories are committed source.
-Reference comparisons use exact column labels and unordered row multisets, preserve
-duplicates and JSON types, and have no numeric tolerance. Ordered answer validation
-and rigorous optimization equivalence remain future work.
+The trace distinguishes graph retrieval from flat fallback. For direct CLI runs
+with another database, pass `--db-path`; this takes precedence over `.env`.
 
 ### Developer branches
 

@@ -1,5 +1,8 @@
 # Bootstrap validation
 
+For the merged five-component system validated on November 8, 2026, see
+[INTEGRATION.md](INTEGRATION.md). The results below document the earlier bootstrap.
+
 Validated on November 4, 2026, using an isolated Python 3.11.15 environment.
 
 ## Before changes

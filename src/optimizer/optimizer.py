@@ -1,16 +1,15 @@
 """Query optimizer: deterministic triggers, one LLM rewrite, mandatory equality gate."""
 
 import json
-import os
 import re
 import sqlite3
-import urllib.request
 from contextlib import closing
 from pathlib import Path
 from time import perf_counter
 from typing import Any, Callable, TypedDict
 
 from src.db import connect_readonly, validate_readonly
+from src.llm import MockProvider, SQLProvider, get_provider
 from src.verifiers.syntax import check_syntax
 
 from .equality import TIMEOUT_S, results_equal
@@ -35,26 +34,11 @@ class OptimizationResult(TypedDict):
 
 
 def call_llm(prompt: str) -> str:
-    """Minimal OpenAI-compatible chat call. Reads the env vars from .env or the shell.
+    """Use the same configured provider as SQL generation and verification."""
+    from src.config import load_settings
+    from src.llm import get_provider
 
-    Key: OPENAI_API_KEY, else OPENCODE_API_KEY. Base URL defaults to api.openai.com.
-    """
-    from dotenv import load_dotenv
-
-    load_dotenv()
-    key = os.environ.get("OPENAI_API_KEY") or os.environ["OPENCODE_API_KEY"]
-    request = urllib.request.Request(
-        os.environ.get("OPENCODE_BASE_URL", "https://api.openai.com/v1").rstrip("/")
-        + "/chat/completions",
-        data=json.dumps({
-            "model": os.environ.get("COMPLETION_MODEL", "gpt-4o-mini"),
-            "temperature": 0,
-            "messages": [{"role": "user", "content": prompt}],
-        }).encode(),
-        headers={"Content-Type": "application/json", "Authorization": "Bearer " + key},
-    )
-    with urllib.request.urlopen(request, timeout=60) as response:
-        return json.load(response)["choices"][0]["message"]["content"]
+    return get_provider(load_settings().model.provider).generate("Optimize this query", prompt)
 
 
 def find_trigger(sql: str, plan: list[list[Any]], db_path: str | Path | None) -> str | None:
@@ -111,7 +95,8 @@ def optimize_sql(
     schema_context: str,
     *,
     db_path: str | Path | None = None,
-    llm: Callable[[str], str] = call_llm,
+    llm: Callable[[str], str] | None = None,
+    provider: SQLProvider | None = None,
     timeout_s: float = TIMEOUT_S,
 ) -> OptimizationResult:
     """Try one gated rewrite. On any problem return the original SQL. Never raises.
@@ -131,6 +116,14 @@ def optimize_sql(
         if trigger is None:
             result["reason"] = "Plan already reasonable; no rewrite attempted."
         else:
+            if llm is None:
+                from src.config import load_settings
+
+                selected = provider or get_provider(load_settings().model.provider)
+                if isinstance(selected, MockProvider) or getattr(selected, "is_mock", False):
+                    result["reason"] = f"Kept original SQL ({trigger}); offline provider cannot propose rewrites."
+                    return result
+                llm = lambda prompt: selected.generate("Optimize this query", prompt)
             _attempt(result, question, schema_context, trigger, db_path, llm, timeout_s)
     except Exception as exc:  # ponytail: broad on purpose, the contract says never raise
         result["reason"] = f"Kept original SQL; optimizer error: {exc}"

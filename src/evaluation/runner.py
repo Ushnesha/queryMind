@@ -12,7 +12,7 @@ import yaml
 from src.config import load_settings
 from src.db import execute_sql
 from src.evaluation.metrics import summarize_results, summarize_runs
-from src.llm import MockProvider, SQLProvider, get_provider
+from src.llm import MockProvider, SQLProvider, get_provider, model_call_count
 from src.orchestrator import run_querymind
 from src.score import results_equal
 from src.state import AgentState
@@ -71,6 +71,14 @@ class _CountedProvider:
     def generate(self, question: str, schema_context: str) -> str:
         self.calls += 1
         return self.provider.generate(question, schema_context)
+
+    @property
+    def llm_calls(self) -> int | None:
+        return model_call_count(self.provider)
+
+    @property
+    def is_mock(self) -> bool:
+        return isinstance(self.provider, MockProvider) or getattr(self.provider, "is_mock", False) is True
 
 
 def run_evaluation(

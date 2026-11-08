@@ -5,11 +5,13 @@ import json
 
 from src.config import OrchestratorSettings, Settings
 from src.db import execute_sql
+from src.llm import MockProvider
 from src.orchestrator import Components, run_querymind
 from src.state import AgentState
 from src.trace import write_jsonl
 
 QUESTION = "Who are the top 3 customers by total spending?"
+VALID_SQL = MockProvider().generate(QUESTION, "")
 
 
 def test_state_supports_starter_fields() -> None:
@@ -22,7 +24,7 @@ def test_orchestrator_offline_smoke(db_path) -> None:
     assert state["status"] == "success"
     assert state["rows"] == [["Alice Chen", 300.0], ["Bob Smith", 175.0], ["Carol Davis", 75.0]]
     assert state["syntax_ok"] and state["safety_ok"]
-    assert not state["semantic_ok"] and not state["result_ok"]
+    assert state["semantic_ok"] and state["result_ok"]
     assert state["optimizer_count"] == 1 and not state["optimization_applied"]
     assert json.loads(json.dumps(state))["final_answer"]
 
@@ -38,14 +40,14 @@ def test_nodes_can_be_replaced_without_database_or_services(tmp_path) -> None:
         },
         execute_sql=lambda *args, **kwargs: {"rows": [[42]], "columns": ["value"], "execution_time_ms": 0.0},
     )
-    state = run_querymind(QUESTION, components=nodes, db_path=tmp_path / "missing.db")
+    state = run_querymind("Return the demo value", components=nodes, db_path=tmp_path / "missing.db")
     assert state["status"] == "success" and state["rows"] == [[42]]
 
 
 def test_neo4j_is_explicit_offline_fallback(db_path) -> None:
     state = run_querymind(QUESTION, schema_mode="neo4j", db_path=db_path)
     assert state["status"] == "success"
-    assert state["trace"][0]["status"] == "placeholder"
+    assert state["trace"][0]["status"] == "fallback"
 
 
 def test_ablation_skips_optional_nodes_but_retains_readonly_safety(db_path) -> None:
@@ -69,7 +71,7 @@ def test_repair_feedback_allows_replacement_generator_to_recover(db_path) -> Non
 
     def generator(*args, feedback=None, **kwargs) -> str:
         feedback_values.append(feedback)
-        return "SELECT 1 AS value" if feedback else "SELECT absent FROM customers"
+        return VALID_SQL if feedback else "SELECT absent FROM customers"
 
     state = run_querymind(QUESTION, db_path=db_path, components=replace(Components(), generate_sql=generator))
     assert state["status"] == "success" and state["repair_count"] == 1
@@ -164,7 +166,7 @@ def test_semantic_mismatch_routes_to_repair_and_succeeds(db_path) -> None:
     state = run_querymind(QUESTION, db_path=db_path, components=nodes)
     assert state["status"] == "success"
     assert state["repair_count"] == 1
-    assert state["metrics"]["llm_calls"] == 2
+    assert state["metrics"]["generation_calls"] == 2
     assert state["sql"] == "SELECT 2 AS value"
     assert state["assumptions"] == ["Category filter verified."]
     assert "category" in calls[1].lower()
@@ -204,7 +206,7 @@ def test_syntax_failure_then_semantic_mismatch_recovers(db_path) -> None:
     state = run_querymind(QUESTION, db_path=db_path, components=nodes)
     assert state["status"] == "success"
     assert state["repair_count"] == 2
-    assert state["metrics"]["llm_calls"] == 3
+    assert state["metrics"]["generation_calls"] == 3
     assert state["sql"] == "SELECT 2 AS value"
 
 
@@ -231,7 +233,7 @@ def test_shared_repair_budget_exhaustion_mixing_syntax_and_semantics(db_path) ->
     state = run_querymind(QUESTION, db_path=db_path, components=nodes)
     assert state["status"] == "refused"
     assert state["repair_count"] == 3
-    assert state["metrics"]["llm_calls"] == 4
+    assert state["metrics"]["generation_calls"] == 4
     assert len(state["sql_history"]) == 4
     assert not any(event["node"] == "executor" for event in state["trace"])
 
@@ -257,33 +259,34 @@ def test_semantic_unanswerable_refuses_immediately_without_repair(db_path) -> No
     state = run_querymind(QUESTION, db_path=db_path, components=nodes)
     assert state["status"] == "refused"
     assert state["repair_count"] == 0
-    assert state["metrics"]["llm_calls"] == 1
+    assert state["metrics"]["generation_calls"] == 1
     assert gen_count == 1
     assert state["missing_fields"] == ["cost"]
     assert not any(event["node"] == "executor" for event in state["trace"])
 
 
 def test_llm_calls_metric_tracking(db_path) -> None:
-    # 1. Happy path: exactly 1 LLM call
+    # Mock generation attempts are counted separately from actual model calls.
     state_smoke = run_querymind(QUESTION, schema_mode="flat", db_path=db_path)
-    assert state_smoke["metrics"]["llm_calls"] == 1
+    assert state_smoke["metrics"]["generation_calls"] == 1
+    assert state_smoke["metrics"]["llm_calls"] == 0
 
     # 2. Empty question: 0 LLM calls
     state_empty = run_querymind("", db_path=db_path)
     assert state_empty["metrics"]["llm_calls"] == 0
 
-    # 3. 1 repair: 2 LLM calls
+    # One repair means two generation attempts, with no model calls.
     state_repair = run_querymind(
         QUESTION,
         db_path=db_path,
         components=replace(
             Components(),
             generate_sql=lambda *args, feedback=None, **kwargs: (
-                "SELECT 1 AS value" if feedback else "SELECT absent FROM customers"
+                VALID_SQL if feedback else "SELECT absent FROM customers"
             ),
         ),
     )
-    assert state_repair["metrics"]["llm_calls"] == 2
+    assert state_repair["metrics"]["generation_calls"] == 2
 
 
 def test_trace_iteration_enrichment(db_path) -> None:
@@ -292,7 +295,7 @@ def test_trace_iteration_enrichment(db_path) -> None:
     def fake_generator(*args, **kwargs) -> str:
         nonlocal attempt
         attempt += 1
-        return "SELECT 1 AS value" if attempt > 1 else "SELECT absent FROM customers"
+        return VALID_SQL if attempt > 1 else "SELECT absent FROM customers"
 
     nodes = replace(Components(), generate_sql=fake_generator)
     state = run_querymind(QUESTION, db_path=db_path, components=nodes)
@@ -415,7 +418,7 @@ def test_ordered_trace_sequence_with_repair(db_path) -> None:
     def recovering_gen(*args, **kwargs) -> str:
         nonlocal attempt
         attempt += 1
-        return "SELECT 1 AS value" if attempt > 1 else "SELECT absent FROM customers"
+        return VALID_SQL if attempt > 1 else "SELECT absent FROM customers"
 
     nodes = replace(Components(), generate_sql=recovering_gen)
     state = run_querymind(QUESTION, db_path=db_path, components=nodes)

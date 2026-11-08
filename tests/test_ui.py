@@ -45,7 +45,7 @@ def test_ui_calls_public_orchestrator_and_shows_missing_field_refusal(monkeypatc
     at.text_input[0].set_value("What is the profit margin?")
     at.button[0].click().run()
     assert not at.exception
-    assert calls == [("What is the profit margin?", "flat")]
+    assert calls == [("What is the profit margin?", "neo4j")]
     assert at.warning[0].value == "QueryMind cannot reliably answer this question."
     output = "\n".join(item.value for item in at.markdown)
     assert "Missing field: product cost" in output
