@@ -1,0 +1,1771 @@
+{
+  "scope": "Milestone 2 preliminary paired flat-versus-Neo4j schema comparison",
+  "question_count": 8,
+  "variants": {
+    "flat": {
+      "scope": "Milestone 2 preliminary reference-result evaluation; no natural-language answer-quality judging",
+      "arm": "querymind",
+      "case_count": 8,
+      "providers": [
+        "MockProvider"
+      ],
+      "placeholder_components": [
+        "result_verifier",
+        "semantic_verifier"
+      ],
+      "limitations": [
+        "Best means top three by total spending.",
+        "Usually means arithmetic mean of order amounts for customers with orders."
+      ],
+      "cases": [
+        {
+          "id": "H1",
+          "question_id": "H1",
+          "question": "Who are the top 3 customers by total spending?",
+          "arm": "querymind",
+          "correct": true,
+          "state": {
+            "question": "Who are the top 3 customers by total spending?",
+            "schema_mode": "flat",
+            "schema_context": "TABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+            "sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+            "sql_history": [
+              "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3"
+            ],
+            "syntax_ok": true,
+            "syntax_error": "",
+            "safety_ok": true,
+            "semantic_ok": false,
+            "semantic_reason": "Starter input checks passed; semantic alignment is unverified.",
+            "answerable": true,
+            "missing_fields": [],
+            "assumptions": [
+              "The starter semantic verifier checks input structure only; alignment between the question and SQL has not been verified."
+            ],
+            "original_sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+            "optimized_sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+            "optimization_applied": false,
+            "original_plan": [
+              [
+                9,
+                0,
+                216,
+                "SCAN o"
+              ],
+              [
+                11,
+                0,
+                45,
+                "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+              ],
+              [
+                14,
+                0,
+                0,
+                "USE TEMP B-TREE FOR GROUP BY"
+              ],
+              [
+                62,
+                0,
+                0,
+                "USE TEMP B-TREE FOR ORDER BY"
+              ]
+            ],
+            "optimized_plan": [
+              [
+                9,
+                0,
+                216,
+                "SCAN o"
+              ],
+              [
+                11,
+                0,
+                45,
+                "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+              ],
+              [
+                14,
+                0,
+                0,
+                "USE TEMP B-TREE FOR GROUP BY"
+              ],
+              [
+                62,
+                0,
+                0,
+                "USE TEMP B-TREE FOR ORDER BY"
+              ]
+            ],
+            "rows": [
+              [
+                "Alice Chen",
+                300.0
+              ],
+              [
+                "Bob Smith",
+                175.0
+              ],
+              [
+                "Carol Davis",
+                75.0
+              ]
+            ],
+            "columns": [
+              "name",
+              "total_spending"
+            ],
+            "result_ok": false,
+            "result_warnings": [
+              "Starter result verification checks table shape only."
+            ],
+            "final_answer": "The query returned 3 row(s). See the result table and verification details.",
+            "repair_count": 0,
+            "optimizer_count": 1,
+            "trace": [
+              {
+                "node": "schema_retriever",
+                "status": "pass",
+                "latency_ms": 1.209,
+                "reason": ""
+              },
+              {
+                "node": "sql_generator",
+                "status": "pass",
+                "latency_ms": 0.103,
+                "reason": ""
+              },
+              {
+                "node": "safety_verifier",
+                "status": "pass",
+                "latency_ms": 0.295,
+                "reason": "Read-only guard passed."
+              },
+              {
+                "node": "syntax_verifier",
+                "status": "pass",
+                "latency_ms": 0.436,
+                "reason": "SQLite compilation passed."
+              },
+              {
+                "node": "semantic_verifier",
+                "status": "placeholder",
+                "latency_ms": 0.002,
+                "reason": "Starter input checks passed; semantic alignment is unverified."
+              },
+              {
+                "node": "optimizer",
+                "status": "pass",
+                "latency_ms": 0.343,
+                "reason": "Starter optimizer inspected the plan and kept SQL unchanged."
+              },
+              {
+                "node": "executor",
+                "status": "pass",
+                "latency_ms": 0.314,
+                "reason": ""
+              },
+              {
+                "node": "result_verifier",
+                "status": "placeholder",
+                "latency_ms": 0.004,
+                "reason": "Starter result verification checks table shape only."
+              },
+              {
+                "node": "response_generator",
+                "status": "pass",
+                "latency_ms": 0.002,
+                "reason": ""
+              }
+            ],
+            "metrics": {
+              "execution_time_ms": 0.23912498727440834,
+              "result_statistics": {
+                "row_count": 3,
+                "column_count": 2
+              },
+              "total_latency_ms": 3.353,
+              "generation_calls": 1,
+              "llm_calls": 0,
+              "provider": "MockProvider"
+            },
+            "status": "success",
+            "error": ""
+          },
+          "refused": false,
+          "missing_fields": [],
+          "missing_field": null,
+          "informed_refusal": false,
+          "ambiguity_flagged": false,
+          "llm_calls": 0,
+          "generation_calls": 1,
+          "latency_ms": 3.353,
+          "difficulty": "hard",
+          "answerable": true,
+          "ambiguous": false,
+          "tags": [
+            "b2",
+            "ablation",
+            "schema"
+          ],
+          "expected_tables": [
+            "customers",
+            "orders"
+          ],
+          "expected_join_paths": [
+            "customers.customer_id = orders.customer_id"
+          ]
+        },
+        {
+          "id": "H2",
+          "question_id": "H2",
+          "question": "Which customers have never placed an order?",
+          "arm": "querymind",
+          "correct": false,
+          "state": {
+            "question": "Which customers have never placed an order?",
+            "schema_mode": "flat",
+            "schema_context": "TABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+            "sql": "",
+            "sql_history": [],
+            "syntax_ok": false,
+            "syntax_error": "",
+            "safety_ok": false,
+            "semantic_ok": false,
+            "semantic_reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "answerable": false,
+            "missing_fields": [],
+            "assumptions": [],
+            "original_sql": "",
+            "optimized_sql": "",
+            "optimization_applied": false,
+            "original_plan": [],
+            "optimized_plan": [],
+            "rows": [],
+            "columns": [],
+            "result_ok": false,
+            "result_warnings": [],
+            "final_answer": "I cannot answer this question. The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "repair_count": 0,
+            "optimizer_count": 0,
+            "trace": [
+              {
+                "node": "schema_retriever",
+                "status": "pass",
+                "latency_ms": 0.319,
+                "reason": ""
+              },
+              {
+                "node": "sql_generator",
+                "status": "error",
+                "latency_ms": 0.006,
+                "reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation."
+              },
+              {
+                "node": "response_generator",
+                "status": "pass",
+                "latency_ms": 0.001,
+                "reason": ""
+              }
+            ],
+            "metrics": {
+              "total_latency_ms": 0.875,
+              "generation_calls": 1,
+              "llm_calls": 0,
+              "provider": "MockProvider"
+            },
+            "status": "refused",
+            "error": ""
+          },
+          "refused": true,
+          "missing_fields": [],
+          "missing_field": null,
+          "informed_refusal": false,
+          "ambiguity_flagged": false,
+          "llm_calls": 0,
+          "generation_calls": 1,
+          "latency_ms": 0.875,
+          "difficulty": "hard",
+          "answerable": true,
+          "ambiguous": false,
+          "tags": [
+            "b2",
+            "ablation",
+            "schema"
+          ],
+          "expected_tables": [
+            "customers",
+            "orders"
+          ],
+          "expected_join_paths": [
+            "customers.customer_id = orders.customer_id"
+          ]
+        },
+        {
+          "id": "H3",
+          "question_id": "H3",
+          "question": "What is the average order amount per customer who has ordered?",
+          "arm": "querymind",
+          "correct": false,
+          "state": {
+            "question": "What is the average order amount per customer who has ordered?",
+            "schema_mode": "flat",
+            "schema_context": "TABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+            "sql": "",
+            "sql_history": [],
+            "syntax_ok": false,
+            "syntax_error": "",
+            "safety_ok": false,
+            "semantic_ok": false,
+            "semantic_reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "answerable": false,
+            "missing_fields": [],
+            "assumptions": [],
+            "original_sql": "",
+            "optimized_sql": "",
+            "optimization_applied": false,
+            "original_plan": [],
+            "optimized_plan": [],
+            "rows": [],
+            "columns": [],
+            "result_ok": false,
+            "result_warnings": [],
+            "final_answer": "I cannot answer this question. The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "repair_count": 0,
+            "optimizer_count": 0,
+            "trace": [
+              {
+                "node": "schema_retriever",
+                "status": "pass",
+                "latency_ms": 0.326,
+                "reason": ""
+              },
+              {
+                "node": "sql_generator",
+                "status": "error",
+                "latency_ms": 0.005,
+                "reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation."
+              },
+              {
+                "node": "response_generator",
+                "status": "pass",
+                "latency_ms": 0.001,
+                "reason": ""
+              }
+            ],
+            "metrics": {
+              "total_latency_ms": 0.859,
+              "generation_calls": 1,
+              "llm_calls": 0,
+              "provider": "MockProvider"
+            },
+            "status": "refused",
+            "error": ""
+          },
+          "refused": true,
+          "missing_fields": [],
+          "missing_field": null,
+          "informed_refusal": false,
+          "ambiguity_flagged": false,
+          "llm_calls": 0,
+          "generation_calls": 1,
+          "latency_ms": 0.859,
+          "difficulty": "hard",
+          "answerable": true,
+          "ambiguous": false,
+          "tags": [
+            "b2",
+            "ablation",
+            "schema"
+          ],
+          "expected_tables": [
+            "customers",
+            "orders"
+          ],
+          "expected_join_paths": [
+            "customers.customer_id = orders.customer_id"
+          ]
+        },
+        {
+          "id": "H4",
+          "question_id": "H4",
+          "question": "How many orders has each customer placed, including those with no orders?",
+          "arm": "querymind",
+          "correct": false,
+          "state": {
+            "question": "How many orders has each customer placed, including those with no orders?",
+            "schema_mode": "flat",
+            "schema_context": "TABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+            "sql": "",
+            "sql_history": [],
+            "syntax_ok": false,
+            "syntax_error": "",
+            "safety_ok": false,
+            "semantic_ok": false,
+            "semantic_reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "answerable": false,
+            "missing_fields": [],
+            "assumptions": [],
+            "original_sql": "",
+            "optimized_sql": "",
+            "optimization_applied": false,
+            "original_plan": [],
+            "optimized_plan": [],
+            "rows": [],
+            "columns": [],
+            "result_ok": false,
+            "result_warnings": [],
+            "final_answer": "I cannot answer this question. The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "repair_count": 0,
+            "optimizer_count": 0,
+            "trace": [
+              {
+                "node": "schema_retriever",
+                "status": "pass",
+                "latency_ms": 0.321,
+                "reason": ""
+              },
+              {
+                "node": "sql_generator",
+                "status": "error",
+                "latency_ms": 0.005,
+                "reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation."
+              },
+              {
+                "node": "response_generator",
+                "status": "pass",
+                "latency_ms": 0.001,
+                "reason": ""
+              }
+            ],
+            "metrics": {
+              "total_latency_ms": 0.856,
+              "generation_calls": 1,
+              "llm_calls": 0,
+              "provider": "MockProvider"
+            },
+            "status": "refused",
+            "error": ""
+          },
+          "refused": true,
+          "missing_fields": [],
+          "missing_field": null,
+          "informed_refusal": false,
+          "ambiguity_flagged": false,
+          "llm_calls": 0,
+          "generation_calls": 1,
+          "latency_ms": 0.856,
+          "difficulty": "hard",
+          "answerable": true,
+          "ambiguous": false,
+          "tags": [
+            "ablation",
+            "schema"
+          ],
+          "expected_tables": [
+            "customers",
+            "orders"
+          ],
+          "expected_join_paths": [
+            "customers.customer_id = orders.customer_id"
+          ]
+        },
+        {
+          "id": "H5",
+          "question_id": "H5",
+          "question": "Which customers spent more than 100 in total?",
+          "arm": "querymind",
+          "correct": false,
+          "state": {
+            "question": "Which customers spent more than 100 in total?",
+            "schema_mode": "flat",
+            "schema_context": "TABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+            "sql": "",
+            "sql_history": [],
+            "syntax_ok": false,
+            "syntax_error": "",
+            "safety_ok": false,
+            "semantic_ok": false,
+            "semantic_reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "answerable": false,
+            "missing_fields": [],
+            "assumptions": [],
+            "original_sql": "",
+            "optimized_sql": "",
+            "optimization_applied": false,
+            "original_plan": [],
+            "optimized_plan": [],
+            "rows": [],
+            "columns": [],
+            "result_ok": false,
+            "result_warnings": [],
+            "final_answer": "I cannot answer this question. The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "repair_count": 0,
+            "optimizer_count": 0,
+            "trace": [
+              {
+                "node": "schema_retriever",
+                "status": "pass",
+                "latency_ms": 0.34,
+                "reason": ""
+              },
+              {
+                "node": "sql_generator",
+                "status": "error",
+                "latency_ms": 0.007,
+                "reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation."
+              },
+              {
+                "node": "response_generator",
+                "status": "pass",
+                "latency_ms": 0.001,
+                "reason": ""
+              }
+            ],
+            "metrics": {
+              "total_latency_ms": 0.913,
+              "generation_calls": 1,
+              "llm_calls": 0,
+              "provider": "MockProvider"
+            },
+            "status": "refused",
+            "error": ""
+          },
+          "refused": true,
+          "missing_fields": [],
+          "missing_field": null,
+          "informed_refusal": false,
+          "ambiguity_flagged": false,
+          "llm_calls": 0,
+          "generation_calls": 1,
+          "latency_ms": 0.913,
+          "difficulty": "hard",
+          "answerable": true,
+          "ambiguous": false,
+          "tags": [
+            "schema"
+          ],
+          "expected_tables": [
+            "customers",
+            "orders"
+          ],
+          "expected_join_paths": [
+            "customers.customer_id = orders.customer_id"
+          ]
+        },
+        {
+          "id": "H6",
+          "question_id": "H6",
+          "question": "What is the latest order date for each customer who has ordered?",
+          "arm": "querymind",
+          "correct": false,
+          "state": {
+            "question": "What is the latest order date for each customer who has ordered?",
+            "schema_mode": "flat",
+            "schema_context": "TABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+            "sql": "",
+            "sql_history": [],
+            "syntax_ok": false,
+            "syntax_error": "",
+            "safety_ok": false,
+            "semantic_ok": false,
+            "semantic_reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "answerable": false,
+            "missing_fields": [],
+            "assumptions": [],
+            "original_sql": "",
+            "optimized_sql": "",
+            "optimization_applied": false,
+            "original_plan": [],
+            "optimized_plan": [],
+            "rows": [],
+            "columns": [],
+            "result_ok": false,
+            "result_warnings": [],
+            "final_answer": "I cannot answer this question. The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "repair_count": 0,
+            "optimizer_count": 0,
+            "trace": [
+              {
+                "node": "schema_retriever",
+                "status": "pass",
+                "latency_ms": 0.282,
+                "reason": ""
+              },
+              {
+                "node": "sql_generator",
+                "status": "error",
+                "latency_ms": 0.005,
+                "reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation."
+              },
+              {
+                "node": "response_generator",
+                "status": "pass",
+                "latency_ms": 0.001,
+                "reason": ""
+              }
+            ],
+            "metrics": {
+              "total_latency_ms": 0.821,
+              "generation_calls": 1,
+              "llm_calls": 0,
+              "provider": "MockProvider"
+            },
+            "status": "refused",
+            "error": ""
+          },
+          "refused": true,
+          "missing_fields": [],
+          "missing_field": null,
+          "informed_refusal": false,
+          "ambiguity_flagged": false,
+          "llm_calls": 0,
+          "generation_calls": 1,
+          "latency_ms": 0.821,
+          "difficulty": "hard",
+          "answerable": true,
+          "ambiguous": false,
+          "tags": [
+            "schema"
+          ],
+          "expected_tables": [
+            "customers",
+            "orders"
+          ],
+          "expected_join_paths": [
+            "customers.customer_id = orders.customer_id"
+          ]
+        },
+        {
+          "id": "A1",
+          "question_id": "A1",
+          "question": "Who are our best customers?",
+          "arm": "querymind",
+          "correct": false,
+          "state": {
+            "question": "Who are our best customers?",
+            "schema_mode": "flat",
+            "schema_context": "TABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+            "sql": "",
+            "sql_history": [],
+            "syntax_ok": false,
+            "syntax_error": "",
+            "safety_ok": false,
+            "semantic_ok": false,
+            "semantic_reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "answerable": false,
+            "missing_fields": [],
+            "assumptions": [],
+            "original_sql": "",
+            "optimized_sql": "",
+            "optimization_applied": false,
+            "original_plan": [],
+            "optimized_plan": [],
+            "rows": [],
+            "columns": [],
+            "result_ok": false,
+            "result_warnings": [],
+            "final_answer": "I cannot answer this question. The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "repair_count": 0,
+            "optimizer_count": 0,
+            "trace": [
+              {
+                "node": "schema_retriever",
+                "status": "pass",
+                "latency_ms": 0.359,
+                "reason": ""
+              },
+              {
+                "node": "sql_generator",
+                "status": "error",
+                "latency_ms": 0.007,
+                "reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation."
+              },
+              {
+                "node": "response_generator",
+                "status": "pass",
+                "latency_ms": 0.001,
+                "reason": ""
+              }
+            ],
+            "metrics": {
+              "total_latency_ms": 0.976,
+              "generation_calls": 1,
+              "llm_calls": 0,
+              "provider": "MockProvider"
+            },
+            "status": "refused",
+            "error": ""
+          },
+          "refused": true,
+          "missing_fields": [],
+          "missing_field": null,
+          "informed_refusal": false,
+          "ambiguity_flagged": false,
+          "llm_calls": 0,
+          "generation_calls": 1,
+          "latency_ms": 0.976,
+          "difficulty": "hard",
+          "answerable": true,
+          "ambiguous": true,
+          "tags": [
+            "b2",
+            "ablation",
+            "schema"
+          ],
+          "expected_tables": [
+            "customers",
+            "orders"
+          ],
+          "expected_join_paths": [
+            "customers.customer_id = orders.customer_id"
+          ],
+          "reference_assumption": "Best means top three by total spending."
+        },
+        {
+          "id": "A2",
+          "question_id": "A2",
+          "question": "How much does each customer usually spend?",
+          "arm": "querymind",
+          "correct": false,
+          "state": {
+            "question": "How much does each customer usually spend?",
+            "schema_mode": "flat",
+            "schema_context": "TABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+            "sql": "",
+            "sql_history": [],
+            "syntax_ok": false,
+            "syntax_error": "",
+            "safety_ok": false,
+            "semantic_ok": false,
+            "semantic_reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "answerable": false,
+            "missing_fields": [],
+            "assumptions": [],
+            "original_sql": "",
+            "optimized_sql": "",
+            "optimization_applied": false,
+            "original_plan": [],
+            "optimized_plan": [],
+            "rows": [],
+            "columns": [],
+            "result_ok": false,
+            "result_warnings": [],
+            "final_answer": "I cannot answer this question. The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "repair_count": 0,
+            "optimizer_count": 0,
+            "trace": [
+              {
+                "node": "schema_retriever",
+                "status": "pass",
+                "latency_ms": 0.277,
+                "reason": ""
+              },
+              {
+                "node": "sql_generator",
+                "status": "error",
+                "latency_ms": 0.007,
+                "reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation."
+              },
+              {
+                "node": "response_generator",
+                "status": "pass",
+                "latency_ms": 0.003,
+                "reason": ""
+              }
+            ],
+            "metrics": {
+              "total_latency_ms": 0.824,
+              "generation_calls": 1,
+              "llm_calls": 0,
+              "provider": "MockProvider"
+            },
+            "status": "refused",
+            "error": ""
+          },
+          "refused": true,
+          "missing_fields": [],
+          "missing_field": null,
+          "informed_refusal": false,
+          "ambiguity_flagged": false,
+          "llm_calls": 0,
+          "generation_calls": 1,
+          "latency_ms": 0.824,
+          "difficulty": "hard",
+          "answerable": true,
+          "ambiguous": true,
+          "tags": [
+            "schema"
+          ],
+          "expected_tables": [
+            "customers",
+            "orders"
+          ],
+          "expected_join_paths": [
+            "customers.customer_id = orders.customer_id"
+          ],
+          "reference_assumption": "Usually means arithmetic mean of order amounts for customers with orders."
+        }
+      ],
+      "metrics": {
+        "run_count": 8,
+        "successful_runs": 1,
+        "refused_runs": 7,
+        "error_runs": 0,
+        "success_rate": 0.125,
+        "completion_rate": 0.125,
+        "executed_runs": 1,
+        "execution_success_rate": 0.125,
+        "total_rows": 3,
+        "mean_total_latency_ms": 1.1846249999999998,
+        "mean_execution_time_ms": 0.23912498727440834,
+        "p50_latency_ms": 0.867,
+        "p95_latency_ms": 2.521049999999999,
+        "latency_observations": 8,
+        "llm_calls_per_question": 0.0,
+        "llm_call_observations": 8,
+        "generation_calls_per_question": 1.0,
+        "generation_call_observations": 8,
+        "case_count": 8,
+        "scored_cases": 8,
+        "unscored_cases": 0,
+        "reference_error_count": 0,
+        "correct_cases": 1,
+        "result_accuracy": 0.125,
+        "answerable_cases": 8,
+        "unanswerable_cases": 0,
+        "ambiguous_cases": 2,
+        "fabrication_count": 0,
+        "fabrication_rate": null,
+        "false_answer_rate": null,
+        "informed_refusal_count": 0,
+        "unanswerable_refusal_rate": null,
+        "raw_unanswerable_refusal_rate": null,
+        "over_refusal_count": 7,
+        "over_refusal_rate": 0.875,
+        "ambiguity_flagged_count": 0,
+        "ambiguity_flagged_rate": 0.0,
+        "easy_scored_cases": 0,
+        "easy_correct_cases": 0,
+        "easy_accuracy": null,
+        "hard_scored_cases": 8,
+        "hard_correct_cases": 1,
+        "hard_accuracy": 0.125,
+        "mean_schema_context_chars": 285.0,
+        "mean_retrieval_latency_ms": 0.42912500000000003,
+        "correct_tables_rate": null,
+        "correct_tables_scored": 0,
+        "correct_join_path_rate": null,
+        "correct_join_path_scored": 0,
+        "fallback_runs": 0
+      },
+      "scoring": {
+        "results": "Shared scorer: exact column labels and unordered row multisets, including duplicate counts; no numeric tolerance.",
+        "unanswerable": "Correct only for an informed refusal matching annotated missing fields; generic unsupported-provider refusals do not count.",
+        "latency": "Inference latency excludes reference SQL execution and scoring.",
+        "calls": "Generation attempts are separate from instrumented LLM calls; unknown LLM counts remain null."
+      }
+    },
+    "neo4j": {
+      "scope": "Milestone 2 preliminary reference-result evaluation; no natural-language answer-quality judging",
+      "arm": "querymind",
+      "case_count": 8,
+      "providers": [
+        "MockProvider"
+      ],
+      "placeholder_components": [
+        "result_verifier",
+        "schema_retriever",
+        "semantic_verifier"
+      ],
+      "limitations": [
+        "Best means top three by total spending.",
+        "Usually means arithmetic mean of order amounts for customers with orders."
+      ],
+      "cases": [
+        {
+          "id": "H1",
+          "question_id": "H1",
+          "question": "Who are the top 3 customers by total spending?",
+          "arm": "querymind",
+          "correct": true,
+          "state": {
+            "question": "Who are the top 3 customers by total spending?",
+            "schema_mode": "neo4j",
+            "schema_context": "-- Neo4j retrieval is a starter placeholder; using flat SQLite schema.\nTABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+            "sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+            "sql_history": [
+              "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3"
+            ],
+            "syntax_ok": true,
+            "syntax_error": "",
+            "safety_ok": true,
+            "semantic_ok": false,
+            "semantic_reason": "Starter input checks passed; semantic alignment is unverified.",
+            "answerable": true,
+            "missing_fields": [],
+            "assumptions": [
+              "The starter semantic verifier checks input structure only; alignment between the question and SQL has not been verified."
+            ],
+            "original_sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+            "optimized_sql": "SELECT c.name, SUM(o.amount) AS total_spending FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name ORDER BY total_spending DESC, c.customer_id LIMIT 3",
+            "optimization_applied": false,
+            "original_plan": [
+              [
+                9,
+                0,
+                216,
+                "SCAN o"
+              ],
+              [
+                11,
+                0,
+                45,
+                "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+              ],
+              [
+                14,
+                0,
+                0,
+                "USE TEMP B-TREE FOR GROUP BY"
+              ],
+              [
+                62,
+                0,
+                0,
+                "USE TEMP B-TREE FOR ORDER BY"
+              ]
+            ],
+            "optimized_plan": [
+              [
+                9,
+                0,
+                216,
+                "SCAN o"
+              ],
+              [
+                11,
+                0,
+                45,
+                "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+              ],
+              [
+                14,
+                0,
+                0,
+                "USE TEMP B-TREE FOR GROUP BY"
+              ],
+              [
+                62,
+                0,
+                0,
+                "USE TEMP B-TREE FOR ORDER BY"
+              ]
+            ],
+            "rows": [
+              [
+                "Alice Chen",
+                300.0
+              ],
+              [
+                "Bob Smith",
+                175.0
+              ],
+              [
+                "Carol Davis",
+                75.0
+              ]
+            ],
+            "columns": [
+              "name",
+              "total_spending"
+            ],
+            "result_ok": false,
+            "result_warnings": [
+              "Starter result verification checks table shape only."
+            ],
+            "final_answer": "The query returned 3 row(s). See the result table and verification details.",
+            "repair_count": 0,
+            "optimizer_count": 1,
+            "trace": [
+              {
+                "node": "schema_retriever",
+                "status": "placeholder",
+                "latency_ms": 0.386,
+                "reason": "Neo4j retrieval is deferred; using flat SQLite schema offline."
+              },
+              {
+                "node": "sql_generator",
+                "status": "pass",
+                "latency_ms": 0.007,
+                "reason": ""
+              },
+              {
+                "node": "safety_verifier",
+                "status": "pass",
+                "latency_ms": 0.066,
+                "reason": "Read-only guard passed."
+              },
+              {
+                "node": "syntax_verifier",
+                "status": "pass",
+                "latency_ms": 0.353,
+                "reason": "SQLite compilation passed."
+              },
+              {
+                "node": "semantic_verifier",
+                "status": "placeholder",
+                "latency_ms": 0.001,
+                "reason": "Starter input checks passed; semantic alignment is unverified."
+              },
+              {
+                "node": "optimizer",
+                "status": "pass",
+                "latency_ms": 0.282,
+                "reason": "Starter optimizer inspected the plan and kept SQL unchanged."
+              },
+              {
+                "node": "executor",
+                "status": "pass",
+                "latency_ms": 0.305,
+                "reason": ""
+              },
+              {
+                "node": "result_verifier",
+                "status": "placeholder",
+                "latency_ms": 0.005,
+                "reason": "Starter result verification checks table shape only."
+              },
+              {
+                "node": "response_generator",
+                "status": "pass",
+                "latency_ms": 0.002,
+                "reason": ""
+              }
+            ],
+            "metrics": {
+              "execution_time_ms": 0.24695810861885548,
+              "result_statistics": {
+                "row_count": 3,
+                "column_count": 2
+              },
+              "total_latency_ms": 2.051,
+              "generation_calls": 1,
+              "llm_calls": 0,
+              "provider": "MockProvider"
+            },
+            "status": "success",
+            "error": ""
+          },
+          "refused": false,
+          "missing_fields": [],
+          "missing_field": null,
+          "informed_refusal": false,
+          "ambiguity_flagged": false,
+          "llm_calls": 0,
+          "generation_calls": 1,
+          "latency_ms": 2.051,
+          "difficulty": "hard",
+          "answerable": true,
+          "ambiguous": false,
+          "tags": [
+            "b2",
+            "ablation",
+            "schema"
+          ],
+          "expected_tables": [
+            "customers",
+            "orders"
+          ],
+          "expected_join_paths": [
+            "customers.customer_id = orders.customer_id"
+          ]
+        },
+        {
+          "id": "H2",
+          "question_id": "H2",
+          "question": "Which customers have never placed an order?",
+          "arm": "querymind",
+          "correct": false,
+          "state": {
+            "question": "Which customers have never placed an order?",
+            "schema_mode": "neo4j",
+            "schema_context": "-- Neo4j retrieval is a starter placeholder; using flat SQLite schema.\nTABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+            "sql": "",
+            "sql_history": [],
+            "syntax_ok": false,
+            "syntax_error": "",
+            "safety_ok": false,
+            "semantic_ok": false,
+            "semantic_reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "answerable": false,
+            "missing_fields": [],
+            "assumptions": [],
+            "original_sql": "",
+            "optimized_sql": "",
+            "optimization_applied": false,
+            "original_plan": [],
+            "optimized_plan": [],
+            "rows": [],
+            "columns": [],
+            "result_ok": false,
+            "result_warnings": [],
+            "final_answer": "I cannot answer this question. The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "repair_count": 0,
+            "optimizer_count": 0,
+            "trace": [
+              {
+                "node": "schema_retriever",
+                "status": "placeholder",
+                "latency_ms": 0.551,
+                "reason": "Neo4j retrieval is deferred; using flat SQLite schema offline."
+              },
+              {
+                "node": "sql_generator",
+                "status": "error",
+                "latency_ms": 0.006,
+                "reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation."
+              },
+              {
+                "node": "response_generator",
+                "status": "pass",
+                "latency_ms": 0.001,
+                "reason": ""
+              }
+            ],
+            "metrics": {
+              "total_latency_ms": 1.127,
+              "generation_calls": 1,
+              "llm_calls": 0,
+              "provider": "MockProvider"
+            },
+            "status": "refused",
+            "error": ""
+          },
+          "refused": true,
+          "missing_fields": [],
+          "missing_field": null,
+          "informed_refusal": false,
+          "ambiguity_flagged": false,
+          "llm_calls": 0,
+          "generation_calls": 1,
+          "latency_ms": 1.127,
+          "difficulty": "hard",
+          "answerable": true,
+          "ambiguous": false,
+          "tags": [
+            "b2",
+            "ablation",
+            "schema"
+          ],
+          "expected_tables": [
+            "customers",
+            "orders"
+          ],
+          "expected_join_paths": [
+            "customers.customer_id = orders.customer_id"
+          ]
+        },
+        {
+          "id": "H3",
+          "question_id": "H3",
+          "question": "What is the average order amount per customer who has ordered?",
+          "arm": "querymind",
+          "correct": false,
+          "state": {
+            "question": "What is the average order amount per customer who has ordered?",
+            "schema_mode": "neo4j",
+            "schema_context": "-- Neo4j retrieval is a starter placeholder; using flat SQLite schema.\nTABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+            "sql": "",
+            "sql_history": [],
+            "syntax_ok": false,
+            "syntax_error": "",
+            "safety_ok": false,
+            "semantic_ok": false,
+            "semantic_reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "answerable": false,
+            "missing_fields": [],
+            "assumptions": [],
+            "original_sql": "",
+            "optimized_sql": "",
+            "optimization_applied": false,
+            "original_plan": [],
+            "optimized_plan": [],
+            "rows": [],
+            "columns": [],
+            "result_ok": false,
+            "result_warnings": [],
+            "final_answer": "I cannot answer this question. The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "repair_count": 0,
+            "optimizer_count": 0,
+            "trace": [
+              {
+                "node": "schema_retriever",
+                "status": "placeholder",
+                "latency_ms": 0.276,
+                "reason": "Neo4j retrieval is deferred; using flat SQLite schema offline."
+              },
+              {
+                "node": "sql_generator",
+                "status": "error",
+                "latency_ms": 0.005,
+                "reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation."
+              },
+              {
+                "node": "response_generator",
+                "status": "pass",
+                "latency_ms": 0.001,
+                "reason": ""
+              }
+            ],
+            "metrics": {
+              "total_latency_ms": 0.82,
+              "generation_calls": 1,
+              "llm_calls": 0,
+              "provider": "MockProvider"
+            },
+            "status": "refused",
+            "error": ""
+          },
+          "refused": true,
+          "missing_fields": [],
+          "missing_field": null,
+          "informed_refusal": false,
+          "ambiguity_flagged": false,
+          "llm_calls": 0,
+          "generation_calls": 1,
+          "latency_ms": 0.82,
+          "difficulty": "hard",
+          "answerable": true,
+          "ambiguous": false,
+          "tags": [
+            "b2",
+            "ablation",
+            "schema"
+          ],
+          "expected_tables": [
+            "customers",
+            "orders"
+          ],
+          "expected_join_paths": [
+            "customers.customer_id = orders.customer_id"
+          ]
+        },
+        {
+          "id": "H4",
+          "question_id": "H4",
+          "question": "How many orders has each customer placed, including those with no orders?",
+          "arm": "querymind",
+          "correct": false,
+          "state": {
+            "question": "How many orders has each customer placed, including those with no orders?",
+            "schema_mode": "neo4j",
+            "schema_context": "-- Neo4j retrieval is a starter placeholder; using flat SQLite schema.\nTABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+            "sql": "",
+            "sql_history": [],
+            "syntax_ok": false,
+            "syntax_error": "",
+            "safety_ok": false,
+            "semantic_ok": false,
+            "semantic_reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "answerable": false,
+            "missing_fields": [],
+            "assumptions": [],
+            "original_sql": "",
+            "optimized_sql": "",
+            "optimization_applied": false,
+            "original_plan": [],
+            "optimized_plan": [],
+            "rows": [],
+            "columns": [],
+            "result_ok": false,
+            "result_warnings": [],
+            "final_answer": "I cannot answer this question. The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "repair_count": 0,
+            "optimizer_count": 0,
+            "trace": [
+              {
+                "node": "schema_retriever",
+                "status": "placeholder",
+                "latency_ms": 0.267,
+                "reason": "Neo4j retrieval is deferred; using flat SQLite schema offline."
+              },
+              {
+                "node": "sql_generator",
+                "status": "error",
+                "latency_ms": 0.005,
+                "reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation."
+              },
+              {
+                "node": "response_generator",
+                "status": "pass",
+                "latency_ms": 0.001,
+                "reason": ""
+              }
+            ],
+            "metrics": {
+              "total_latency_ms": 0.793,
+              "generation_calls": 1,
+              "llm_calls": 0,
+              "provider": "MockProvider"
+            },
+            "status": "refused",
+            "error": ""
+          },
+          "refused": true,
+          "missing_fields": [],
+          "missing_field": null,
+          "informed_refusal": false,
+          "ambiguity_flagged": false,
+          "llm_calls": 0,
+          "generation_calls": 1,
+          "latency_ms": 0.793,
+          "difficulty": "hard",
+          "answerable": true,
+          "ambiguous": false,
+          "tags": [
+            "ablation",
+            "schema"
+          ],
+          "expected_tables": [
+            "customers",
+            "orders"
+          ],
+          "expected_join_paths": [
+            "customers.customer_id = orders.customer_id"
+          ]
+        },
+        {
+          "id": "H5",
+          "question_id": "H5",
+          "question": "Which customers spent more than 100 in total?",
+          "arm": "querymind",
+          "correct": false,
+          "state": {
+            "question": "Which customers spent more than 100 in total?",
+            "schema_mode": "neo4j",
+            "schema_context": "-- Neo4j retrieval is a starter placeholder; using flat SQLite schema.\nTABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+            "sql": "",
+            "sql_history": [],
+            "syntax_ok": false,
+            "syntax_error": "",
+            "safety_ok": false,
+            "semantic_ok": false,
+            "semantic_reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "answerable": false,
+            "missing_fields": [],
+            "assumptions": [],
+            "original_sql": "",
+            "optimized_sql": "",
+            "optimization_applied": false,
+            "original_plan": [],
+            "optimized_plan": [],
+            "rows": [],
+            "columns": [],
+            "result_ok": false,
+            "result_warnings": [],
+            "final_answer": "I cannot answer this question. The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "repair_count": 0,
+            "optimizer_count": 0,
+            "trace": [
+              {
+                "node": "schema_retriever",
+                "status": "placeholder",
+                "latency_ms": 0.265,
+                "reason": "Neo4j retrieval is deferred; using flat SQLite schema offline."
+              },
+              {
+                "node": "sql_generator",
+                "status": "error",
+                "latency_ms": 0.004,
+                "reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation."
+              },
+              {
+                "node": "response_generator",
+                "status": "pass",
+                "latency_ms": 0.001,
+                "reason": ""
+              }
+            ],
+            "metrics": {
+              "total_latency_ms": 0.783,
+              "generation_calls": 1,
+              "llm_calls": 0,
+              "provider": "MockProvider"
+            },
+            "status": "refused",
+            "error": ""
+          },
+          "refused": true,
+          "missing_fields": [],
+          "missing_field": null,
+          "informed_refusal": false,
+          "ambiguity_flagged": false,
+          "llm_calls": 0,
+          "generation_calls": 1,
+          "latency_ms": 0.783,
+          "difficulty": "hard",
+          "answerable": true,
+          "ambiguous": false,
+          "tags": [
+            "schema"
+          ],
+          "expected_tables": [
+            "customers",
+            "orders"
+          ],
+          "expected_join_paths": [
+            "customers.customer_id = orders.customer_id"
+          ]
+        },
+        {
+          "id": "H6",
+          "question_id": "H6",
+          "question": "What is the latest order date for each customer who has ordered?",
+          "arm": "querymind",
+          "correct": false,
+          "state": {
+            "question": "What is the latest order date for each customer who has ordered?",
+            "schema_mode": "neo4j",
+            "schema_context": "-- Neo4j retrieval is a starter placeholder; using flat SQLite schema.\nTABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+            "sql": "",
+            "sql_history": [],
+            "syntax_ok": false,
+            "syntax_error": "",
+            "safety_ok": false,
+            "semantic_ok": false,
+            "semantic_reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "answerable": false,
+            "missing_fields": [],
+            "assumptions": [],
+            "original_sql": "",
+            "optimized_sql": "",
+            "optimization_applied": false,
+            "original_plan": [],
+            "optimized_plan": [],
+            "rows": [],
+            "columns": [],
+            "result_ok": false,
+            "result_warnings": [],
+            "final_answer": "I cannot answer this question. The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "repair_count": 0,
+            "optimizer_count": 0,
+            "trace": [
+              {
+                "node": "schema_retriever",
+                "status": "placeholder",
+                "latency_ms": 0.347,
+                "reason": "Neo4j retrieval is deferred; using flat SQLite schema offline."
+              },
+              {
+                "node": "sql_generator",
+                "status": "error",
+                "latency_ms": 0.004,
+                "reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation."
+              },
+              {
+                "node": "response_generator",
+                "status": "pass",
+                "latency_ms": 0.001,
+                "reason": ""
+              }
+            ],
+            "metrics": {
+              "total_latency_ms": 0.874,
+              "generation_calls": 1,
+              "llm_calls": 0,
+              "provider": "MockProvider"
+            },
+            "status": "refused",
+            "error": ""
+          },
+          "refused": true,
+          "missing_fields": [],
+          "missing_field": null,
+          "informed_refusal": false,
+          "ambiguity_flagged": false,
+          "llm_calls": 0,
+          "generation_calls": 1,
+          "latency_ms": 0.874,
+          "difficulty": "hard",
+          "answerable": true,
+          "ambiguous": false,
+          "tags": [
+            "schema"
+          ],
+          "expected_tables": [
+            "customers",
+            "orders"
+          ],
+          "expected_join_paths": [
+            "customers.customer_id = orders.customer_id"
+          ]
+        },
+        {
+          "id": "A1",
+          "question_id": "A1",
+          "question": "Who are our best customers?",
+          "arm": "querymind",
+          "correct": false,
+          "state": {
+            "question": "Who are our best customers?",
+            "schema_mode": "neo4j",
+            "schema_context": "-- Neo4j retrieval is a starter placeholder; using flat SQLite schema.\nTABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+            "sql": "",
+            "sql_history": [],
+            "syntax_ok": false,
+            "syntax_error": "",
+            "safety_ok": false,
+            "semantic_ok": false,
+            "semantic_reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "answerable": false,
+            "missing_fields": [],
+            "assumptions": [],
+            "original_sql": "",
+            "optimized_sql": "",
+            "optimization_applied": false,
+            "original_plan": [],
+            "optimized_plan": [],
+            "rows": [],
+            "columns": [],
+            "result_ok": false,
+            "result_warnings": [],
+            "final_answer": "I cannot answer this question. The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "repair_count": 0,
+            "optimizer_count": 0,
+            "trace": [
+              {
+                "node": "schema_retriever",
+                "status": "placeholder",
+                "latency_ms": 0.332,
+                "reason": "Neo4j retrieval is deferred; using flat SQLite schema offline."
+              },
+              {
+                "node": "sql_generator",
+                "status": "error",
+                "latency_ms": 0.007,
+                "reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation."
+              },
+              {
+                "node": "response_generator",
+                "status": "pass",
+                "latency_ms": 0.001,
+                "reason": ""
+              }
+            ],
+            "metrics": {
+              "total_latency_ms": 0.862,
+              "generation_calls": 1,
+              "llm_calls": 0,
+              "provider": "MockProvider"
+            },
+            "status": "refused",
+            "error": ""
+          },
+          "refused": true,
+          "missing_fields": [],
+          "missing_field": null,
+          "informed_refusal": false,
+          "ambiguity_flagged": false,
+          "llm_calls": 0,
+          "generation_calls": 1,
+          "latency_ms": 0.862,
+          "difficulty": "hard",
+          "answerable": true,
+          "ambiguous": true,
+          "tags": [
+            "b2",
+            "ablation",
+            "schema"
+          ],
+          "expected_tables": [
+            "customers",
+            "orders"
+          ],
+          "expected_join_paths": [
+            "customers.customer_id = orders.customer_id"
+          ],
+          "reference_assumption": "Best means top three by total spending."
+        },
+        {
+          "id": "A2",
+          "question_id": "A2",
+          "question": "How much does each customer usually spend?",
+          "arm": "querymind",
+          "correct": false,
+          "state": {
+            "question": "How much does each customer usually spend?",
+            "schema_mode": "neo4j",
+            "schema_context": "-- Neo4j retrieval is a starter placeholder; using flat SQLite schema.\nTABLE customers (\n  customer_id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  email TEXT\n)\n\nTABLE orders (\n  order_id INTEGER PRIMARY KEY,\n  customer_id INTEGER NOT NULL,\n  amount REAL NOT NULL,\n  order_date TEXT NOT NULL,\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n)",
+            "sql": "",
+            "sql_history": [],
+            "syntax_ok": false,
+            "syntax_error": "",
+            "safety_ok": false,
+            "semantic_ok": false,
+            "semantic_reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "answerable": false,
+            "missing_fields": [],
+            "assumptions": [],
+            "original_sql": "",
+            "optimized_sql": "",
+            "optimization_applied": false,
+            "original_plan": [],
+            "optimized_plan": [],
+            "rows": [],
+            "columns": [],
+            "result_ok": false,
+            "result_warnings": [],
+            "final_answer": "I cannot answer this question. The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation.",
+            "repair_count": 0,
+            "optimizer_count": 0,
+            "trace": [
+              {
+                "node": "schema_retriever",
+                "status": "placeholder",
+                "latency_ms": 0.259,
+                "reason": "Neo4j retrieval is deferred; using flat SQLite schema offline."
+              },
+              {
+                "node": "sql_generator",
+                "status": "error",
+                "latency_ms": 0.005,
+                "reason": "The offline mock supports only 'Who are the top 3 customers by total spending?' and 'How many customers are there?'. A real SQL provider is a future implementation."
+              },
+              {
+                "node": "response_generator",
+                "status": "pass",
+                "latency_ms": 0.001,
+                "reason": ""
+              }
+            ],
+            "metrics": {
+              "total_latency_ms": 0.849,
+              "generation_calls": 1,
+              "llm_calls": 0,
+              "provider": "MockProvider"
+            },
+            "status": "refused",
+            "error": ""
+          },
+          "refused": true,
+          "missing_fields": [],
+          "missing_field": null,
+          "informed_refusal": false,
+          "ambiguity_flagged": false,
+          "llm_calls": 0,
+          "generation_calls": 1,
+          "latency_ms": 0.849,
+          "difficulty": "hard",
+          "answerable": true,
+          "ambiguous": true,
+          "tags": [
+            "schema"
+          ],
+          "expected_tables": [
+            "customers",
+            "orders"
+          ],
+          "expected_join_paths": [
+            "customers.customer_id = orders.customer_id"
+          ],
+          "reference_assumption": "Usually means arithmetic mean of order amounts for customers with orders."
+        }
+      ],
+      "metrics": {
+        "run_count": 8,
+        "successful_runs": 1,
+        "refused_runs": 7,
+        "error_runs": 0,
+        "success_rate": 0.125,
+        "completion_rate": 0.125,
+        "executed_runs": 1,
+        "execution_success_rate": 0.125,
+        "total_rows": 3,
+        "mean_total_latency_ms": 1.0198749999999999,
+        "mean_execution_time_ms": 0.24695810861885548,
+        "p50_latency_ms": 0.8554999999999999,
+        "p95_latency_ms": 1.7275999999999996,
+        "latency_observations": 8,
+        "llm_calls_per_question": 0.0,
+        "llm_call_observations": 8,
+        "generation_calls_per_question": 1.0,
+        "generation_call_observations": 8,
+        "case_count": 8,
+        "scored_cases": 8,
+        "unscored_cases": 0,
+        "reference_error_count": 0,
+        "correct_cases": 1,
+        "result_accuracy": 0.125,
+        "answerable_cases": 8,
+        "unanswerable_cases": 0,
+        "ambiguous_cases": 2,
+        "fabrication_count": 0,
+        "fabrication_rate": null,
+        "false_answer_rate": null,
+        "informed_refusal_count": 0,
+        "unanswerable_refusal_rate": null,
+        "raw_unanswerable_refusal_rate": null,
+        "over_refusal_count": 7,
+        "over_refusal_rate": 0.875,
+        "ambiguity_flagged_count": 0,
+        "ambiguity_flagged_rate": 0.0,
+        "easy_scored_cases": 0,
+        "easy_correct_cases": 0,
+        "easy_accuracy": null,
+        "hard_scored_cases": 8,
+        "hard_correct_cases": 1,
+        "hard_accuracy": 0.125,
+        "mean_schema_context_chars": 356.0,
+        "mean_retrieval_latency_ms": 0.335375,
+        "correct_tables_rate": null,
+        "correct_tables_scored": 0,
+        "correct_join_path_rate": null,
+        "correct_join_path_scored": 0,
+        "fallback_runs": 8
+      },
+      "scoring": {
+        "results": "Shared scorer: exact column labels and unordered row multisets, including duplicate counts; no numeric tolerance.",
+        "unanswerable": "Correct only for an informed refusal matching annotated missing fields; generic unsupported-provider refusals do not count.",
+        "latency": "Inference latency excludes reference SQL execution and scoring.",
+        "calls": "Generation attempts are separate from instrumented LLM calls; unknown LLM counts remain null."
+      }
+    }
+  },
+  "comparison": [
+    {
+      "metric": "result_accuracy",
+      "flat": 0.125,
+      "neo4j": 0.125
+    },
+    {
+      "metric": "correct_tables_rate",
+      "flat": null,
+      "neo4j": null
+    },
+    {
+      "metric": "correct_join_path_rate",
+      "flat": null,
+      "neo4j": null
+    },
+    {
+      "metric": "mean_schema_context_chars",
+      "flat": 285.0,
+      "neo4j": 356.0
+    },
+    {
+      "metric": "mean_retrieval_latency_ms",
+      "flat": 0.42912500000000003,
+      "neo4j": 0.335375
+    },
+    {
+      "metric": "fallback_runs",
+      "flat": 0,
+      "neo4j": 8
+    }
+  ],
+  "limitations": [
+    "Correct tables and join paths are unscored until annotations and retriever metrics are available.",
+    "Neo4j placeholder/fallback runs are not measurements of graph retrieval."
+  ]
+}

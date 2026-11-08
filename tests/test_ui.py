@@ -1,7 +1,13 @@
-"""The UI imports safely and delegates queries to the public orchestrator."""
+"""Presentation contracts exercised without credentials or a Streamlit server."""
 
-from contextlib import nullcontext
-from types import SimpleNamespace
+from pathlib import Path
+
+from streamlit.testing.v1 import AppTest
+
+from src import orchestrator
+
+
+APP = Path(__file__).resolve().parents[1] / "app.py"
 
 
 def test_ui_import_exposes_entry_point() -> None:
@@ -11,54 +17,98 @@ def test_ui_import_exposes_entry_point() -> None:
 
 
 def test_ui_does_not_run_an_empty_question(monkeypatch) -> None:
-    import app
-
-    messages: list[str] = []
-    fake = SimpleNamespace(
-        set_page_config=lambda **kwargs: None,
-        title=lambda value: None,
-        caption=lambda value: None,
-        text_input=lambda *args, **kwargs: "  ",
-        button=lambda *args, **kwargs: True,
-        warning=messages.append,
-    )
-    monkeypatch.setattr(app, "st", fake)
-    def unexpected_run(*args, **kwargs) -> None:
+    def unexpected_run(*args, **kwargs):
         raise AssertionError("Should not run")
 
-    monkeypatch.setattr(app, "run_querymind", unexpected_run)
-    app.main()
-    assert messages == ["Enter a business question."]
+    monkeypatch.setattr(orchestrator, "run_querymind", unexpected_run)
+    at = AppTest.from_file(str(APP)).run()
+    at.text_input[0].set_value("  ")
+    at.button[0].click().run()
+    assert not at.exception
+    assert at.warning[0].value == "Enter a business question."
 
 
-def test_ui_calls_public_orchestrator_and_shows_refusal(monkeypatch) -> None:
-    import app
+def test_ui_calls_public_orchestrator_and_shows_missing_field_refusal(monkeypatch) -> None:
+    calls = []
 
-    messages: list[str] = []
-    calls: list[tuple[str, str]] = []
-
-    def run(question: str, *, schema_mode: str) -> dict:
+    def run(question, *, schema_mode):
         calls.append((question, schema_mode))
-        return {"status": "refused", "final_answer": "Unsupported starter question.", "trace": []}
+        return {
+            "question": question, "status": "refused", "answerable": False,
+            "missing_fields": ["product cost"],
+            "semantic_reason": "Profit margin requires product cost, which is absent.",
+            "final_answer": "No reliable answer.", "trace": [],
+        }
 
-    fake = SimpleNamespace(
-        set_page_config=lambda **kwargs: None,
-        title=lambda value: None,
-        caption=lambda value: None,
-        text_input=lambda *args, **kwargs: "Find unavailable fields",
-        button=lambda *args, **kwargs: True,
-        spinner=lambda value: nullcontext(),
-        subheader=lambda value: None,
-        write=messages.append,
-        info=lambda value: None,
-        expander=lambda value: nullcontext(),
-        json=lambda value: None,
-    )
-    monkeypatch.setattr(app, "st", fake)
-    monkeypatch.setattr(app, "run_querymind", run)
-    app.main()
-    assert calls == [("Find unavailable fields", "flat")]
-    assert "Unsupported starter question." in messages
+    monkeypatch.setattr(orchestrator, "run_querymind", run)
+    at = AppTest.from_file(str(APP)).run()
+    at.text_input[0].set_value("What is the profit margin?")
+    at.button[0].click().run()
+    assert not at.exception
+    assert calls == [("What is the profit margin?", "flat")]
+    assert at.warning[0].value == "QueryMind cannot reliably answer this question."
+    output = "\n".join(item.value for item in at.markdown)
+    assert "Missing field: product cost" in output
+    assert "Reason: Profit margin requires product cost, which is absent." in output
+    assert "✓ Semantic verification" not in output
+
+
+def test_ui_displays_result_sql_trace_and_retains_completed_answer(monkeypatch) -> None:
+    calls = []
+
+    def run(question, *, schema_mode):
+        calls.append(question)
+        return {
+            "question": question, "status": "success", "answerable": True,
+            "final_answer": "There are four customers.",
+            "columns": ["customer_count"], "rows": [[4]],
+            "sql": "SELECT COUNT(*) AS customer_count FROM customers",
+            "original_sql": "SELECT COUNT(*) AS customer_count FROM customers",
+            "safety_ok": True, "syntax_ok": True,
+            "semantic_ok": False, "result_ok": False,
+            "trace": [
+                {"node": "schema_retriever", "status": "pass"},
+                {"node": "safety_verifier", "status": "pass"},
+                {"node": "syntax_verifier", "status": "pass"},
+                {"node": "semantic_verifier", "status": "placeholder"},
+                {"node": "optimizer", "status": "pass"},
+                {"node": "executor", "status": "pass"},
+                {"node": "result_verifier", "status": "placeholder"},
+            ],
+        }
+
+    monkeypatch.setattr(orchestrator, "run_querymind", run)
+    at = AppTest.from_file(str(APP)).run()
+    at.text_input[0].set_value("How many customers are there?")
+    at.button[0].click().run()
+    assert not at.exception
+    assert at.dataframe[0].value.iloc[0, 0] == 4
+    assert at.code[0].value == "SELECT COUNT(*) AS customer_count FROM customers"
+    assert [item.value for item in at.subheader] == [
+        "Answer", "Result", "Generated SQL", "Assumptions", "Verification", "Agent Trace",
+    ]
+    output = "\n".join(item.value for item in at.markdown)
+    assert "✓ SQL safe" in output and "✓ Syntax valid" in output
+    assert "Semantic verification: starter checks only" in output
+    assert "Result sanity: starter checks only" in output
+    assert "Optimizer: SQL unchanged" in output
+    assert "Schema → Safety → Syntax → Semantic verify → Optimize → Execute → Result verify" in output
+    at.run()
+    assert not at.exception
+    assert calls == ["How many customers are there?"]
+    assert "There are four customers." in [item.value for item in at.markdown]
+
+
+def test_ui_handles_public_entry_point_exception(monkeypatch) -> None:
+    def run(*args, **kwargs):
+        raise FileNotFoundError("Database missing; run make seed.")
+
+    monkeypatch.setattr(orchestrator, "run_querymind", run)
+    at = AppTest.from_file(str(APP)).run()
+    at.text_input[0].set_value("How many customers?")
+    at.button[0].click().run()
+    assert not at.exception
+    assert at.error[0].value == "QueryMind could not run: Database missing; run make seed."
 
 
 def test_ui_verification_labels_do_not_overstate_placeholders() -> None:
@@ -77,6 +127,19 @@ def test_ui_verification_labels_do_not_overstate_placeholders() -> None:
     assert app._verification_label({"result_ok": False, "trace": []}, "result_verifier", "result_ok") == "not run"
     assert app._verification_label(
         {"safety_ok": True, "trace": [{"node": "safety_verifier", "status": "fail"}]},
-        "safety_verifier",
-        "safety_ok",
+        "safety_verifier", "safety_ok",
     ) == "failed"
+
+
+def test_optimizer_preservation_needs_explicit_evidence() -> None:
+    import app
+
+    state = {
+        "original_sql": "SELECT 1", "sql": "SELECT 2", "optimization_applied": True,
+        "trace": [{"node": "optimizer", "status": "pass"}],
+    }
+    assert app._optimizer_label(state) == "result preservation not recorded"
+    state["metrics"] = {"optimizer_result_equal": True}
+    assert app._optimizer_label(state) == "passed"
+    state["metrics"]["optimizer_result_equal"] = False
+    assert app._optimizer_label(state) == "result preservation failed"
