@@ -1,0 +1,22 @@
+- id: S0537
+  set: multi
+  kind: reference
+  ordered: true
+  question: Find the kind of program which most number of students are enrolled in?
+  reference_sql: 'SELECT T1.degree_summary_name FROM Degree_Programs AS T1 JOIN Student_Enrolment AS T2
+    ON T1.degree_program_id  =  T2.degree_program_id GROUP BY T1.degree_summary_name ORDER BY count(*)
+    DESC LIMIT 1
+
+    '
+  note: Spider 1.0 dev.json index 537; db_id student_transcripts_tracking
+- id: S0561
+  set: multi
+  kind: reference
+  ordered: true
+  question: Which address holds the most number of students currently? List the address id and all lines.
+  reference_sql: 'SELECT T1.address_id ,  T1.line_1 ,  T1.line_2 FROM Addresses AS T1 JOIN Students AS
+    T2 ON T1.address_id  =  T2.current_address_id GROUP BY T1.address_id ORDER BY count(*) DESC LIMIT
+    1
+
+    '
+  note: Spider 1.0 dev.json index 561; db_id student_transcripts_tracking

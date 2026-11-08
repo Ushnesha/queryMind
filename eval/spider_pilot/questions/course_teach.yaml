@@ -1,0 +1,27 @@
+- id: S0381
+  set: single
+  kind: reference
+  ordered: false
+  question: How many teachers are there?
+  reference_sql: 'SELECT count(*) FROM teacher
+
+    '
+  note: Spider 1.0 dev.json index 381; db_id course_teach
+- id: S0384
+  set: single
+  kind: reference
+  ordered: true
+  question: What are the names of the teachers ordered by ascending age?
+  reference_sql: 'SELECT Name FROM teacher ORDER BY Age ASC
+
+    '
+  note: Spider 1.0 dev.json index 384; db_id course_teach
+- id: S0390
+  set: single
+  kind: reference
+  ordered: false
+  question: What are the names of the teachers who are aged either 32 or 33?
+  reference_sql: 'SELECT Name FROM teacher WHERE Age  =  32 OR Age  =  33
+
+    '
+  note: Spider 1.0 dev.json index 390; db_id course_teach

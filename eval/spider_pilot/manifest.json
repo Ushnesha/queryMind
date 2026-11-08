@@ -1,0 +1,123 @@
+{
+  "source": "Spider 1.0 dev split (dev.json), Yu et al. 2018, CC BY-SA 4.0",
+  "dev_json_sha256": "30d64a3fccde493226df79687aed9e4a1c0129525baf44f29c0573d914d758a4",
+  "source_questions": 1034,
+  "seed": 598,
+  "requested": 50,
+  "selected": 50,
+  "databases": {
+    "battle_death": [
+      "S0493",
+      "S0499",
+      "S0506"
+    ],
+    "car_1": [
+      "S0099",
+      "S0102"
+    ],
+    "concert_singer": [
+      "S0035"
+    ],
+    "course_teach": [
+      "S0381",
+      "S0384",
+      "S0390"
+    ],
+    "cre_Doc_Template_Mgt": [
+      "S0304",
+      "S0319",
+      "S0328",
+      "S0331",
+      "S0359",
+      "S0361",
+      "S0376"
+    ],
+    "dog_kennels": [
+      "S0943",
+      "S0993",
+      "S0995"
+    ],
+    "employee_hire_evaluation": [
+      "S0261"
+    ],
+    "flight_2": [
+      "S0210",
+      "S0211",
+      "S0214",
+      "S0220",
+      "S0231"
+    ],
+    "network_1": [
+      "S0889",
+      "S0892"
+    ],
+    "orchestra": [
+      "S0846"
+    ],
+    "poker_player": [
+      "S0648",
+      "S0654"
+    ],
+    "singer": [
+      "S1023"
+    ],
+    "student_transcripts_tracking": [
+      "S0537",
+      "S0561"
+    ],
+    "tvshow": [
+      "S0610",
+      "S0629",
+      "S0636"
+    ],
+    "voter_1": [
+      "S0692"
+    ],
+    "world_1": [
+      "S0706",
+      "S0710",
+      "S0733",
+      "S0735",
+      "S0742",
+      "S0771",
+      "S0774",
+      "S0783",
+      "S0795",
+      "S0800",
+      "S0813"
+    ],
+    "wta_1": [
+      "S0446",
+      "S0458"
+    ]
+  },
+  "by_complexity": {
+    "single": 25,
+    "multi": 25
+  },
+  "ordered_cases": 11,
+  "dropped": [
+    {
+      "index": 15,
+      "db_id": "concert_singer",
+      "reason": "gold result is empty"
+    },
+    {
+      "index": 225,
+      "db_id": "flight_2",
+      "reason": "gold result is empty"
+    },
+    {
+      "index": 60,
+      "db_id": "pets_1",
+      "reason": "gold result is empty"
+    },
+    {
+      "index": 397,
+      "db_id": "course_teach",
+      "reason": "gold result is empty"
+    }
+  ],
+  "complexity_rule": "multi = gold SQL contains JOIN, INTERSECT, UNION, EXCEPT or a nested SELECT",
+  "ordered_rule": "row order enforced when gold SQL contains ORDER BY"
+}

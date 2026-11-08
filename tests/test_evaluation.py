@@ -67,8 +67,8 @@ def test_provider_call_accounting_is_instrumented_not_assumed(db_path: Path) -> 
 
     questions = [{"id": "E1", "question": "Count", "sql": "SELECT COUNT(*) AS customer_count FROM customers"}]
     report = run_evaluation(questions, db_path=db_path, provider=Provider())
-    # Generation plus the semantic and result judges use the shared provider.
-    assert report["cases"][0]["llm_calls"] == 6
+    # Generation, both judges and the answer writer use the shared provider.
+    assert report["cases"][0]["llm_calls"] == 8
     assert report["cases"][0]["generation_calls"] == 1
 
 

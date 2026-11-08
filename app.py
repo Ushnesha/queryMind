@@ -2,12 +2,63 @@
 
 from __future__ import annotations
 
+import os
+from pathlib import Path
+import sqlite3
+
 import streamlit as st
 from dotenv import load_dotenv
 
-from src.config import PROJECT_ROOT, load_settings
+from src.config import PROJECT_ROOT, load_settings, resolve_path
 from src.orchestrator import run_querymind
+from src.schema.build_graph import build_schema_graph
+from src.schema.context import render_schema
 from src.state import AgentState
+
+
+def discover_databases(configured: Path, spider_root: Path) -> dict[str, Path]:
+    """Discover local Spider SQLite files without reading gold evaluation data."""
+    choices = {"Configured database / " + configured.stem: configured.resolve()}
+    roots = [(name, spider_root / name) for name in ("database", "test_database")]
+    if spider_root.name in {"database", "test_database"}:
+        roots = [(spider_root.name, spider_root)]
+    for split, root in roots:
+        if root.is_dir():
+            for path in sorted(root.glob("*/*.sqlite")):
+                if path.is_file():
+                    choices[f"Spider / {split} / {path.stem}"] = path.resolve()
+    return choices
+
+
+def _database_browser() -> Path:
+    settings = load_settings()
+    root = resolve_path(os.environ.get("SPIDER_DATA_ROOT") or "data/spider_data")
+    choices = discover_databases(settings.database.path, root)
+    labels = list(choices)
+    # Prefer the Spider label if the configured path is part of the dataset.
+    default = next((i for i, label in enumerate(labels[1:], 1)
+                    if choices[label] == settings.database.path.resolve()), 0)
+    with st.sidebar:
+        st.header("Database explorer")
+        label = st.selectbox("Database", labels, index=default, key="querymind_database")
+        selected = choices[label]
+        st.caption(f"{len(choices) - 1} Spider database files available")
+        if st.session_state.get("querymind_active_database") != str(selected):
+            st.session_state.pop("querymind_result", None)
+            st.session_state["querymind_active_database"] = str(selected)
+        try:
+            graph = build_schema_graph(selected)
+            tables = [table["name"] for table in graph["tables"]]
+            table = st.selectbox("Browse table", ["All tables", *tables], key=f"querymind_table_{selected}")
+            st.caption(f"{len(tables)} tables · Questions can join tables within this database.")
+            with st.expander("Table schema"):
+                st.text(render_schema(graph, tables if table == "All tables" else [table]))
+            st.caption("Table selection browses the schema. Queries can use any table in the selected database.")
+        except (FileNotFoundError, ValueError, sqlite3.Error) as exc:
+            st.warning(f"Cannot inspect this database: {exc}")
+        if len(choices) == 1:
+            st.info("No Spider files found. Set SPIDER_DATA_ROOT to your local Spider 1.0 dataset folder.")
+    return selected
 
 
 def main() -> None:
@@ -16,9 +67,11 @@ def main() -> None:
     st.set_page_config(page_title="QueryMind", page_icon="🔎", layout="wide")
     st.title("QueryMind")
     st.caption("Ask a business question and inspect the answer, SQL, and verification.")
+    database_path = _database_browser()
+    st.caption("Selected database: " + database_path.stem)
     question = st.text_input(
         "Ask your database",
-        placeholder="Who are the top 3 customers by total spending?",
+        placeholder="Ask about the tables in the selected database…",
         key="querymind_question",
     )
     if st.button("Ask QueryMind", type="primary"):
@@ -27,7 +80,8 @@ def main() -> None:
             return
         try:
             with st.spinner("Running QueryMind…"):
-                state = run_querymind(question.strip(), schema_mode=load_settings().schema.default_mode)
+                state = run_querymind(question.strip(), schema_mode=load_settings().schema.default_mode,
+                                      db_path=database_path)
         except (FileNotFoundError, ValueError, RuntimeError) as exc:
             st.session_state.pop("querymind_result", None)
             st.error(f"QueryMind could not run: {exc}")

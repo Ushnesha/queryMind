@@ -1,0 +1,51 @@
+- id: S0210
+  set: multi
+  kind: reference
+  ordered: false
+  question: Return the number of flights arriving in Aberdeen.
+  reference_sql: 'SELECT count(*) FROM FLIGHTS AS T1 JOIN AIRPORTS AS T2 ON T1.DestAirport  =  T2.AirportCode
+    WHERE T2.City  =  "Aberdeen"
+
+    '
+  note: Spider 1.0 dev.json index 210; db_id flight_2
+- id: S0211
+  set: multi
+  kind: reference
+  ordered: false
+  question: How many flights depart from City 'Aberdeen' and have destination City 'Ashley'?
+  reference_sql: 'SELECT count(*) FROM FLIGHTS AS T1 JOIN AIRPORTS AS T2 ON T1.DestAirport  =  T2.AirportCode
+    JOIN AIRPORTS AS T3 ON T1.SourceAirport  =  T3.AirportCode WHERE T2.City  =  "Ashley" AND T3.City  =  "Aberdeen"
+
+    '
+  note: Spider 1.0 dev.json index 211; db_id flight_2
+- id: S0214
+  set: multi
+  kind: reference
+  ordered: false
+  question: Give the number of Jetblue Airways flights.
+  reference_sql: 'SELECT count(*) FROM FLIGHTS AS T1 JOIN AIRLINES AS T2 ON T1.Airline  =  T2.uid WHERE
+    T2.Airline = "JetBlue Airways"
+
+    '
+  note: Spider 1.0 dev.json index 214; db_id flight_2
+- id: S0220
+  set: multi
+  kind: reference
+  ordered: false
+  question: Count the number of United Airlines flights that arrive in Aberdeen.
+  reference_sql: 'SELECT count(*) FROM FLIGHTS AS T1 JOIN AIRPORTS AS T2 ON T1.DestAirport  =  T2.AirportCode
+    JOIN AIRLINES AS T3 ON T3.uid  =  T1.Airline WHERE T2.City  =  "Aberdeen" AND T3.Airline  =  "United
+    Airlines"
+
+    '
+  note: Spider 1.0 dev.json index 220; db_id flight_2
+- id: S0231
+  set: multi
+  kind: reference
+  ordered: true
+  question: Find the abbreviation and country of the airline that has fewest number of flights?
+  reference_sql: 'SELECT T1.Abbreviation ,  T1.Country FROM AIRLINES AS T1 JOIN FLIGHTS AS T2 ON T1.uid  =  T2.Airline
+    GROUP BY T1.Airline ORDER BY count(*) LIMIT 1
+
+    '
+  note: Spider 1.0 dev.json index 231; db_id flight_2

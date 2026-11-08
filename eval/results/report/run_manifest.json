@@ -1,0 +1,104 @@
+{
+  "runs": [
+    {
+      "dataset": "stakeholder",
+      "started": "2026-11-08T19:26:15+00:00",
+      "model": "devstral2-123b",
+      "baseline_commit": "c0b0cda",
+      "repeats": 3,
+      "arms": [
+        "b0",
+        "b1",
+        "querymind"
+      ],
+      "infra_failures_retried": {},
+      "finished": "2026-11-08T19:39:09+00:00",
+      "database_dump_sha256_unchanged": true,
+      "database_dump_sha256": {
+        "stakeholder_analytics.db": "d7d6a9fcc7fab97c96f3b8b12c4aabe3055a54c049afecb7afdc760f3c086038"
+      }
+    },
+    {
+      "dataset": "spider",
+      "started": "2026-11-08T19:42:15+00:00",
+      "model": "devstral2-123b",
+      "baseline_commit": "c0b0cda",
+      "repeats": 1,
+      "arms": [
+        "b0",
+        "b1",
+        "querymind"
+      ],
+      "infra_failures_retried": {},
+      "finished": "2026-11-08T19:54:21+00:00",
+      "database_file_sha256_unchanged": true,
+      "database_file_sha256": {
+        "battle_death.sqlite": "12569f4493a9655639c4ea86ba4bd8a4ea6411e1b8ae0e1fdf3d6a995344265d",
+        "car_1.sqlite": "9d851e396e02997a1de073ae982fe1e4b1769fdffce2fac6e325857a3a938709",
+        "concert_singer.sqlite": "4fa1ba5ab4577e895271088b1dc44aa94be88e25a54293317a67584112ef059d",
+        "course_teach.sqlite": "da45fcdde64ac2b9330146506b7653ad4417489d8e496e509045e1b02245d793",
+        "cre_Doc_Template_Mgt.sqlite": "9c3fdd03d8795ecde60aae782ce50c4fb1d6c03de1401fcdd6dc177342a53df5",
+        "dog_kennels.sqlite": "ea5fbc6cf6aaf500371c5c121c339d9802ba6f5fbecd948a5274c0b487a9f486",
+        "employee_hire_evaluation.sqlite": "760fec5cc872ef0cdf99242614f05c93dbd00d422ac9da87ea64fcf555be7373",
+        "flight_2.sqlite": "db777ba6488ae2b515cb138d71ff23c4533e5fd0355854648a1102faff3fb7af",
+        "network_1.sqlite": "bec92cd9a68d6f23469a0df246429299f44caaf75eab12275784e0bb7d0aa9ca",
+        "orchestra.sqlite": "13b64af1cf6fcbd34953a44f951b2bf79bedc000b344549212dac1a9345e2f86",
+        "poker_player.sqlite": "63fffd7b68524f07a742a74b74b95a4ba178e6419f3574b9ee78b8dda1df46ba",
+        "singer.sqlite": "5c1b72755d148c294b26d7b479307e8799b93485ac918720f953e2ab84d59a0a",
+        "student_transcripts_tracking.sqlite": "5a1f4928a1fd36f6edb31c4f054203b2e2fab6b18e5951c4f5633628f82a8e56",
+        "tvshow.sqlite": "1212c2e75cf1dcf3aeb4055331a85298b073d8a613ead77975b13bd3346b9fc4",
+        "voter_1.sqlite": "815bf1611b8a32f649d292a6138562f1761a0c10cb256e20f6561199cff31531",
+        "world_1.sqlite": "17b986695f16786d58d66f85e49dba87bdfe72953207ab9b1b49da9d2301ef65",
+        "wta_1.sqlite": "8f20747456d7748674b4f05432f3de96446ced95b8bd5a6fd01284f6c28f727c"
+      }
+    },
+    {
+      "dataset": "stakeholder",
+      "started": "2026-11-08T19:54:31+00:00",
+      "model": "devstral2-123b",
+      "baseline_commit": "c0b0cda",
+      "repeats": 1,
+      "arms": [
+        "querymind-flat"
+      ],
+      "infra_failures_retried": {},
+      "finished": "2026-11-08T19:56:35+00:00",
+      "database_file_sha256_unchanged": true,
+      "database_file_sha256": {
+        "stakeholder_analytics.db": "e5f691407d5e990a927f1189bdf6b5bae23f62841f359a37d3e31ea7186fba7f"
+      }
+    },
+    {
+      "dataset": "spider",
+      "started": "2026-11-08T19:56:35+00:00",
+      "model": "devstral2-123b",
+      "baseline_commit": "c0b0cda",
+      "repeats": 1,
+      "arms": [
+        "querymind-flat"
+      ],
+      "infra_failures_retried": {},
+      "finished": "2026-11-08T20:04:52+00:00",
+      "database_file_sha256_unchanged": true,
+      "database_file_sha256": {
+        "battle_death.sqlite": "12569f4493a9655639c4ea86ba4bd8a4ea6411e1b8ae0e1fdf3d6a995344265d",
+        "car_1.sqlite": "9d851e396e02997a1de073ae982fe1e4b1769fdffce2fac6e325857a3a938709",
+        "concert_singer.sqlite": "4fa1ba5ab4577e895271088b1dc44aa94be88e25a54293317a67584112ef059d",
+        "course_teach.sqlite": "da45fcdde64ac2b9330146506b7653ad4417489d8e496e509045e1b02245d793",
+        "cre_Doc_Template_Mgt.sqlite": "9c3fdd03d8795ecde60aae782ce50c4fb1d6c03de1401fcdd6dc177342a53df5",
+        "dog_kennels.sqlite": "ea5fbc6cf6aaf500371c5c121c339d9802ba6f5fbecd948a5274c0b487a9f486",
+        "employee_hire_evaluation.sqlite": "760fec5cc872ef0cdf99242614f05c93dbd00d422ac9da87ea64fcf555be7373",
+        "flight_2.sqlite": "db777ba6488ae2b515cb138d71ff23c4533e5fd0355854648a1102faff3fb7af",
+        "network_1.sqlite": "bec92cd9a68d6f23469a0df246429299f44caaf75eab12275784e0bb7d0aa9ca",
+        "orchestra.sqlite": "13b64af1cf6fcbd34953a44f951b2bf79bedc000b344549212dac1a9345e2f86",
+        "poker_player.sqlite": "63fffd7b68524f07a742a74b74b95a4ba178e6419f3574b9ee78b8dda1df46ba",
+        "singer.sqlite": "5c1b72755d148c294b26d7b479307e8799b93485ac918720f953e2ab84d59a0a",
+        "student_transcripts_tracking.sqlite": "5a1f4928a1fd36f6edb31c4f054203b2e2fab6b18e5951c4f5633628f82a8e56",
+        "tvshow.sqlite": "1212c2e75cf1dcf3aeb4055331a85298b073d8a613ead77975b13bd3346b9fc4",
+        "voter_1.sqlite": "815bf1611b8a32f649d292a6138562f1761a0c10cb256e20f6561199cff31531",
+        "world_1.sqlite": "17b986695f16786d58d66f85e49dba87bdfe72953207ab9b1b49da9d2301ef65",
+        "wta_1.sqlite": "8f20747456d7748674b4f05432f3de96446ced95b8bd5a6fd01284f6c28f727c"
+      }
+    }
+  ]
+}

@@ -18,6 +18,13 @@ def test_sqlite_environment_override(monkeypatch, tmp_path: Path) -> None:
     assert load_settings().database.path == tmp_path / "other.db"
 
 
+def test_provider_environment_override(monkeypatch) -> None:
+    monkeypatch.setenv("QUERYMIND_PROVIDER", "opencode")
+    assert load_settings().model.provider == "opencode"
+    monkeypatch.setenv("QUERYMIND_PROVIDER", "")
+    assert load_settings().model.provider == "mock"
+
+
 def test_invalid_budget_is_rejected(tmp_path: Path) -> None:
     path = tmp_path / "settings.yaml"
     path.write_text("orchestrator:\n  max_repairs: 4\n", encoding="utf-8")

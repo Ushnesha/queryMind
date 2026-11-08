@@ -1,0 +1,28 @@
+- id: S0493
+  set: single
+  kind: reference
+  ordered: false
+  question: List the name, date and result of each battle.
+  reference_sql: 'SELECT name ,  date FROM battle
+
+    '
+  note: Spider 1.0 dev.json index 493; db_id battle_death
+- id: S0499
+  set: multi
+  kind: reference
+  ordered: false
+  question: What are the ids and names of the battles that led to more than 10 people killed in total.
+  reference_sql: 'SELECT T1.id ,  T1.name FROM battle AS T1 JOIN ship AS T2 ON T1.id  =  T2.lost_in_battle
+    JOIN death AS T3 ON T2.id  =  T3.caused_by_ship_id GROUP BY T1.id HAVING sum(T3.killed)  >  10
+
+    '
+  note: Spider 1.0 dev.json index 499; db_id battle_death
+- id: S0506
+  set: single
+  kind: reference
+  ordered: false
+  question: What are the notes of the death events which has substring 'East'?
+  reference_sql: 'SELECT note FROM death WHERE note LIKE ''%East%''
+
+    '
+  note: Spider 1.0 dev.json index 506; db_id battle_death

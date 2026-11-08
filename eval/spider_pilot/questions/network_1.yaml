@@ -1,0 +1,20 @@
+- id: S0889
+  set: multi
+  kind: reference
+  ordered: false
+  question: What are the names of high schoolers who have 3 or more friends?
+  reference_sql: 'SELECT T2.name FROM Friend AS T1 JOIN Highschooler AS T2 ON T1.student_id  =  T2.id
+    GROUP BY T1.student_id HAVING count(*)  >=  3
+
+    '
+  note: Spider 1.0 dev.json index 889; db_id network_1
+- id: S0892
+  set: multi
+  kind: reference
+  ordered: false
+  question: How many friends does the high school student Kyle have?
+  reference_sql: 'SELECT count(*) FROM Friend AS T1 JOIN Highschooler AS T2 ON T1.student_id  =  T2.id
+    WHERE T2.name  =  "Kyle"
+
+    '
+  note: Spider 1.0 dev.json index 892; db_id network_1

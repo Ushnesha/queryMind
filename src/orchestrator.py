@@ -101,7 +101,7 @@ def run_querymind(
     try:
         if not question.strip():
             refuse("Enter a natural-language question.")
-            return _finish(state, nodes, started)
+            return _finish(state, nodes, started, provider=sql_provider)
         config = settings or load_settings()
         mode = schema_mode or config.schema.default_mode
         if mode not in {"flat", "neo4j"}:
@@ -140,12 +140,12 @@ def run_querymind(
                 ), iteration=attempt).strip()
             except ValueError as exc:
                 refuse(str(exc))
-                return _finish(state, nodes, started)
+                return _finish(state, nodes, started, provider=sql_provider)
             state["sql_history"].append(state["sql"])
             if state["sql"].upper().startswith("NOT_ANSWERABLE:"):
                 state["missing_fields"] = [field.strip() for field in state["sql"].split(":", 1)[1].split(",") if field.strip()]
                 refuse("Required data is missing: " + ", ".join(state["missing_fields"]))
-                return _finish(state, nodes, started)
+                return _finish(state, nodes, started, provider=sql_provider)
 
             # 1. Safety check (mandatory lexical / policy guard)
             safety = call_node("safety_verifier", lambda: nodes.check_safety(state["sql"]), iteration=attempt)
@@ -185,7 +185,7 @@ def run_querymind(
                     # If missing required data: refuse immediately without burning repairs
                     if not semantic["answerable"]:
                         refuse(semantic["reason"])
-                        return _finish(state, nodes, started)
+                        return _finish(state, nodes, started, provider=sql_provider)
 
                     # If semantic mismatch: trigger repair
                     if not semantic["matches_question"]:
@@ -201,7 +201,7 @@ def run_querymind(
             # Handle verification failure (safety, syntax, or semantic mismatch)
             if state["repair_count"] >= config.orchestrator.max_repairs:
                 refuse("SQL verification failed after the configured repair limit: " + failure)
-                return _finish(state, nodes, started)
+                return _finish(state, nodes, started, provider=sql_provider)
 
             state["repair_count"] += 1
             feedback = f"Previous SQL:\n{state['sql']}\n\nVerification failure:\n{failure}"
@@ -261,14 +261,24 @@ def run_querymind(
             skipped("result_verifier")
     except Exception as exc:
         state.update(status="error", error=str(exc))
-    return _finish(state, nodes, started)
+    return _finish(state, nodes, started, provider=sql_provider)
 
 
-def _finish(state: AgentState, nodes: Components, started: float) -> AgentState:
+def _finish(state: AgentState, nodes: Components, started: float, *, provider: SQLProvider | None = None) -> AgentState:
     """Always produce a response and total timing, including refusal/error paths."""
     response_start = perf_counter()
     try:
-        state["final_answer"] = nodes.generate_response(state)
+        before = model_call_count(provider) if provider is not None else 0
+        try:
+            state["final_answer"] = nodes.generate_response(
+                state, **({"provider": provider} if nodes.generate_response is generate_response else {})
+            )
+        finally:
+            after = model_call_count(provider) if provider is not None else 0
+            if before is None or after is None:
+                state["metrics"]["llm_calls"] = None
+            elif state["metrics"]["llm_calls"] is not None:
+                state["metrics"]["llm_calls"] += max(0, after - before)
         add_trace(state, "response_generator", "pass", (perf_counter() - response_start) * 1000)
     except Exception as exc:
         state.update(status="error", error=str(exc), final_answer="QueryMind could not format the response.")

@@ -1,0 +1,20 @@
+- id: S0099
+  set: multi
+  kind: reference
+  ordered: false
+  question: Find the name of the makers that produced some cars in the year of 1970?
+  reference_sql: 'SELECT DISTINCT T1.Maker FROM CAR_MAKERS AS T1 JOIN MODEL_LIST AS T2 ON T1.Id  =  T2.Maker
+    JOIN CAR_NAMES AS T3 ON T2.model  =  T3.model JOIN CARS_DATA AS T4 ON T3.MakeId  =  T4.id WHERE T4.year  =  ''1970''
+
+    '
+  note: Spider 1.0 dev.json index 99; db_id car_1
+- id: S0102
+  set: multi
+  kind: reference
+  ordered: false
+  question: What is the maker of the carr produced in the earliest year and what year was it?
+  reference_sql: 'SELECT T2.Make ,  T1.Year FROM CARS_DATA AS T1 JOIN CAR_NAMES AS T2 ON T1.Id  =  T2.MakeId
+    WHERE T1.Year  =  (SELECT min(YEAR) FROM CARS_DATA)
+
+    '
+  note: Spider 1.0 dev.json index 102; db_id car_1

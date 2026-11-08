@@ -15,4 +15,7 @@ data/*.db-*
 # eval/results/schema_spider_*.md
 !eval/results/.gitkeep
 eval/results/integrated/
+# Stakeholder baseline checkout (pinned; recreate with `make stakeholder-baseline`)
+external/
 data/
+docs/

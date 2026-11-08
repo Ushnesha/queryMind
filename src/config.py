@@ -54,7 +54,10 @@ class Settings:
 
 
 def load_settings(path: str | Path | None = None) -> Settings:
-    """Load YAML defaults; SQLITE_DB overrides only the database location.
+    """Load YAML defaults; SQLITE_DB and QUERYMIND_PROVIDER override per machine.
+
+    The committed provider stays ``mock`` so tests and credential-free checkouts
+    work offline; set ``QUERYMIND_PROVIDER=opencode`` in ``.env`` for live runs.
 
     This function never opens databases, reads credentials, or calls services.
     Library callers can instead pass a Settings instance to the orchestrator.
@@ -83,7 +86,10 @@ def load_settings(path: str | Path | None = None) -> Settings:
         raise ValueError("schema mode must be flat/neo4j and top_k must be positive")
     return Settings(
         database=DatabaseSettings(resolve_path(os.environ.get("SQLITE_DB") or database.get("path", "data/analytics.db"))),
-        model=ModelSettings(float(model.get("temperature", 0)), str(model.get("provider", "mock"))),
+        model=ModelSettings(
+            float(model.get("temperature", 0)),
+            str(os.environ.get("QUERYMIND_PROVIDER") or model.get("provider", "mock")).strip(),
+        ),
         orchestrator=OrchestratorSettings(repairs, rounds),
         schema=SchemaSettings(mode, top_k),
         evaluation=EvaluationSettings(resolve_path(evaluation.get("trace_dir", "eval/results"))),

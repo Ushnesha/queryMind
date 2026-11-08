@@ -212,10 +212,15 @@ def test_live_provider_uses_custom_init_parameters() -> None:
 # 6. Mocked Network Request & Response Handling
 # ---------------------------------------------------------------------------
 
-def test_live_provider_successful_request(monkeypatch: pytest.MonkeyPatch) -> None:
+@pytest.mark.parametrize("base_url, model, expected_model", [
+    ("https://openai.rc.asu.edu/v1", "openai/devstral2-123b", "devstral2-123b"),
+    ("https://openai.rc.asu.edu/v1", "devstral2-123b", "devstral2-123b"),
+    ("https://gateway.example/v1", "openai/devstral2-123b", "openai/devstral2-123b"),
+])
+def test_live_provider_successful_request(monkeypatch: pytest.MonkeyPatch, base_url, model, expected_model) -> None:
     monkeypatch.setenv("OPENCODE_API_KEY", "test-secret-key")
-    monkeypatch.setenv("COMPLETION_MODEL", "openai/devstral2-123b")
-    monkeypatch.setenv("OPENCODE_BASE_URL", "https://openai.rc.asu.edu/v1")
+    monkeypatch.setenv("COMPLETION_MODEL", model)
+    monkeypatch.setenv("OPENCODE_BASE_URL", base_url)
 
     captured_request = {}
 
@@ -256,10 +261,10 @@ def test_live_provider_successful_request(monkeypatch: pytest.MonkeyPatch) -> No
     assert result == "SELECT COUNT(*) FROM items;"
 
     # Verify request details
-    assert captured_request["url"] == "https://openai.rc.asu.edu/v1/chat/completions"
+    assert captured_request["url"] == base_url + "/chat/completions"
     assert captured_request["headers"]["Authorization"] == "Bearer test-secret-key"
     assert captured_request["headers"]["Content-type"] == "application/json"
-    assert captured_request["data"]["model"] == "openai/devstral2-123b"
+    assert captured_request["data"]["model"] == expected_model
     assert "items" in captured_request["data"]["messages"][0]["content"]
 
 

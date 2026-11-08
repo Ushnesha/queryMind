@@ -1,0 +1,10 @@
+- id: S1023
+  set: multi
+  kind: reference
+  ordered: false
+  question: What are the names of the singers that have more than one songs?
+  reference_sql: 'SELECT T1.Name FROM singer AS T1 JOIN song AS T2 ON T1.Singer_ID  =  T2.Singer_ID GROUP
+    BY T1.Name HAVING COUNT(*)  >  1
+
+    '
+  note: Spider 1.0 dev.json index 1023; db_id singer

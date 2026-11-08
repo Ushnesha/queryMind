@@ -12,7 +12,7 @@ from scripts.seed_db import seed_database
 def offline_only(monkeypatch: pytest.MonkeyPatch) -> None:
     """Make accidental external network use fail, even on credentialed machines."""
     monkeypatch.setattr("dotenv.load_dotenv", lambda *args, **kwargs: False)
-    for name in ("OPENCODE_API_KEY", "OPENAI_API_KEY", "NEO4J_PASSWORD", "SQLITE_DB"):
+    for name in ("OPENCODE_API_KEY", "OPENAI_API_KEY", "NEO4J_PASSWORD", "SQLITE_DB", "QUERYMIND_PROVIDER"):
         monkeypatch.delenv(name, raising=False)
 
     def deny_network(*args: object, **kwargs: object) -> None:

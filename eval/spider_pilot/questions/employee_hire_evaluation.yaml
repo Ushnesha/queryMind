@@ -1,0 +1,9 @@
+- id: S0261
+  set: single
+  kind: reference
+  ordered: true
+  question: Sort employee names by their age in ascending order.
+  reference_sql: 'SELECT name FROM employee ORDER BY age
+
+    '
+  note: Spider 1.0 dev.json index 261; db_id employee_hire_evaluation

@@ -1,0 +1,10 @@
+- id: S0846
+  set: multi
+  kind: reference
+  ordered: false
+  question: Please show the name of the conductor that has conducted orchestras founded after 2008.
+  reference_sql: 'SELECT T1.Name FROM conductor AS T1 JOIN orchestra AS T2 ON T1.Conductor_ID  =  T2.Conductor_ID
+    WHERE Year_of_Founded  >  2008
+
+    '
+  note: Spider 1.0 dev.json index 846; db_id orchestra

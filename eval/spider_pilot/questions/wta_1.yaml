@@ -1,0 +1,18 @@
+- id: S0446
+  set: single
+  kind: reference
+  ordered: false
+  question: What are the names of tournaments that have more than 10 matches?
+  reference_sql: 'SELECT tourney_name FROM matches GROUP BY tourney_name HAVING count(*)  >  10
+
+    '
+  note: Spider 1.0 dev.json index 446; db_id wta_1
+- id: S0458
+  set: single
+  kind: reference
+  ordered: true
+  question: What are the full names of all left handed players, in order of birth date?
+  reference_sql: 'SELECT first_name ,  last_name FROM players WHERE hand  =  ''L'' ORDER BY birth_date
+
+    '
+  note: Spider 1.0 dev.json index 458; db_id wta_1

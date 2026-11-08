@@ -1,0 +1,30 @@
+- id: S0610
+  set: multi
+  kind: reference
+  ordered: false
+  question: What is the series name of the TV Channel that shows the cartoon "The Rise of the Blue Beetle"?
+  reference_sql: 'SELECT T1.series_name FROM TV_Channel AS T1 JOIN Cartoon AS T2 ON T1.id = T2.Channel
+    WHERE T2.Title = "The Rise of the Blue Beetle!"
+
+    '
+  note: Spider 1.0 dev.json index 610; db_id tvshow
+- id: S0629
+  set: single
+  kind: reference
+  ordered: true
+  question: Find the production code and channel of the most recently aired cartoon .
+  reference_sql: 'select production_code ,  channel from cartoon order by original_air_date desc limit
+    1
+
+    '
+  note: Spider 1.0 dev.json index 629; db_id tvshow
+- id: S0636
+  set: multi
+  kind: reference
+  ordered: false
+  question: What are the countries that are not playing cartoons written by Todd Casey?
+  reference_sql: 'SELECT country FROM TV_Channel EXCEPT SELECT T1.country FROM TV_Channel AS T1 JOIN cartoon
+    AS T2 ON T1.id = T2.Channel WHERE T2.written_by  =  ''Todd Casey''
+
+    '
+  note: Spider 1.0 dev.json index 636; db_id tvshow

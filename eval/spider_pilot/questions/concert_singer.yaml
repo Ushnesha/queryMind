@@ -1,0 +1,10 @@
+- id: S0035
+  set: multi
+  kind: reference
+  ordered: false
+  question: List singer names and number of concerts for each singer.
+  reference_sql: 'SELECT T2.name ,  count(*) FROM singer_in_concert AS T1 JOIN singer AS T2 ON T1.singer_id  =  T2.singer_id
+    GROUP BY T2.singer_id
+
+    '
+  note: Spider 1.0 dev.json index 35; db_id concert_singer

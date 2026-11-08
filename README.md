@@ -125,6 +125,21 @@ SQLITE_DB=data/analytics.db streamlit run app.py
 The UI displays the answer, table, SQL, assumptions, missing fields, verification
 status/warnings, and expandable trace. It uses only the public orchestrator API.
 
+The sidebar's **Database** dropdown includes the configured database and local
+Spider 1.0 SQLite files from `SPIDER_DATA_ROOT` (default `data/spider_data`).
+Both `database/` and `test_database/` are discovered and labelled separately.
+The **Browse table** dropdown and **Table schema** expander show the selected
+database's tables, columns, keys and indexes. Table browsing does not restrict
+queries: questions may join any tables within the selected database. Cross-database
+joins are not supported. Changing databases clears the previous answer and routes
+the next query through that database's schema and read-only executor.
+
+With `QUERYMIND_PROVIDER=opencode` in `.env`, run `make ui` and choose a Spider database in the sidebar;
+no restart or `.env` change is needed when switching databases. Graph mode uses
+that database's uploaded Neo4j schema when available, with a visible flat-schema
+fallback otherwise. To add another local Spider database, place its existing
+SQLite file under `data/spider_data/database/<db_id>/<db_id>.sqlite` and refresh.
+
 ### Integrated experiments
 
 ```bash
@@ -141,10 +156,18 @@ not live-model quality. See [INTEGRATION.md](docs/INTEGRATION.md) for validation
 
 ### Model and graph configuration
 
-Keep credentials in `.env`. Set `model.provider: openai` (or `opencode`) in
-`config/settings.yaml` to enable the existing live provider. Configure its
-base URL, API key, and model using the environment names in `.env.example`.
-The optimizer and both judges use that same provider. The default remains `mock`.
+Keep credentials in `.env`. The committed `model.provider` stays `mock`, so tests
+and credential-free checkouts run offline. To use the live model on your machine,
+add `QUERYMIND_PROVIDER=opencode` (or `openai`) to `.env`; the UI, `src.run`, and the
+evaluation scripts load `.env` and the variable overrides the settings file. Tests
+always remove it and use the mock. Configure the base URL, API key, and model using
+the environment names in `.env.example`. The optimizer and both judges use that
+same provider.
+
+| Use | Provider |
+|---|---|
+| `make test`, CI, graders without a key, offline demo | `mock` (committed default) |
+| Streamlit on real questions, Spider databases, report evaluation | `opencode` via `QUERYMIND_PROVIDER` |
 
 The UI loads `.env` and uses `schema.default_mode` from the settings file.
 `make ui` explicitly selects `data/analytics.db` because the mock and milestone

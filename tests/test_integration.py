@@ -14,6 +14,8 @@ class ScriptedProvider:
 
     def generate(self, question, context):
         self.llm_calls += 1
+        if "answer writer" in context:
+            return "There are 4 customers."
         if "semantic verifier" in context:
             return json.dumps({"matches_question": True, "answerable": True, "reason": "Count matches."})
         if "result verifier" in context:
@@ -26,8 +28,9 @@ def test_shared_provider_covers_generation_and_both_judges(db_path):
     state = run_querymind("How many customers are there?", schema_mode="flat", db_path=db_path, provider=provider)
     assert state["status"] == "success"
     assert state["semantic_ok"] and state["result_ok"]
+    assert state["final_answer"] == "There are 4 customers."
     assert state["metrics"]["generation_calls"] == 1
-    assert state["metrics"]["llm_calls"] == provider.llm_calls == 3
+    assert state["metrics"]["llm_calls"] == provider.llm_calls == 4
 
 
 def test_missing_cost_refuses_before_execution_with_real_semantics(db_path):

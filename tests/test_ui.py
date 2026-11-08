@@ -31,7 +31,7 @@ def test_ui_does_not_run_an_empty_question(monkeypatch) -> None:
 def test_ui_calls_public_orchestrator_and_shows_missing_field_refusal(monkeypatch) -> None:
     calls = []
 
-    def run(question, *, schema_mode):
+    def run(question, *, schema_mode, db_path):
         calls.append((question, schema_mode))
         return {
             "question": question, "status": "refused", "answerable": False,
@@ -56,7 +56,7 @@ def test_ui_calls_public_orchestrator_and_shows_missing_field_refusal(monkeypatc
 def test_ui_displays_result_sql_trace_and_retains_completed_answer(monkeypatch) -> None:
     calls = []
 
-    def run(question, *, schema_mode):
+    def run(question, *, schema_mode, db_path):
         calls.append(question)
         return {
             "question": question, "status": "success", "answerable": True,
@@ -143,3 +143,57 @@ def test_optimizer_preservation_needs_explicit_evidence() -> None:
     assert app._optimizer_label(state) == "passed"
     state["metrics"]["optimizer_result_equal"] = False
     assert app._optimizer_label(state) == "result preservation failed"
+
+
+def test_spider_discovery_supports_both_dataset_layouts(tmp_path):
+    from app import discover_databases
+
+    for split in ("database", "test_database"):
+        path = tmp_path / split / "singers" / "singers.sqlite"
+        path.parent.mkdir(parents=True)
+        path.touch()
+    choices = discover_databases(tmp_path / "demo.db", tmp_path)
+    assert len(choices) == 3
+    assert choices["Spider / database / singers"] != choices["Spider / test_database / singers"]
+    assert len(discover_databases(tmp_path / "demo.db", tmp_path / "database")) == 2
+    assert len(discover_databases(tmp_path / "demo.db", tmp_path / "missing")) == 1
+
+
+def test_database_selection_routes_queries_and_clears_old_results(monkeypatch, tmp_path):
+    import sqlite3
+
+    paths = {}
+    for name, table in (("music", "singer"), ("school", "student")):
+        path = tmp_path / "database" / name / f"{name}.sqlite"
+        path.parent.mkdir(parents=True)
+        with sqlite3.connect(path) as connection:
+            connection.execute(f"CREATE TABLE {table} (id INTEGER PRIMARY KEY, name TEXT)")
+        paths[name] = path
+    monkeypatch.setenv("SPIDER_DATA_ROOT", str(tmp_path))
+    monkeypatch.setenv("SQLITE_DB", str(paths["music"]))
+    calls = []
+
+    def run(question, *, schema_mode, db_path):
+        calls.append(db_path)
+        return {"question": question, "status": "success", "answerable": True,
+                "final_answer": "There are 6 singers.", "rows": [[6]], "columns": ["count"], "trace": []}
+
+    monkeypatch.setattr(orchestrator, "run_querymind", run)
+    at = AppTest.from_file(str(APP)).run()
+    assert not at.exception
+    assert at.selectbox(key="querymind_database").value == "Spider / database / music"
+    assert "singer" in at.selectbox[1].options
+    at.text_input[0].set_value("How many singers are there?")
+    at.button[0].click().run()
+    assert not at.exception
+    assert calls == [paths["music"]]
+    assert len(at.dataframe) == 1
+    at.selectbox[1].select("singer").run()
+    assert len(at.dataframe) == 1  # Browsing a table retains the answer.
+    at.selectbox(key="querymind_database").select("Spider / database / school").run()
+    assert not at.exception
+    assert "student" in at.selectbox[1].options and "singer" not in at.selectbox[1].options
+    assert len(at.dataframe) == 0
+    at.text_input[0].set_value("How many students are there?")
+    at.button[0].click().run()
+    assert calls == [paths["music"], paths["school"]]

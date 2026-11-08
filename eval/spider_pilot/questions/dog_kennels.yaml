@@ -1,0 +1,28 @@
+- id: S0943
+  set: multi
+  kind: reference
+  ordered: false
+  question: Find the id and cell phone of the professionals who operate two or more types of treatments.
+  reference_sql: 'SELECT T1.professional_id ,  T1.cell_number FROM Professionals AS T1 JOIN Treatments
+    AS T2 ON T1.professional_id  =  T2.professional_id GROUP BY T1.professional_id HAVING count(*)  >=  2
+
+    '
+  note: Spider 1.0 dev.json index 943; db_id dog_kennels
+- id: S0993
+  set: single
+  kind: reference
+  ordered: false
+  question: What is the charge amount of the most expensive charge type?
+  reference_sql: 'SELECT max(charge_amount) FROM Charges
+
+    '
+  note: Spider 1.0 dev.json index 993; db_id dog_kennels
+- id: S0995
+  set: single
+  kind: reference
+  ordered: false
+  question: What are the email, cell phone and home phone of each professional?
+  reference_sql: 'SELECT email_address ,  cell_number ,  home_phone FROM professionals
+
+    '
+  note: Spider 1.0 dev.json index 995; db_id dog_kennels

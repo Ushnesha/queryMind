@@ -8,6 +8,7 @@ import re
 from typing import Protocol
 import urllib.error
 import urllib.request
+from urllib.parse import urlsplit
 
 
 class SQLProvider(Protocol):
@@ -68,6 +69,10 @@ class OpenAICompatibleProvider:
         self.temperature = temperature
         self.timeout = timeout
         self.llm_calls = 0
+        # Cumulative usage reported by the gateway; responses without usage are counted separately.
+        self.prompt_tokens = 0
+        self.completion_tokens = 0
+        self.calls_without_usage = 0
 
     def _resolve_api_key(self) -> str:
         key = (
@@ -103,11 +108,24 @@ class OpenAICompatibleProvider:
             )
         return model.strip()
 
+    def _record_usage(self, usage: object) -> None:
+        prompt = usage.get("prompt_tokens") if isinstance(usage, dict) else None
+        completion = usage.get("completion_tokens") if isinstance(usage, dict) else None
+        if isinstance(prompt, int) and isinstance(completion, int):
+            self.prompt_tokens += prompt
+            self.completion_tokens += completion
+        else:
+            self.calls_without_usage += 1
+
     def generate(self, question: str, schema_context: str) -> str:
         """Call OpenAI-compatible chat completion and return the generated SQL."""
         api_key = self._resolve_api_key()
         base_url = self._resolve_base_url()
         model = self._resolve_model()
+        # ASU lists bare IDs; openai/ is a client routing prefix there.
+        # Other gateways may require provider prefixes, so preserve them.
+        if urlsplit(base_url).hostname == "openai.rc.asu.edu":
+            model = model.removeprefix("openai/")
 
         endpoint = f"{base_url}/chat/completions"
         payload = {
@@ -137,6 +155,7 @@ class OpenAICompatibleProvider:
             with urllib.request.urlopen(req, timeout=self.timeout) as response:
                 body = response.read().decode("utf-8")
                 res_json = json.loads(body)
+                self._record_usage(res_json.get("usage"))
                 choices = res_json.get("choices")
                 if not choices or not isinstance(choices, list):
                     raise ValueError(f"Provider returned invalid response format: {body[:200]}")

@@ -1,0 +1,69 @@
+- id: S0304
+  set: single
+  kind: reference
+  ordered: false
+  question: Return the document id, template id, and description for the document with the name Robbin
+    CV.
+  reference_sql: 'SELECT document_id ,  template_id ,  Document_Description FROM Documents WHERE document_name  =  "Robbin
+    CV"
+
+    '
+  note: Spider 1.0 dev.json index 304; db_id cre_Doc_Template_Mgt
+- id: S0319
+  set: single
+  kind: reference
+  ordered: false
+  question: Show template ids, version numbers, and template type codes for all templates.
+  reference_sql: 'SELECT template_id ,  version_number ,  template_type_code FROM Templates
+
+    '
+  note: Spider 1.0 dev.json index 319; db_id cre_Doc_Template_Mgt
+- id: S0328
+  set: single
+  kind: reference
+  ordered: false
+  question: Return the version numbers and template type codes of templates with a version number greater
+    than 5.
+  reference_sql: 'SELECT version_number ,  template_type_code FROM Templates WHERE version_number  >  5
+
+    '
+  note: Spider 1.0 dev.json index 328; db_id cre_Doc_Template_Mgt
+- id: S0331
+  set: single
+  kind: reference
+  ordered: true
+  question: Which template type code has most number of templates?
+  reference_sql: 'SELECT template_type_code FROM Templates GROUP BY template_type_code ORDER BY count(*)
+    DESC LIMIT 1
+
+    '
+  note: Spider 1.0 dev.json index 331; db_id cre_Doc_Template_Mgt
+- id: S0359
+  set: multi
+  kind: reference
+  ordered: false
+  question: How many paragraphs for the document with name 'Summer Show'?
+  reference_sql: 'SELECT count(*) FROM Paragraphs AS T1 JOIN Documents AS T2 ON T1.document_ID  =  T2.document_ID
+    WHERE T2.document_name  =  ''Summer Show''
+
+    '
+  note: Spider 1.0 dev.json index 359; db_id cre_Doc_Template_Mgt
+- id: S0361
+  set: single
+  kind: reference
+  ordered: false
+  question: Show paragraph details for paragraph with text 'Korea ' .
+  reference_sql: 'select other_details from paragraphs where paragraph_text like ''korea''
+
+    '
+  note: Spider 1.0 dev.json index 361; db_id cre_Doc_Template_Mgt
+- id: S0376
+  set: single
+  kind: reference
+  ordered: true
+  question: Return the id of the document with the fewest paragraphs.
+  reference_sql: 'SELECT document_id FROM Paragraphs GROUP BY document_id ORDER BY count(*) ASC LIMIT
+    1
+
+    '
+  note: Spider 1.0 dev.json index 376; db_id cre_Doc_Template_Mgt

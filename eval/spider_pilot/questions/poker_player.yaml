@@ -1,0 +1,18 @@
+- id: S0648
+  set: single
+  kind: reference
+  ordered: false
+  question: Count the number of poker players.
+  reference_sql: 'SELECT count(*) FROM poker_player
+
+    '
+  note: Spider 1.0 dev.json index 648; db_id poker_player
+- id: S0654
+  set: single
+  kind: reference
+  ordered: false
+  question: Return the average earnings across all poker players.
+  reference_sql: 'SELECT avg(Earnings) FROM poker_player
+
+    '
+  note: Spider 1.0 dev.json index 654; db_id poker_player

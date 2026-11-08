@@ -1,0 +1,9 @@
+- id: S0692
+  set: single
+  kind: reference
+  ordered: false
+  question: What are the names of the contestants whose names are not 'Jessie Alloway'
+  reference_sql: 'SELECT contestant_name FROM contestants WHERE contestant_name != ''Jessie Alloway''
+
+    '
+  note: Spider 1.0 dev.json index 692; db_id voter_1

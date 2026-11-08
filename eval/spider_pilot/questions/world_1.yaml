@@ -1,0 +1,106 @@
+- id: S0706
+  set: single
+  kind: reference
+  ordered: false
+  question: What is the total surface area of the countries in the Caribbean region?
+  reference_sql: 'SELECT sum(SurfaceArea) FROM country WHERE Region  =  "Caribbean"
+
+    '
+  note: Spider 1.0 dev.json index 706; db_id world_1
+- id: S0710
+  set: multi
+  kind: reference
+  ordered: false
+  question: Which region is the city Kabul located in?
+  reference_sql: 'SELECT Region FROM country AS T1 JOIN city AS T2 ON T1.Code  =  T2.CountryCode WHERE
+    T2.Name  =  "Kabul"
+
+    '
+  note: Spider 1.0 dev.json index 710; db_id world_1
+- id: S0733
+  set: single
+  kind: reference
+  ordered: false
+  question: What is the number of distinct languages used around the world?
+  reference_sql: 'SELECT count(DISTINCT LANGUAGE) FROM countrylanguage
+
+    '
+  note: Spider 1.0 dev.json index 733; db_id world_1
+- id: S0735
+  set: single
+  kind: reference
+  ordered: false
+  question: How many different forms of governments are there in Africa?
+  reference_sql: 'SELECT count(DISTINCT GovernmentForm) FROM country WHERE Continent  =  "Africa"
+
+    '
+  note: Spider 1.0 dev.json index 735; db_id world_1
+- id: S0742
+  set: multi
+  kind: reference
+  ordered: true
+  question: Which continent has the most diverse languages?
+  reference_sql: 'SELECT T1.Continent FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode
+    GROUP BY T1.Continent ORDER BY COUNT(*) DESC LIMIT 1
+
+    '
+  note: Spider 1.0 dev.json index 742; db_id world_1
+- id: S0771
+  set: multi
+  kind: reference
+  ordered: false
+  question: For the countries founded before 1930, what is the total number of distinct official languages?
+  reference_sql: 'SELECT count(DISTINCT T2.Language) FROM country AS T1 JOIN countrylanguage AS T2 ON
+    T1.Code  =  T2.CountryCode WHERE  IndepYear  <  1930 AND T2.IsOfficial  =  "T"
+
+    '
+  note: Spider 1.0 dev.json index 771; db_id world_1
+- id: S0774
+  set: multi
+  kind: reference
+  ordered: false
+  question: What are the African countries that have a  population less than any country in Asia?
+  reference_sql: 'SELECT Name FROM country WHERE Continent  =  "Africa"  AND population  <  (SELECT max(population)
+    FROM country WHERE Continent  =  "Asia")
+
+    '
+  note: Spider 1.0 dev.json index 774; db_id world_1
+- id: S0783
+  set: multi
+  kind: reference
+  ordered: false
+  question: Return the codes of countries that do not speak English and do not have Republics for governments.
+  reference_sql: 'SELECT Code FROM country WHERE GovernmentForm != "Republic" EXCEPT SELECT CountryCode
+    FROM countrylanguage WHERE LANGUAGE  =  "English"
+
+    '
+  note: Spider 1.0 dev.json index 783; db_id world_1
+- id: S0795
+  set: multi
+  kind: reference
+  ordered: false
+  question: How many cities in each district have a population that is above the average population across
+    all cities?
+  reference_sql: 'SELECT count(*) ,  District FROM city WHERE Population  >  (SELECT avg(Population) FROM
+    city) GROUP BY District
+
+    '
+  note: Spider 1.0 dev.json index 795; db_id world_1
+- id: S0800
+  set: single
+  kind: reference
+  ordered: true
+  question: What are the names and areas of countries with the top 5 largest area?
+  reference_sql: 'SELECT Name ,  SurfaceArea FROM country ORDER BY SurfaceArea DESC LIMIT 5
+
+    '
+  note: Spider 1.0 dev.json index 800; db_id world_1
+- id: S0813
+  set: single
+  kind: reference
+  ordered: false
+  question: Return the names of cities that have a population between 160000 and 900000 .
+  reference_sql: 'select name from city where population between 160000 and 900000
+
+    '
+  note: Spider 1.0 dev.json index 813; db_id world_1
