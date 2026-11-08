@@ -1,0 +1,326 @@
+{
+  "summary": {
+    "label": "PRELIMINARY: optimizer-only, Spider dev gold SQL, small subset",
+    "index_fks_on_copies": false,
+    "indexes_added": {
+      "wta_1": 0,
+      "world_1": 0,
+      "flight_2": 0
+    },
+    "databases": [
+      "flight_2",
+      "world_1",
+      "wta_1"
+    ],
+    "queries_considered": 30,
+    "queries_rewritten": 0,
+    "equality_maintained": "0/0",
+    "plan_improved": "0/0",
+    "median_ms_before_rewritten": null,
+    "median_ms_after_rewritten": null,
+    "llm_calls": 4,
+    "timing": "1 warm-up + 5 runs, median; time limit 30.0s"
+  },
+  "queries": [
+    {
+      "db_id": "wta_1",
+      "question": "Find the total number of players.",
+      "original_sql": "SELECT count(*) FROM players",
+      "changed": false,
+      "reason": "Rewrite rejected (full scan of large table players (20662 rows)): results differ, errored or timed out.",
+      "llm_calls": 1,
+      "optimizer_ms": 1844,
+      "optimized_sql": "SELECT count(*) FROM players"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "How many players are there?",
+      "original_sql": "SELECT count(*) FROM players",
+      "changed": false,
+      "reason": "Rewrite rejected (full scan of large table players (20662 rows)): results differ, errored or timed out.",
+      "llm_calls": 1,
+      "optimizer_ms": 2031,
+      "optimized_sql": "SELECT count(*) FROM players"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "Find the total number of matches.",
+      "original_sql": "SELECT count(*) FROM matches",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 1,
+      "optimized_sql": "SELECT count(*) FROM matches"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "Count the number of matches.",
+      "original_sql": "SELECT count(*) FROM matches",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 1,
+      "optimized_sql": "SELECT count(*) FROM matches"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "List the first name and birth date of all players from the country with code USA.",
+      "original_sql": "SELECT first_name ,  birth_date FROM players WHERE country_code  =  'USA'",
+      "changed": false,
+      "reason": "Rewrite rejected (full scan of large table players (20662 rows)): results equal but plan not improved.",
+      "llm_calls": 1,
+      "optimizer_ms": 1792,
+      "optimized_sql": "SELECT first_name ,  birth_date FROM players WHERE country_code  =  'USA'"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "What are the first names and birth dates of players from the USA?",
+      "original_sql": "SELECT first_name ,  birth_date FROM players WHERE country_code  =  'USA'",
+      "changed": false,
+      "reason": "Rewrite rejected (full scan of large table players (20662 rows)): results equal but plan not improved.",
+      "llm_calls": 1,
+      "optimizer_ms": 1776,
+      "optimized_sql": "SELECT first_name ,  birth_date FROM players WHERE country_code  =  'USA'"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "Find the average age of losers and winners of all matches.",
+      "original_sql": "SELECT avg(loser_age) ,  avg(winner_age) FROM matches",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "optimized_sql": "SELECT avg(loser_age) ,  avg(winner_age) FROM matches"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "What are the average ages of losers and winners across matches?",
+      "original_sql": "SELECT avg(loser_age) ,  avg(winner_age) FROM matches",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "optimized_sql": "SELECT avg(loser_age) ,  avg(winner_age) FROM matches"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "Find the average rank of winners in all matches.",
+      "original_sql": "SELECT avg(winner_rank) FROM matches",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "optimized_sql": "SELECT avg(winner_rank) FROM matches"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "What is the average rank for winners in all matches?",
+      "original_sql": "SELECT avg(winner_rank) FROM matches",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "optimized_sql": "SELECT avg(winner_rank) FROM matches"
+    },
+    {
+      "db_id": "world_1",
+      "question": "What are the names of all the countries that became independent after 1950?",
+      "original_sql": "SELECT Name FROM country WHERE IndepYear  >  1950",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "optimized_sql": "SELECT Name FROM country WHERE IndepYear  >  1950"
+    },
+    {
+      "db_id": "world_1",
+      "question": "Give the names of the nations that were founded after 1950.",
+      "original_sql": "SELECT Name FROM country WHERE IndepYear  >  1950",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "optimized_sql": "SELECT Name FROM country WHERE IndepYear  >  1950"
+    },
+    {
+      "db_id": "world_1",
+      "question": "How many countries have a republic as their form of government?",
+      "original_sql": "SELECT count(*) FROM country WHERE GovernmentForm  =  \"Republic\"",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 1,
+      "optimized_sql": "SELECT count(*) FROM country WHERE GovernmentForm  =  \"Republic\""
+    },
+    {
+      "db_id": "world_1",
+      "question": "How many countries have governments that are republics?",
+      "original_sql": "SELECT count(*) FROM country WHERE GovernmentForm  =  \"Republic\"",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 1,
+      "optimized_sql": "SELECT count(*) FROM country WHERE GovernmentForm  =  \"Republic\""
+    },
+    {
+      "db_id": "world_1",
+      "question": "What is the total surface area of the countries in the Caribbean region?",
+      "original_sql": "SELECT sum(SurfaceArea) FROM country WHERE Region  =  \"Caribbean\"",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "optimized_sql": "SELECT sum(SurfaceArea) FROM country WHERE Region  =  \"Caribbean\""
+    },
+    {
+      "db_id": "world_1",
+      "question": "How much surface area do the countires in the Carribean cover together?",
+      "original_sql": "SELECT sum(SurfaceArea) FROM country WHERE Region  =  \"Caribbean\"",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "optimized_sql": "SELECT sum(SurfaceArea) FROM country WHERE Region  =  \"Caribbean\""
+    },
+    {
+      "db_id": "world_1",
+      "question": "Which continent is Anguilla in?",
+      "original_sql": "SELECT Continent FROM country WHERE Name  =  \"Anguilla\"",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "optimized_sql": "SELECT Continent FROM country WHERE Name  =  \"Anguilla\""
+    },
+    {
+      "db_id": "world_1",
+      "question": "What is the continent name which Anguilla belongs to?",
+      "original_sql": "SELECT Continent FROM country WHERE Name  =  \"Anguilla\"",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "optimized_sql": "SELECT Continent FROM country WHERE Name  =  \"Anguilla\""
+    },
+    {
+      "db_id": "world_1",
+      "question": "Which region is the city Kabul located in?",
+      "original_sql": "SELECT Region FROM country AS T1 JOIN city AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.Name  =  \"Kabul\"",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "optimized_sql": "SELECT Region FROM country AS T1 JOIN city AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.Name  =  \"Kabul\""
+    },
+    {
+      "db_id": "world_1",
+      "question": "What region is Kabul in?",
+      "original_sql": "SELECT Region FROM country AS T1 JOIN city AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.Name  =  \"Kabul\"",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "optimized_sql": "SELECT Region FROM country AS T1 JOIN city AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.Name  =  \"Kabul\""
+    },
+    {
+      "db_id": "flight_2",
+      "question": "Which country does Airline \"JetBlue Airways\" belong to?",
+      "original_sql": "SELECT Country FROM AIRLINES WHERE Airline  =  \"JetBlue Airways\"",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "optimized_sql": "SELECT Country FROM AIRLINES WHERE Airline  =  \"JetBlue Airways\""
+    },
+    {
+      "db_id": "flight_2",
+      "question": "What country is Jetblue Airways affiliated with?",
+      "original_sql": "SELECT Country FROM AIRLINES WHERE Airline  =  \"JetBlue Airways\"",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "optimized_sql": "SELECT Country FROM AIRLINES WHERE Airline  =  \"JetBlue Airways\""
+    },
+    {
+      "db_id": "flight_2",
+      "question": "What is the abbreviation of Airline \"JetBlue Airways\"?",
+      "original_sql": "SELECT Abbreviation FROM AIRLINES WHERE Airline  =  \"JetBlue Airways\"",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "optimized_sql": "SELECT Abbreviation FROM AIRLINES WHERE Airline  =  \"JetBlue Airways\""
+    },
+    {
+      "db_id": "flight_2",
+      "question": "Which abbreviation corresponds to Jetblue Airways?",
+      "original_sql": "SELECT Abbreviation FROM AIRLINES WHERE Airline  =  \"JetBlue Airways\"",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "optimized_sql": "SELECT Abbreviation FROM AIRLINES WHERE Airline  =  \"JetBlue Airways\""
+    },
+    {
+      "db_id": "flight_2",
+      "question": "List all airline names and their abbreviations in \"USA\".",
+      "original_sql": "SELECT Airline ,  Abbreviation FROM AIRLINES WHERE Country  =  \"USA\"",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "optimized_sql": "SELECT Airline ,  Abbreviation FROM AIRLINES WHERE Country  =  \"USA\""
+    },
+    {
+      "db_id": "flight_2",
+      "question": "What are the airline names and abbreviations for airlines in the USA?",
+      "original_sql": "SELECT Airline ,  Abbreviation FROM AIRLINES WHERE Country  =  \"USA\"",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "optimized_sql": "SELECT Airline ,  Abbreviation FROM AIRLINES WHERE Country  =  \"USA\""
+    },
+    {
+      "db_id": "flight_2",
+      "question": "List the airport code and name in the city of Anthony.",
+      "original_sql": "SELECT AirportCode ,  AirportName FROM AIRPORTS WHERE city  =  \"Anthony\"",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "optimized_sql": "SELECT AirportCode ,  AirportName FROM AIRPORTS WHERE city  =  \"Anthony\""
+    },
+    {
+      "db_id": "flight_2",
+      "question": "Give the airport code and airport name corresonding to the city Anthony.",
+      "original_sql": "SELECT AirportCode ,  AirportName FROM AIRPORTS WHERE city  =  \"Anthony\"",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "optimized_sql": "SELECT AirportCode ,  AirportName FROM AIRPORTS WHERE city  =  \"Anthony\""
+    },
+    {
+      "db_id": "flight_2",
+      "question": "How many airlines do we have?",
+      "original_sql": "SELECT count(*) FROM AIRLINES",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "optimized_sql": "SELECT count(*) FROM AIRLINES"
+    },
+    {
+      "db_id": "flight_2",
+      "question": "What is the total number of airlines?",
+      "original_sql": "SELECT count(*) FROM AIRLINES",
+      "changed": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "optimized_sql": "SELECT count(*) FROM AIRLINES"
+    }
+  ]
+}
