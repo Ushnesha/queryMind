@@ -1,6 +1,7 @@
 """Optimizer contract and shared equality semantics."""
 
 import json
+from pathlib import Path
 import sqlite3
 
 from src.optimizer import compare_results, explain_query_plan, optimize_sql
@@ -228,3 +229,109 @@ def test_equal_rewrite_without_plan_improvement_rejected(db_path) -> None:
     out = run(db_path, FakeLLM(reply(worse)))
     assert not out["changed"] and out["sql"] == IN_SQL
     assert out["equality_ok"] is True and "plan not improved" in out["reason"]
+
+
+# ---- R5.2 Key-Aware DISTINCT Guard Tests ----
+from src.optimizer.distinct_guard import check_distinct_guard
+
+
+def test_distinct_guard_rejects_non_key_column(db_path) -> None:
+    orig = "SELECT DISTINCT name FROM customers"
+    cand = "SELECT name FROM customers"
+    ok, reason = check_distinct_guard(orig, cand, db_path=db_path)
+    assert not ok
+    assert "not contain a declared key" in reason
+
+    # Optimizer end-to-end should reject before equality/plan checks
+    out = _opt(orig, "List customer names", "customers(customer_id, name)", db_path=db_path, llm=FakeLLM(reply(cand)))
+    assert not out["changed"]
+    assert out["sql"] == orig
+    assert "unsafe DISTINCT removal" in out["reason"]
+    assert out["equality_ok"] is None  # Never executed
+
+
+def test_distinct_guard_rejects_join_query(db_path) -> None:
+    orig = "SELECT DISTINCT c.customer_id FROM customers c JOIN orders o ON c.customer_id = o.customer_id"
+    cand = "SELECT c.customer_id FROM customers c JOIN orders o ON c.customer_id = o.customer_id"
+    ok, reason = check_distinct_guard(orig, cand, db_path=db_path)
+    assert not ok
+    assert "joins" in reason
+
+    out = _opt(orig, "Which customers ordered?", "schema", db_path=db_path, llm=FakeLLM(reply(cand)))
+    assert not out["changed"]
+    assert out["sql"] == orig
+    assert "unsafe DISTINCT removal" in out["reason"]
+    assert out["equality_ok"] is None
+
+
+def test_distinct_guard_allows_primary_key_single_table(db_path) -> None:
+    orig = "SELECT DISTINCT customer_id FROM customers"
+    cand = "SELECT customer_id FROM customers"
+    ok, reason = check_distinct_guard(orig, cand, db_path=db_path)
+    assert ok
+    assert "contains unique key" in reason
+
+    # The structural guard certifies it as safe. As noted in requirements,
+    # the optimizer will only accept if the remaining gates (triggers, plan improvement) pass.
+    # On SQLite, rowid PRIMARY KEY needs no temp b-tree, so plan is already reasonable.
+    out = _opt(orig, "List customer IDs", "customers(customer_id)", db_path=db_path, llm=FakeLLM(reply(cand)))
+    assert not out["changed"]
+    assert "Plan already reasonable" in out["reason"]
+
+
+def test_distinct_guard_preserves_distinct_candidate(db_path) -> None:
+    orig = "SELECT DISTINCT c.name FROM customers c JOIN orders o ON c.customer_id = o.customer_id"
+    cand = "SELECT DISTINCT c.name FROM customers c JOIN (SELECT customer_id FROM orders) o ON c.customer_id = o.customer_id"
+    ok, reason = check_distinct_guard(orig, cand, db_path=db_path)
+    assert ok
+    assert "preserves DISTINCT" in reason
+
+
+def test_distinct_guard_ignores_queries_without_distinct(db_path) -> None:
+    orig = "SELECT customer_id FROM customers"
+    cand = "SELECT customer_id FROM customers WHERE customer_id > 0"
+    ok, reason = check_distinct_guard(orig, cand, db_path=db_path)
+    assert ok
+    assert "does not use DISTINCT" in reason
+
+
+def test_distinct_guard_multi_column_pk_vs_non_key(db_path) -> None:
+    # Multi-column with PK included -> safe
+    orig1 = "SELECT DISTINCT customer_id, name FROM customers"
+    cand1 = "SELECT customer_id, name FROM customers"
+    ok1, _ = check_distinct_guard(orig1, cand1, db_path=db_path)
+    assert ok1
+
+    # Multi-column without PK -> unsafe
+    orig2 = "SELECT DISTINCT name, email FROM customers"
+    cand2 = "SELECT name, email FROM customers"
+    ok2, _ = check_distinct_guard(orig2, cand2, db_path=db_path)
+    assert not ok2
+
+
+def test_distinct_guard_ignores_accidental_dataset_uniqueness(db_path) -> None:
+    # In db_path fixture, all 4 customer names happen to be distinct.
+    # An empirical-only gate would say rows match, but the structural guard must reject it.
+    orig = "SELECT DISTINCT name FROM customers"
+    cand = "SELECT name FROM customers"
+    out = _opt(orig, "Customer names", "schema", db_path=db_path, llm=FakeLLM(reply(cand)))
+    assert not out["changed"]
+    assert out["sql"] == orig
+    assert out["equality_ok"] is None
+
+
+def test_distinct_guard_with_unique_index(tmp_path: Path) -> None:
+    db = tmp_path / "unique_idx.db"
+    conn = sqlite3.connect(db)
+    conn.execute("CREATE TABLE users (user_id INTEGER, email TEXT)")
+    conn.execute("CREATE UNIQUE INDEX uq_user_email ON users(email)")
+    conn.execute("INSERT INTO users VALUES (1, 'u1@example.com'), (2, 'u2@example.com')")
+    conn.commit()
+    conn.close()
+
+    orig = "SELECT DISTINCT email FROM users"
+    cand = "SELECT email FROM users"
+    ok, reason = check_distinct_guard(orig, cand, db_path=db)
+    assert ok
+    assert "contains unique key" in reason
+
