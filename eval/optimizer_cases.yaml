@@ -1,0 +1,134 @@
+# CONTROLLED_DEVELOPMENT_SUITE: R5.3 scenario validation suite (not the frozen live system evaluation)
+#
+# Suite of 10 targeted SQL queries designed to systematically exercise
+# QueryMind's optimizer gates, triggers, DISTINCT guards, and scale-invariance.
+# Evaluated against both data/analytics.db (small) and data/large_analytics.db (large).
+
+cases:
+  - id: OPT01
+    category: correlated_subquery
+    question: "Which customers with ID up to 150 have placed at least one order?"
+    query: >-
+      SELECT c.customer_id, c.name FROM customers c
+      WHERE c.customer_id <= 150
+      AND (SELECT COUNT(*) FROM orders o WHERE o.customer_id = c.customer_id) > 0
+    candidate_rewrite: >-
+      SELECT c.customer_id, c.name FROM customers c
+      WHERE c.customer_id <= 150
+      AND EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = c.customer_id)
+    rewrite_reason: "Replace correlated scalar COUNT subquery with EXISTS"
+    expected_trigger: "correlated subquery in plan"
+    expected_acceptance: true
+
+  - id: OPT02
+    category: scan_consolidation
+    question: "What is the total spending and order count for customer 42?"
+    query: >-
+      SELECT (SELECT SUM(amount) FROM orders WHERE customer_id = 42) AS total,
+             (SELECT COUNT(*) FROM orders WHERE customer_id = 42) AS cnt
+    candidate_rewrite: >-
+      SELECT SUM(amount) AS total, COUNT(*) AS cnt
+      FROM orders WHERE customer_id = 42
+    rewrite_reason: "Combine separate table scans into single pass"
+    expected_trigger: "full scan of large table orders"
+    expected_acceptance: true
+
+  - id: OPT03
+    category: union_consolidation
+    question: "Which distinct customer IDs have placed orders above 500 dollars?"
+    query: >-
+      SELECT customer_id FROM orders WHERE amount > 500
+      UNION
+      SELECT customer_id FROM orders WHERE amount > 800
+    candidate_rewrite: >-
+      SELECT DISTINCT customer_id FROM orders WHERE amount > 500
+    rewrite_reason: "Consolidate redundant UNION scans into single DISTINCT scan"
+    expected_trigger: "full scan of large table orders"
+    expected_acceptance: true
+
+  - id: OPT04
+    category: distinct_unsafe_non_key
+    question: "What are the unique customer names?"
+    query: >-
+      SELECT DISTINCT name FROM customers
+    candidate_rewrite: >-
+      SELECT name FROM customers
+    rewrite_reason: "Remove DISTINCT to avoid temp b-tree"
+    expected_trigger: "DISTINCT needs a temp b-tree"
+    expected_acceptance: false
+
+  - id: OPT05
+    category: distinct_unsafe_join
+    question: "Which customers have placed high-value orders above 500 dollars?"
+    query: >-
+      SELECT DISTINCT c.customer_id, c.name
+      FROM customers c JOIN orders o ON c.customer_id = o.customer_id
+      WHERE o.amount > 500
+    candidate_rewrite: >-
+      SELECT c.customer_id, c.name
+      FROM customers c JOIN orders o ON c.customer_id = o.customer_id
+      WHERE o.amount > 500
+    rewrite_reason: "Remove DISTINCT across join"
+    expected_trigger: "full scan of large table orders"
+    expected_acceptance: false
+
+  - id: OPT06
+    category: distinct_safe_key
+    question: "What are the IDs and names of the first 1000 customers?"
+    query: >-
+      SELECT DISTINCT customer_id, name FROM customers WHERE customer_id <= 1000
+    candidate_rewrite: >-
+      SELECT customer_id, name FROM customers WHERE customer_id <= 1000
+    rewrite_reason: "Remove redundant DISTINCT on primary key projection"
+    expected_trigger: "full scan of large table customers"
+    expected_acceptance: false
+
+  - id: OPT07
+    category: already_optimal
+    question: "What is the name of customer 42?"
+    query: >-
+      SELECT name FROM customers WHERE customer_id = 42
+    candidate_rewrite: null
+    rewrite_reason: null
+    expected_trigger: null
+    expected_acceptance: false
+
+  - id: OPT08
+    category: equality_rejection
+    question: "What is the total spending by customer for orders over 100 dollars?"
+    query: >-
+      SELECT customer_id, SUM(amount) AS total
+      FROM orders WHERE amount > 100 GROUP BY customer_id
+    candidate_rewrite: >-
+      SELECT customer_id, SUM(amount) AS total
+      FROM orders GROUP BY customer_id
+    rewrite_reason: "Incorrect rewrite dropping WHERE filter"
+    expected_trigger: "full scan of large table orders"
+    expected_acceptance: false
+
+  - id: OPT09
+    category: in_subquery_unimproved
+    question: "Which customers have placed an order over 900 dollars?"
+    query: >-
+      SELECT c.name FROM customers c
+      WHERE c.customer_id IN (SELECT customer_id FROM orders WHERE amount > 900)
+    candidate_rewrite: >-
+      SELECT DISTINCT c.name FROM customers c
+      JOIN orders o ON c.customer_id = o.customer_id WHERE o.amount > 900
+    rewrite_reason: "Rewrite IN subquery to JOIN with DISTINCT"
+    expected_trigger: "IN (SELECT ...) subquery"
+    expected_acceptance: false
+
+  - id: OPT10
+    category: scale_timeout
+    question: "Which customers have total spending exceeding 5000 dollars?"
+    query: >-
+      SELECT c.customer_id, c.name FROM customers c
+      WHERE (SELECT SUM(o.amount) FROM orders o WHERE o.customer_id = c.customer_id) > 5000
+    candidate_rewrite: >-
+      SELECT c.customer_id, c.name FROM customers c
+      JOIN orders o ON c.customer_id = o.customer_id
+      GROUP BY c.customer_id, c.name HAVING SUM(o.amount) > 5000
+    rewrite_reason: "Replace unbounded correlated subquery with join and group by"
+    expected_trigger: "correlated subquery in plan"
+    expected_acceptance: false
