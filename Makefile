@@ -4,7 +4,7 @@ DEMO_DB ?= data/analytics.db
 REPORT_DIR ?= eval/results/integrated
 
 .PHONY: test seed demo baseline-demo ui eval ablation score verify-data schema-graph benchmark \
-	stakeholder-baseline spider-pilot report-eval report-score
+	stakeholder-baseline spider-pilot report-eval report-score report-eval-60 b2-17 poster-figures
 
 test:
 	$(PYTHON) -m pytest -q
@@ -60,3 +60,16 @@ report-eval:
 
 report-score:
 	$(STAKEHOLDER_DIR)/venv/bin/python scripts/score_report_eval.py
+
+# --- Milestone 3 poster (Member 1): b2 arm, 60-question set, poster panels ---
+# b0/b1 do not depend on R1/R6 and can run first: make report-eval-60 ARMS=b0,b1
+ARMS ?= b0,b1,b2,querymind,querymind-flat
+
+b2-17:
+	$(PYTHON) -m scripts.run_report_eval --dataset stakeholder --arms b2
+
+report-eval-60:
+	$(PYTHON) -m scripts.run_report_eval --dataset stakeholder60 --arms $(ARMS)
+
+poster-figures: report-score
+	$(PYTHON) -m scripts.make_poster_figures

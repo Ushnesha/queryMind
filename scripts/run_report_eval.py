@@ -2,8 +2,8 @@
 
 * b0/b1 run through the stakeholder's unchanged baseline
   (`external/agentic-sql-analyst/src/baseline.py`, pinned commit) in its own venv.
-* QueryMind runs through `scripts/run_querymind_trace.py`, which writes the
-  same trace format.
+* QueryMind runs through `scripts/run_querymind_trace.py` and b2 (k=3 result
+  vote) through `scripts/run_b2_trace.py`; both write the same trace format.
 * Every arm sees the same question IDs, database files and model.
 
 Runs are resumable: a question already present in a trace is skipped. Records
@@ -39,10 +39,11 @@ INFRA_ERRORS = {
     "APITimeoutError", "APIConnectionError", "RateLimitError", "InternalServerError",
     "APIStatusError", "ProviderError",
 }
-ARMS = ("b0", "b1", "querymind")
+ARMS = ("b0", "b1", "b2", "querymind", "querymind-flat")
 # QueryMind arms -> extra CLI options. `querymind` uses the configured schema mode
 # (neo4j); `querymind-flat` is the retrieval diagnostic with everything else fixed.
 QM_ARMS = {"querymind": [], "querymind-flat": ["--schema-mode", "flat"]}
+QUESTIONS_60 = PROJECT_ROOT / "eval/questions_60.yaml"
 
 
 def datasets() -> dict[str, list[tuple[str, Path, Path]]]:
@@ -52,9 +53,10 @@ def datasets() -> dict[str, list[tuple[str, Path, Path]]]:
         (path.stem, path, spider_root / path.stem / f"{path.stem}.sqlite")
         for path in sorted((PROJECT_ROOT / "eval/spider_pilot/questions").glob("*.yaml"))
     ]
+    stakeholder_db = PROJECT_ROOT / "data/stakeholder_analytics.db"
     return {
-        "stakeholder": [("main", BASELINE_ROOT / "eval/questions.yaml",
-                         PROJECT_ROOT / "data/stakeholder_analytics.db")],
+        "stakeholder": [("main", BASELINE_ROOT / "eval/questions.yaml", stakeholder_db)],
+        "stakeholder60": [("main", QUESTIONS_60, stakeholder_db)],
         "spider": spider,
     }
 
@@ -83,8 +85,14 @@ def drop_infra_failures(path: Path) -> int:
 
 
 def run_arm(arm: str, questions: Path, db_path: Path, trace: Path, ids: list[str],
-            env: dict[str, str], model: str, run_tag: str) -> None:
-    if arm in QM_ARMS:
+            env: dict[str, str], model: str, run_tag: str, b2_samples: int = 3,
+            b2_temperature: float = 0.7) -> None:
+    if arm == "b2":
+        command = [str(QM_PY), "-m", "scripts.run_b2_trace", "--questions", str(questions),
+                   "--db", str(db_path), "--trace", str(trace), "--ids", ",".join(ids), "--run-tag", run_tag,
+                   "--samples", str(b2_samples), "--temperature", str(b2_temperature)]
+        cwd = PROJECT_ROOT
+    elif arm in QM_ARMS:
         command = [str(QM_PY), "-m", "scripts.run_querymind_trace", "--questions", str(questions),
                    "--db", str(db_path), "--trace", str(trace), "--ids", ",".join(ids), "--run-tag", run_tag,
                    "--arm-name", arm, *QM_ARMS[arm]]
@@ -102,10 +110,13 @@ def run_arm(arm: str, questions: Path, db_path: Path, trace: Path, ids: list[str
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dataset", choices=("stakeholder", "spider", "all"), default="all")
+    parser.add_argument("--dataset", choices=("stakeholder", "stakeholder60", "spider", "all"), default="all",
+                        help="all = stakeholder (17) + spider; stakeholder60 is eval/questions_60.yaml")
     parser.add_argument("--arms", default=",".join(ARMS))
     parser.add_argument("--repeats", type=int, default=None,
-                        help="Override repeats (default: stakeholder 3, spider 1)")
+                        help="Override repeats (default: stakeholder/stakeholder60 3, spider 1)")
+    parser.add_argument("--b2-samples", type=int, default=3)
+    parser.add_argument("--b2-temperature", type=float, default=0.7)
     parser.add_argument("--infra-retries", type=int, default=2)
     parser.add_argument("--model", default="devstral2-123b")
     args = parser.parse_args(argv)
@@ -120,21 +131,34 @@ def main(argv: list[str] | None = None) -> int:
     env = {**os.environ, **{k: v for k, v in dotenv_values(PROJECT_ROOT / ".env").items() if v is not None}}
     env["COMPLETION_MODEL"] = args.model
     arms = [arm.strip() for arm in args.arms.split(",") if arm.strip()]
-    selected = datasets() if args.dataset == "all" else {args.dataset: datasets()[args.dataset]}
+    unknown = [arm for arm in arms if arm not in ARMS]
+    if unknown:
+        parser.error(f"Unknown arm(s) {unknown}; choose from {ARMS}")
+    all_sets = datasets()
+    selected = ({k: all_sets[k] for k in ("stakeholder", "spider")} if args.dataset == "all"
+                else {args.dataset: all_sets[args.dataset]})
+    for name, groups in selected.items():
+        missing = [str(q) for _, q, _ in groups if not q.exists()]
+        if missing:
+            parser.error(f"{name}: question file(s) missing: {missing}")
 
     manifest_path = OUT_ROOT / "run_manifest.json"
     manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else {"runs": []}
     for name, groups in selected.items():
-        repeats = args.repeats or (3 if name == "stakeholder" else 1)
+        repeats = args.repeats or (1 if name == "spider" else 3)
         before = {str(db): file_hash(db) for _, _, db in groups}
-        if name == "spider" and "querymind" in arms:
+        if name == "spider" and any(arm in QM_ARMS for arm in arms):
             ids = [group for group, _, _ in groups]
             subprocess.run([str(QM_PY), "-m", "scripts.build_schema_graph", "--spider-root", "data/spider_data",
                             *sum((["--db-id", i] for i in ids), []), "--upload"],
                            cwd=PROJECT_ROOT, env=env, check=True, capture_output=True)
         entry = {"dataset": name, "started": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                  "model": args.model, "baseline_commit": head, "repeats": repeats, "arms": arms,
+                 "querymind_commit": subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=PROJECT_ROOT,
+                                                    capture_output=True, text=True).stdout.strip(),
                  "infra_failures_retried": {}}
+        if "b2" in arms:
+            entry["b2"] = {"samples": args.b2_samples, "temperature": args.b2_temperature}
         for repeat in range(1, repeats + 1):
             for arm in arms:
                 for group, questions, db_path in groups:
@@ -147,7 +171,8 @@ def main(argv: list[str] | None = None) -> int:
                         if not todo:
                             break
                         started = time.time()
-                        run_arm(arm, questions, db_path, trace, todo, env, args.model, f"r{repeat}")
+                        run_arm(arm, questions, db_path, trace, todo, env, args.model, f"r{repeat}",
+                                args.b2_samples, args.b2_temperature)
                         failed = drop_infra_failures(trace) if attempt < args.infra_retries else 0
                         key = f"r{repeat}/{arm}/{group}"
                         if failed:

@@ -29,10 +29,14 @@ import db  # noqa: E402  (stakeholder module)
 import score  # noqa: E402  (stakeholder module)
 
 RESULTS = PROJECT_ROOT / "eval/results/report"
-ARMS = ("b0", "b1", "querymind", "querymind-flat")
+ARMS = ("b0", "b1", "b2", "querymind", "querymind-flat")
 ARM_LABEL = {"b0": "b0 (frozen single call)", "b1": "b1 (b0 + refusal sentence)",
+             "b2": "b2 (k=3 samples, result vote)",
              "querymind": "QueryMind (Neo4j schema)", "querymind-flat": "QueryMind, flat schema (diagnostic)"}
-PAIRS = (("querymind", "b0"), ("querymind", "b1"), ("querymind-flat", "b1"), ("querymind", "querymind-flat"))
+# Every system against b1 (the control arm), plus the two QueryMind diagnostics.
+PAIRS = (("b0", "b1"), ("b2", "b1"), ("querymind", "b1"), ("querymind-flat", "b1"),
+         ("querymind", "b0"), ("querymind", "b2"), ("querymind", "querymind-flat"))
+DATASETS = ("stakeholder", "stakeholder60", "spider")
 INFRA_ERRORS = {"APITimeoutError", "APIConnectionError", "RateLimitError", "InternalServerError",
                 "APIStatusError", "ProviderError"}
 
@@ -41,6 +45,8 @@ def sources(name: str) -> list[tuple[str, Path, Path]]:
     if name == "stakeholder":
         return [("main", PROJECT_ROOT / "external/agentic-sql-analyst/eval/questions.yaml",
                  PROJECT_ROOT / "data/stakeholder_analytics.db")]
+    if name == "stakeholder60":
+        return [("main", PROJECT_ROOT / "eval/questions_60.yaml", PROJECT_ROOT / "data/stakeholder_analytics.db")]
     root = PROJECT_ROOT / "data/spider_data/database"
     return [(p.stem, p, root / p.stem / f"{p.stem}.sqlite")
             for p in sorted((PROJECT_ROOT / "eval/spider_pilot/questions").glob("*.yaml"))]
@@ -117,6 +123,8 @@ def summarize(rows: list[dict], name: str) -> dict:
     unans = [r for r in rows if r["kind"] == "unanswerable"]
     ambig = [r for r in rows if r["kind"] == "ambiguous"]
     lat = sorted(r["latency_ms"] / 1000 for r in recs if r.get("latency_ms") is not None)
+    lat_answered = sorted(r["record"]["latency_ms"] / 1000 for r in rows
+                          if r["record"].get("exec_ok") and r["record"].get("latency_ms") is not None)
     tokens = [r["prompt_tokens"] + r["completion_tokens"] for r in recs
               if r.get("prompt_tokens") is not None and r.get("completion_tokens") is not None]
     calls = [r.get("qm_llm_calls", 1 if r.get("arm") in ("b0", "b1") else None) for r in recs]
@@ -142,6 +150,11 @@ def summarize(rows: list[dict], name: str) -> dict:
             "p50": statistics.median(lat) if lat else None,
             "p95": lat[max(0, math.ceil(0.95 * len(lat)) - 1)] if lat else None,
             "over_15s": sum(1 for x in lat if x > 15),
+        },
+        "latency_answered_s": {
+            "n": len(lat_answered),
+            "p50": statistics.median(lat_answered) if lat_answered else None,
+            "p95": lat_answered[max(0, math.ceil(0.95 * len(lat_answered)) - 1)] if lat_answered else None,
         },
         "tokens_per_question": statistics.fmean(tokens) if tokens else None,
         "token_records": len(tokens),
@@ -202,8 +215,31 @@ def paired(rows_a: list[dict], rows_b: list[dict]) -> dict:
     keys = a.keys() & b.keys()
     only_a = sum(1 for k in keys if a[k] and not b[k])
     only_b = sum(1 for k in keys if b[k] and not a[k])
-    return {"n": len(keys), "querymind_only": only_a, "baseline_only": only_b,
+    return {"n": len(keys), "a_only": only_a, "b_only": only_b,
             "p_exact_mcnemar": mcnemar_exact(only_a, only_b)}
+
+
+def b2_behaviour(all_rows: list[dict]) -> dict:
+    recs = [r["record"] for r in all_rows if r["record"]]
+    return {
+        "runs": len(recs),
+        "majority_count_distribution": dict(sorted(Counter(r.get("b2_majority_count") for r in recs).items(),
+                                                   key=lambda kv: (kv[0] is None, kv[0]))),
+        "selected": sum(1 for r in recs if r.get("b2_selected_index") is not None),
+        "no_majority_abstentions": sum(1 for r in recs if r.get("refused") and not r.get("missing_field")),
+        "refusal_consensus": sum(1 for r in recs if r.get("b2_refusal_consensus")),
+        "error_types": dict(Counter(r.get("error_type") for r in recs if r.get("error_type"))),
+    }
+
+
+def mean_over_repeats(summaries: dict, arm: str, key: str) -> dict | None:
+    """Mean rate of a (k, n) metric over all repeats that ran this arm."""
+    pairs = [summaries[rep][arm].get(key) for rep in sorted(summaries) if arm in summaries[rep]]
+    pairs = [p for p in pairs if isinstance(p, tuple) and p[1]]
+    if not pairs:
+        return None
+    rates = [k / n for k, n in pairs]
+    return {"repeats": len(rates), "mean": statistics.fmean(rates), "min": min(rates), "max": max(rates)}
 
 
 def fmt(pair) -> str:
@@ -220,7 +256,7 @@ def markdown(name: str, scored: dict, summaries: dict, manifest: dict) -> str:
     def row(label, key, render=fmt):
         lines.append(f"| {label} | " + " | ".join(render(primary[a].get(key)) for a in arms) + " |")
 
-    if name == "stakeholder":
+    if name.startswith("stakeholder"):
         row("Easy accuracy (set easy)", "set_easy")
         row("Hard accuracy (set hard)", "set_hard")
         row("Unanswerable refused + field named", "unanswerable_refused_correctly")
@@ -238,6 +274,9 @@ def markdown(name: str, scored: dict, summaries: dict, manifest: dict) -> str:
     lines.append("| p50 / p95 end-to-end latency (s) | " + " | ".join(
         f"{primary[a]['latency_s']['p50']:.2f} / {primary[a]['latency_s']['p95']:.2f}"
         if primary[a]["latency_s"]["p50"] is not None else "N/A" for a in arms) + " |")
+    lines.append("| p50 latency, answered questions only (s) | " + " | ".join(
+        f"{primary[a]['latency_answered_s']['p50']:.2f}"
+        if primary[a]["latency_answered_s"]["p50"] is not None else "N/A" for a in arms) + " |")
     lines.append("| Questions over 15 s | " + " | ".join(
         f"{primary[a]['latency_s']['over_15s']}/{primary[a]['latency_s']['n']}" for a in arms) + " |")
     lines.append("| LLM calls / question (mean) | " + " | ".join(
@@ -252,7 +291,7 @@ def markdown(name: str, scored: dict, summaries: dict, manifest: dict) -> str:
 
     reps = sorted(summaries)
     if len(reps) > 1:
-        key = "set_hard" if name == "stakeholder" else "answer_accuracy_reference"
+        key = "set_hard" if name.startswith("stakeholder") else "answer_accuracy_reference"
         lines += ["", "### Repeat stability", "",
                   "| Arm | " + " | ".join(f"{r} correct (all kinds)" for r in reps) + " | Same verdict in every run |",
                   "|---|" + "---:|" * (len(reps) + 1)]
@@ -272,7 +311,7 @@ def markdown(name: str, scored: dict, summaries: dict, manifest: dict) -> str:
                   "|---|---:|---:|---:|---:|"]
         for a, b in pairs:
             p = paired(scored["r1"][a], scored["r1"][b])
-            lines.append(f"| {a} vs {b} | {p['n']} | {p['querymind_only']} | {p['baseline_only']} "
+            lines.append(f"| {a} vs {b} | {p['n']} | {p['a_only']} | {p['b_only']} "
                          f"| {p['p_exact_mcnemar']:.3f} |")
     lines += ["", "### Per-question verdicts (r1)", "",
               "| Question | Set | Kind | " + " | ".join(arms) + " |", "|---|---|---|" + "---|" * len(arms)]
@@ -283,7 +322,7 @@ def markdown(name: str, scored: dict, summaries: dict, manifest: dict) -> str:
             by_q[(r["group"], r["id"])][arm] = ("PASS" if r["correct"] else "FAIL") + f": {r['verdict'][:70]}"
             meta[(r["group"], r["id"])] = (r["set"], r["kind"])
     for key in sorted(by_q):
-        label = key[1] if name == "stakeholder" else f"{key[1]} ({key[0]})"
+        label = key[1] if name.startswith("stakeholder") else f"{key[1]} ({key[0]})"
         lines.append(f"| {label} | {meta[key][0]} | {meta[key][1]} | "
                      + " | ".join(by_q[key].get(a, "—").replace("|", "/") for a in arms) + " |")
     return "\n".join(lines)
@@ -297,7 +336,7 @@ def main(argv: list[str] | None = None) -> int:
     manifest_path = RESULTS / "run_manifest.json"
     manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else {}
     report, sections = {"manifest": manifest, "datasets": {}}, []
-    for name in ("stakeholder", "spider"):
+    for name in DATASETS:
         if not (RESULTS / name).exists():
             continue
         scored = score_dataset(name)
@@ -306,7 +345,13 @@ def main(argv: list[str] | None = None) -> int:
                      for arm in ("querymind", "querymind-flat")
                      if any(arm in rep for rep in scored.values())}
         r1 = scored.get("r1", {})
+        rate_keys = ("set_easy", "set_hard", "unanswerable_refused_correctly", "fabrications", "ambiguity_flagged",
+                     "over_refusal", "exec_success", "answer_accuracy_reference")
         report["datasets"][name] = {
+            "mean_over_repeats": {arm: {k: mean_over_repeats(summaries, arm, k) for k in rate_keys}
+                                  for arm in ARMS if any(arm in s for s in summaries.values())},
+            "b2_behaviour": (b2_behaviour([row for rep in scored.values() for row in rep.get("b2", [])])
+                             if any("b2" in rep for rep in scored.values()) else None),
             "summaries": summaries, "querymind_behaviour": behaviour,
             "consistency": {arm: consistency(scored, arm) for arm in ARMS},
             "paired_r1": {f"{a} vs {b}": paired(r1[a], r1[b]) for a, b in PAIRS if a in r1 and b in r1},
