@@ -1,0 +1,90 @@
+# Member 5 (R5: Optimizer at Scale) contribution to the shared 60-question set.
+# Allocation: 2 Easy, 3 Hard, 1 Unanswerable, 1 Ambiguous = 7 questions.
+# Schema: customers (customer_id, name, email)
+#         orders (order_id, customer_id, amount, order_date)
+
+questions:
+  - id: M5_E1
+    question: "What is the highest order amount recorded?"
+    difficulty: easy
+    answerable: true
+    ambiguous: false
+    expected_tables: [orders]
+    sql: >-
+      SELECT MAX(amount) AS max_amount FROM orders
+
+  - id: M5_E2
+    question: "Which customers have an email address on file?"
+    difficulty: easy
+    answerable: true
+    ambiguous: false
+    expected_tables: [customers]
+    sql: >-
+      SELECT name FROM customers WHERE email IS NOT NULL AND email != '' ORDER BY name
+
+  - id: M5_H1
+    question: "Which customers have placed more than two orders, and what is their total spending?"
+    difficulty: hard
+    answerable: true
+    ambiguous: false
+    expected_tables: [customers, orders]
+    expected_join_paths: [customers.customer_id = orders.customer_id]
+    sql: >-
+      SELECT c.name, COUNT(o.order_id) AS order_count, SUM(o.amount) AS total_spending
+      FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id
+      GROUP BY c.customer_id, c.name
+      HAVING COUNT(o.order_id) > 2
+      ORDER BY total_spending DESC, c.name
+
+  - id: M5_H2
+    question: "What is the average order amount per customer for orders placed in 2024?"
+    difficulty: hard
+    answerable: true
+    ambiguous: false
+    expected_tables: [customers, orders]
+    expected_join_paths: [customers.customer_id = orders.customer_id]
+    sql: >-
+      SELECT c.name, AVG(o.amount) AS avg_order_amount
+      FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id
+      WHERE o.order_date >= '2024-01-01' AND o.order_date <= '2024-12-31'
+      GROUP BY c.customer_id, c.name
+      ORDER BY avg_order_amount DESC, c.name
+
+  - id: M5_H3
+    question: "Which customers spent more than the overall average customer spending?"
+    difficulty: hard
+    answerable: true
+    ambiguous: false
+    expected_tables: [customers, orders]
+    expected_join_paths: [customers.customer_id = orders.customer_id]
+    sql: >-
+      WITH customer_totals AS (
+        SELECT customer_id, SUM(amount) AS total_spent
+        FROM orders
+        GROUP BY customer_id
+      )
+      SELECT c.name, ct.total_spent
+      FROM customers AS c JOIN customer_totals AS ct ON c.customer_id = ct.customer_id
+      WHERE ct.total_spent > (SELECT AVG(total_spent) FROM customer_totals)
+      ORDER BY ct.total_spent DESC, c.name
+
+  - id: M5_U1
+    question: "What is the shipping address for customer Alice?"
+    difficulty: easy
+    answerable: false
+    ambiguous: false
+    missing_fields: [shipping address, address]
+
+  - id: M5_A1
+    question: "Who are the recent customers?"
+    difficulty: hard
+    answerable: true
+    ambiguous: true
+    reference_assumption: "Recent customers means customers who placed an order on or after January 1, 2024."
+    expected_tables: [customers, orders]
+    expected_join_paths: [customers.customer_id = orders.customer_id]
+    sql: >-
+      SELECT DISTINCT c.name
+      FROM customers AS c JOIN orders AS o ON c.customer_id = o.customer_id
+      WHERE o.order_date >= '2024-01-01'
+      ORDER BY c.name
