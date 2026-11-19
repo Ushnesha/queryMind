@@ -191,6 +191,61 @@ def load_query_cases(path: Path) -> list[dict[str, Any]]:
     raise ValueError(f"Unable to parse test cases from {path}")
 
 
+def load_trace_cases(path: Path) -> list[dict[str, Any]]:
+    """Extract benchmark query cases from a QueryMind JSONL trace file.
+
+    Supports both stakeholder-mapped flat trace records and raw AgentState records.
+    Filters out refused or execution-failed queries.
+    """
+    cases: list[dict[str, Any]] = []
+    lines = path.read_text(encoding="utf-8").splitlines()
+    for idx, line in enumerate(lines, 1):
+        if not line.strip():
+            continue
+        data = json.loads(line)
+        state = data.get("state") if isinstance(data.get("state"), dict) else data
+
+        # Filter out refused or failed queries
+        if data.get("refused") is True or state.get("status") == "refused":
+            continue
+        if data.get("exec_ok") is False or state.get("status") == "error":
+            continue
+
+        qid = str(data.get("question_id") or state.get("question_id") or state.get("id") or f"T{idx:03d}")
+        question = str(data.get("question") or state.get("question") or "")
+        orig_sql = data.get("qm_original_sql") or state.get("original_sql") or ""
+        applied = bool(data.get("qm_optimization_applied") or state.get("optimization_applied"))
+        final_sql = data.get("sql") or state.get("sql") or ""
+        opt_sql = state.get("optimized_sql") or (final_sql if applied else "")
+
+        if orig_sql and orig_sql.strip():
+            query = orig_sql.strip()
+            cand = (
+                final_sql.strip()
+                if (applied and final_sql.strip() != orig_sql.strip())
+                else (opt_sql.strip() if (opt_sql and opt_sql.strip() != orig_sql.strip()) else None)
+            )
+        else:
+            query = final_sql.strip()
+            cand = None
+
+        if not query or query.startswith("NOT_ANSWERABLE"):
+            continue
+
+        category = str(data.get("category") or data.get("difficulty") or "frozen_system_trace")
+        reason = str(data.get("qm_reason") or "Replay candidate from system trace")
+
+        cases.append({
+            "id": qid,
+            "category": category,
+            "question": question,
+            "query": query,
+            "candidate_rewrite": cand,
+            "rewrite_reason": reason,
+        })
+    return cases
+
+
 def run_dual_benchmark(args: argparse.Namespace) -> int:
     """Execute controlled dual-database benchmark across small and large databases."""
     small_db = Path(args.small_db)
@@ -203,7 +258,15 @@ def run_dual_benchmark(args: argparse.Namespace) -> int:
         print(f"Error: large database not found at {large_db}", file=sys.stderr)
         return 1
 
-    cases = load_query_cases(Path(args.queries))
+    if getattr(args, "traces", None):
+        cases = load_trace_cases(Path(args.traces))
+        suite_label = f"FROZEN_SYSTEM_TRACES: {Path(args.traces).name}"
+        artifact_prefix = "optimizer_freeze_benchmark"
+    else:
+        cases = load_query_cases(Path(args.queries))
+        suite_label = "CONTROLLED_DEVELOPMENT_SUITE: R5.3 scenario validation suite (not the frozen live system evaluation)"
+        artifact_prefix = "optimizer_dual_benchmark"
+
     candidates_map: dict[str, str] = {}
     if args.candidates:
         cand_path = Path(args.candidates)
@@ -380,7 +443,7 @@ def run_dual_benchmark(args: argparse.Namespace) -> int:
     )
 
     summary = {
-        "suite_label": "CONTROLLED_DEVELOPMENT_SUITE: R5.3 scenario validation suite (not the frozen live system evaluation)",
+        "suite_label": suite_label,
         "timing_protocol": f"{args.warmups} warm-up + {args.runs} runs, interleaved; timeout {args.timeout}s",
         "small_database": str(small_db),
         "large_database": str(large_db),
@@ -401,7 +464,7 @@ def run_dual_benchmark(args: argparse.Namespace) -> int:
     # Save artifacts
     args.out.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    base = args.out / f"optimizer_dual_benchmark_{stamp}"
+    base = args.out / f"{artifact_prefix}_{stamp}"
 
     json_path = base.with_suffix(".json")
     json_path.write_text(
@@ -645,6 +708,12 @@ def main(argv: list[str] | None = None) -> int:
         type=Path,
         default=ROOT / "eval" / "optimizer_cases.yaml",
         help="Path to YAML or JSON benchmark query file",
+    )
+    parser.add_argument(
+        "--traces",
+        type=Path,
+        default=None,
+        help="Path to QueryMind JSONL trace file to benchmark frozen system SQL",
     )
     parser.add_argument(
         "--candidates",

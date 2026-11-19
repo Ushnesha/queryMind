@@ -1,0 +1,108 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 720 450] /Contents 4 0 R /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 3865 >>
+stream
+0.980 0.990 1.000 rg
+0.820 0.860 0.920 RG 1.50 w
+10.00 10.00 700.00 430.00 re B
+BT /F2 16.0 Tf 0.080 0.180 0.360 rg 30.00 410.00 Td (QueryMind Plan Transformation: Gated Rewrite at Scale) Tj ET
+BT /F2 10.0 Tf 0.750 0.350 0.050 rg 30.00 392.00 Td ([DEVELOPMENT PREVIEW: Controlled Scenario Suite \(R5.3\)] - Representative Case OPT10: Scale Timeout) Tj ET
+1.000 1.000 1.000 rg
+0.800 0.840 0.900 RG 1.20 w
+30.00 100.00 300.00 275.00 re B
+0.930 0.950 0.980 rg
+0.800 0.840 0.900 RG 1.00 w
+30.00 345.00 300.00 30.00 re B
+BT /F2 12.0 Tf 0.150 0.300 0.550 rg 45.00 355.00 Td (BEFORE: Original Query & Plan) Tj ET
+BT /F2 9.5 Tf 0.200 0.250 0.300 rg 45.00 325.00 Td (Original SQL:) Tj ET
+BT /F1 8.0 Tf 0.350 0.400 0.450 rg 45.00 310.00 Td (SELECT c.customer_id, c.name FROM customer) Tj ET
+BT /F1 8.0 Tf 0.350 0.400 0.450 rg 45.00 298.00 Td (s c WHERE \(SELECT SUM\(o.amount\) FROM order) Tj ET
+BT /F1 8.0 Tf 0.350 0.400 0.450 rg 45.00 286.00 Td (s o WHERE o.customer_id = c.customer_id\) >) Tj ET
+BT /F2 9.5 Tf 0.200 0.250 0.300 rg 45.00 255.00 Td (SQLite EXPLAIN Plan Operators:) Tj ET
+0.980 0.920 0.920 rg
+0.900 0.700 0.700 RG 1.00 w
+45.00 236.00 270.00 15.00 re B
+BT /F2 8.0 Tf 0.600 0.150 0.150 rg 50.00 240.00 Td (! SCAN c) Tj ET
+0.980 0.920 0.920 rg
+0.900 0.700 0.700 RG 1.00 w
+45.00 218.00 270.00 15.00 re B
+BT /F2 8.0 Tf 0.600 0.150 0.150 rg 50.00 222.00 Td (! CORRELATED SCALAR SUBQUERY 1) Tj ET
+0.980 0.920 0.920 rg
+0.900 0.700 0.700 RG 1.00 w
+45.00 200.00 270.00 15.00 re B
+BT /F2 8.0 Tf 0.600 0.150 0.150 rg 50.00 204.00 Td (! SCAN o) Tj ET
+0.950 0.960 0.980 rg
+0.800 0.840 0.900 RG 1.00 w
+45.00 115.00 270.00 28.00 re B
+BT /F2 10.0 Tf 0.200 0.250 0.350 rg 55.00 124.00 Td (Scale Latency \(100k rows\): 21841.5 ms) Tj ET
+BT /F2 18.0 Tf 0.200 0.500 0.400 rg 348.00 250.00 Td (===>) Tj ET
+0.920 0.980 0.940 rg
+0.600 0.850 0.700 RG 1.00 w
+335.00 195.00 52.00 45.00 re B
+BT /F2 8.0 Tf 0.050 0.500 0.300 rg 342.00 225.00 Td (Gated) Tj ET
+BT /F2 8.0 Tf 0.050 0.500 0.300 rg 338.00 212.00 Td (Rewrite) Tj ET
+BT /F2 8.5 Tf 0.050 0.600 0.350 rg 342.00 200.00 Td (PASS) Tj ET
+1.000 1.000 1.000 rg
+0.650 0.850 0.720 RG 1.20 w
+390.00 100.00 300.00 275.00 re B
+0.900 0.970 0.930 rg
+0.650 0.850 0.720 RG 1.00 w
+390.00 345.00 300.00 30.00 re B
+BT /F2 12.0 Tf 0.050 0.450 0.300 rg 405.00 355.00 Td (AFTER: QueryMind Optimized Plan) Tj ET
+BT /F2 9.5 Tf 0.200 0.250 0.300 rg 405.00 325.00 Td (Optimized SQL:) Tj ET
+BT /F1 8.0 Tf 0.200 0.450 0.300 rg 405.00 310.00 Td (SELECT c.customer_id, c.name FROM customer) Tj ET
+BT /F1 8.0 Tf 0.200 0.450 0.300 rg 405.00 298.00 Td (s c JOIN orders o ON c.customer_id = o.cus) Tj ET
+BT /F1 8.0 Tf 0.200 0.450 0.300 rg 405.00 286.00 Td (tomer_id GROUP BY c.customer_id, c.name HA) Tj ET
+BT /F2 9.5 Tf 0.200 0.250 0.300 rg 405.00 255.00 Td (Optimized Plan Operators:) Tj ET
+0.920 0.980 0.940 rg
+0.600 0.850 0.700 RG 1.00 w
+405.00 236.00 270.00 15.00 re B
+BT /F2 8.0 Tf 0.050 0.500 0.300 rg 410.00 240.00 Td (* SCAN o) Tj ET
+0.920 0.980 0.940 rg
+0.600 0.850 0.700 RG 1.00 w
+405.00 218.00 270.00 15.00 re B
+BT /F2 8.0 Tf 0.050 0.500 0.300 rg 410.00 222.00 Td (* SEARCH c USING INTEGER PRIMARY KEY \(ro) Tj ET
+0.920 0.980 0.940 rg
+0.600 0.850 0.700 RG 1.00 w
+405.00 200.00 270.00 15.00 re B
+BT /F2 8.0 Tf 0.050 0.500 0.300 rg 410.00 204.00 Td (* USE TEMP B-TREE FOR GROUP BY) Tj ET
+0.900 0.970 0.930 rg
+0.600 0.850 0.700 RG 1.00 w
+405.00 115.00 270.00 28.00 re B
+BT /F2 10.0 Tf 0.050 0.500 0.300 rg 415.00 124.00 Td (Scale Latency: 41.5 ms  \(526.5x Speedup\)) Tj ET
+0.950 0.980 0.950 rg
+0.650 0.850 0.700 RG 1.20 w
+30.00 30.00 660.00 50.00 re B
+BT /F2 11.0 Tf 0.050 0.450 0.250 rg 45.00 60.00 Td (Mandatory Correctness Gate: Dual-Database Result Equality Verified) Tj ET
+BT /F1 9.0 Tf 0.200 0.400 0.300 rg 45.00 42.00 Td (Identical multiset rows returned on both stakeholder demo DB \(6 orders\) and large synthetic DB \(100,000 orders\).) Tj ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000251 00000 n 
+0000004168 00000 n 
+0000004238 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R >>
+startxref
+4313
+%%EOF
