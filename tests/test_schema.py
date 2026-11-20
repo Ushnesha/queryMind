@@ -176,8 +176,10 @@ def test_local_graph_handles_disconnected_matching_tables(graph_database: Path) 
     result = Neo4jSchemaRetriever(graph_database, backend="local_graph").retrieve_with_metadata(
         "customers offices", top_k=2
     )
-    assert set(result.tables) == {"customers", "offices"}
-    assert result.relationships == []
+    # orders is customers' direct FK neighbour (orders.customer_id -> customers).
+    assert set(result.tables) == {"customers", "offices", "orders"}
+    assert len(result.relationships) == 1
+    assert (result.relationships[0]["from_table"], result.relationships[0]["to_table"]) == ("orders", "customers")
 
 
 def test_unrelated_question_gets_explicit_full_schema_fallback(graph_database: Path) -> None:
@@ -276,6 +278,15 @@ class _RecordingTransaction:
             return _Records({**{key: relationship[key] for key in endpoint_keys},
                              "metadata": {key: value for key, value in relationship.items() if key not in endpoint_keys}}
                             for relationship in payload["relationships"])
+        if "AS neighbor_name" in query:
+            seeds = set(parameters["table_names"])
+            neighbors = set()
+            for relationship in payload["relationships"]:
+                if relationship["from_table"] in seeds:
+                    neighbors.add(relationship["to_table"])
+                if relationship["to_table"] in seeds:
+                    neighbors.add(relationship["from_table"])
+            return _Records({"neighbor_name": name} for name in sorted(neighbors))
         if "RETURN DISTINCT table_name" in query:
             return _Records([{"table_name": "orders"}, {"table_name": "order_items"}])
         return _Records()

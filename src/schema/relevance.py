@@ -84,3 +84,26 @@ def expand_local_join_paths(payload: dict[str, Any], table_names: list[str]) -> 
                 visited.add(neighbor)
                 paths.append(path + [neighbor])
     return sorted(selected)
+
+
+def fk_neighbors(payload: dict[str, Any], table_names: list[str]) -> list[str]:
+    """Return the seeds plus every table one foreign key away, in either direction.
+
+    Pairwise shortest paths add nothing when only one table matches the
+    question, so a lone ``customers`` seed would never reach ``orders`` (which
+    holds the revenue columns). Only the given seeds are expanded, by one hop,
+    to keep retrieval precision on large schemas. Edge direction is ignored:
+    ``orders.customer_id -> customers`` makes each a neighbour of the other.
+    Names missing from ``payload["tables"]`` (dangling FK metadata) are dropped.
+    """
+    seeds = set(table_names)
+    if not seeds:
+        return []
+    known = {table["name"] for table in payload["tables"]}
+    selected = set(seeds)
+    for edge in payload["relationships"]:
+        if edge["from_table"] in seeds:
+            selected.add(edge["to_table"])
+        if edge["to_table"] in seeds:
+            selected.add(edge["from_table"])
+    return sorted(selected & known)
