@@ -5,16 +5,16 @@ Backend: **Local graph (offline diagnostic)**. Cases: 10. Generation: disabled; 
 | Metric | Flat schema | Local graph (offline diagnostic) |
 |---|---:|---:|
 | Required table recall | 100.0% | 100.0% |
-| Table precision | 45.8% | 85.8% |
-| Exact table set | 0.0% | 60.0% |
+| Table precision | 45.8% | 58.2% |
+| Exact table set | 0.0% | 0.0% |
 | Required column recall | 100.0% | 100.0% |
-| Column precision | 17.6% | 32.6% |
+| Column precision | 17.6% | 22.2% |
 | Required FK-edge recall | 100.0% | 100.0% |
-| FK-edge precision | 35.7% | 80.0% |
+| FK-edge precision | 35.7% | 45.7% |
 | Complete required join path | 100.0% | 100.0% |
-| Mean context tokens/estimate | 269.80 | 135.00 |
-| Mean retrieval latency (ms) | 0.76 | 0.87 |
-| Median retrieval latency (ms) | 0.47 | 0.54 |
+| Mean context tokens/estimate | 269.80 | 201.50 |
+| Mean retrieval latency (ms) | 0.31 | 0.37 |
+| Median retrieval latency (ms) | 0.28 | 0.32 |
 | SQL generation success | TBD (generation disabled) | TBD (generation disabled) |
 | Syntax/safety success | TBD (generation disabled) | TBD (generation disabled) |
 | Execution success | TBD (generation disabled) | TBD (generation disabled) |

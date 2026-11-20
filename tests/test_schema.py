@@ -455,3 +455,91 @@ def test_strict_graph_failure_clears_prior_live_provenance(graph_database: Path)
     with pytest.raises(RuntimeError, match="Neo4j retrieval failed"):
         retriever.retrieve_with_metadata("customers products", top_k=2)
     assert retriever.last_result is None
+
+
+# --- R1: single-seed questions must reach orders through a direct FK hop ---
+
+@pytest.fixture
+def stakeholder_database(tmp_path: Path) -> Path:
+    """The stakeholder schema: two dimension tables joined only through orders."""
+    path = tmp_path / "stakeholder.db"
+    with sqlite3.connect(path) as connection:
+        connection.executescript("""
+            CREATE TABLE customers (
+                customer_id INTEGER PRIMARY KEY, customer_name TEXT, region TEXT, signup_date TEXT
+            );
+            CREATE TABLE products (
+                product_id INTEGER PRIMARY KEY, product_name TEXT, category TEXT, unit_price REAL
+            );
+            CREATE TABLE orders (
+                order_id INTEGER PRIMARY KEY,
+                customer_id INTEGER REFERENCES customers(customer_id),
+                product_id INTEGER REFERENCES products(product_id),
+                order_date TEXT, quantity INTEGER, total_amount REAL
+            );
+        """)
+    return path
+
+
+# Milestone 2 Neo4j runs refused these questions: each matches a single seed
+# table, pairwise join paths added nothing, and orders (which holds
+# total_amount and quantity) was never retrieved.
+R1_REGRESSIONS = [
+    ("E2", "Which product category generated the most revenue?", "products"),
+    ("E3", "What is the total revenue by region?", "customers"),
+    ("H4", "Compare Q3 and Q4 performance for our best region.", "customers"),
+    ("H5", "List the second-most-popular product in each category.", "products"),
+]
+_R1_IDS = [question_id for question_id, _, _ in R1_REGRESSIONS]
+
+
+@pytest.mark.parametrize(("question_id", "question", "seed"), R1_REGRESSIONS, ids=_R1_IDS)
+def test_r1_local_graph_single_seed_retrieves_orders(
+    stakeholder_database: Path, question_id: str, question: str, seed: str
+) -> None:
+    result = Neo4jSchemaRetriever(stakeholder_database, backend="local_graph").retrieve_with_metadata(question)
+    assert set(result.tables) == {seed, "orders"}, question_id
+    assert "orders.total_amount" in result.columns
+    assert "orders.quantity" in result.columns
+    assert "TABLE orders" in result.context
+
+
+@pytest.mark.parametrize(("question_id", "question", "seed"), R1_REGRESSIONS, ids=_R1_IDS)
+def test_r1_mocked_live_neo4j_single_seed_retrieves_orders(
+    stakeholder_database: Path, question_id: str, question: str, seed: str
+) -> None:
+    driver = _RecordingDriver(build_schema_graph(stakeholder_database))
+    result = Neo4jSchemaRetriever(stakeholder_database, driver=driver, strict=True).retrieve_with_metadata(question)
+    assert result.backend == "neo4j"
+    assert set(result.tables) == {seed, "orders"}, question_id
+    assert any("AS neighbor_name" in query for query, _ in driver.transaction.calls)
+
+
+def test_r1_fk_neighbors_adds_only_direct_neighbours_in_both_directions(graph_database: Path) -> None:
+    from src.schema.relevance import fk_neighbors
+
+    payload = build_schema_graph(graph_database)
+    # order_items is two hops from customers and must not appear.
+    assert fk_neighbors(payload, ["customers"]) == ["customers", "orders"]
+    # orders references customers and is referenced by order_items.
+    assert fk_neighbors(payload, ["orders"]) == ["customers", "order_items", "orders"]
+    assert fk_neighbors(payload, ["offices"]) == ["offices"]
+    assert fk_neighbors(payload, []) == []
+
+
+def test_r1_neighbour_query_is_scoped_and_undirected(graph_database: Path) -> None:
+    from src.schema.neo4j_store import expand_fk_neighbors
+
+    payload = build_schema_graph(graph_database)
+    driver = _RecordingDriver(payload)
+    tables = expand_fk_neighbors(
+        driver=driver, schema_id=payload["schema_id"], table_names=["customers", "offices", "customers"],
+    )
+    assert tables == ["customers", "offices", "orders"]
+    query, parameters = driver.transaction.calls[0]
+    assert "-[:REFERENCES]-(" in query
+    assert "-[:REFERENCES]->" not in query
+    assert query.count("schema_id: $schema_id") == 3
+    assert parameters["schema_id"] == payload["schema_id"]
+    assert parameters["table_names"] == ["customers", "offices"]
+    assert expand_fk_neighbors(driver=_RecordingDriver(payload), schema_id=payload["schema_id"], table_names=[]) == []
