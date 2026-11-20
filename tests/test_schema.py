@@ -288,6 +288,9 @@ class _RecordingTransaction:
                     neighbors.add(relationship["from_table"])
             return _Records({"neighbor_name": name} for name in sorted(neighbors))
         if "RETURN DISTINCT table_name" in query:
+            # Like Cypher's left_name < right_name filter: one seed forms no pair, so no path rows.
+            if len(set(parameters["table_names"])) < 2:
+                return _Records()
             return _Records([{"table_name": "orders"}, {"table_name": "order_items"}])
         return _Records()
 
@@ -543,3 +546,65 @@ def test_r1_neighbour_query_is_scoped_and_undirected(graph_database: Path) -> No
     assert parameters["schema_id"] == payload["schema_id"]
     assert parameters["table_names"] == ["customers", "offices"]
     assert expand_fk_neighbors(driver=_RecordingDriver(payload), schema_id=payload["schema_id"], table_names=[]) == []
+
+
+# --- R1 (Fix 1b): FK neighbours only for seeds that join no other table ---
+
+def test_r1_unconnected_seeds_ignores_joined_seeds(graph_database: Path) -> None:
+    from src.schema.relevance import unconnected_seeds
+
+    payload = build_schema_graph(graph_database)
+    assert unconnected_seeds(payload, ["customers"], ["customers"]) == ["customers"]
+    assert unconnected_seeds(payload, ["customers", "orders"], ["customers", "orders"]) == []
+    assert unconnected_seeds(payload, ["customers", "offices"], ["customers", "offices"]) == ["customers", "offices"]
+    assert unconnected_seeds(payload, [], []) == []
+
+
+def test_r1_unconnected_seeds_ignores_self_references(tmp_path: Path) -> None:
+    from src.schema.relevance import unconnected_seeds
+
+    path = tmp_path / "self_reference.db"
+    with sqlite3.connect(path) as connection:
+        connection.executescript("""
+            CREATE TABLE employees (
+                employee_id INTEGER PRIMARY KEY,
+                manager_id INTEGER REFERENCES employees(employee_id)
+            );
+            CREATE TABLE departments (
+                dept_id INTEGER PRIMARY KEY,
+                head_id INTEGER REFERENCES employees(employee_id)
+            );
+        """)
+    payload = build_schema_graph(path)
+    assert any(edge["from_table"] == edge["to_table"] == "employees" for edge in payload["relationships"])
+    assert unconnected_seeds(payload, ["employees"], ["employees"]) == ["employees"]
+
+
+def test_r1_local_graph_connected_seeds_get_no_neighbours(graph_database: Path) -> None:
+    result = Neo4jSchemaRetriever(graph_database, backend="local_graph").retrieve_with_metadata(
+        "customers orders", top_k=5
+    )
+    assert sorted(result.seed_tables) == ["customers", "orders"]
+    # Fix 1 would also have added order_items, orders' direct neighbour.
+    assert set(result.tables) == {"customers", "orders"}
+
+
+def test_r1_mocked_live_neo4j_skips_neighbour_query_for_connected_seeds(graph_database: Path) -> None:
+    driver = _RecordingDriver(build_schema_graph(graph_database))
+    result = Neo4jSchemaRetriever(graph_database, driver=driver, strict=True).retrieve_with_metadata(
+        "customers orders", top_k=5
+    )
+    assert result.backend == "neo4j"
+    assert sorted(result.seed_tables) == ["customers", "orders"]
+    assert not any("AS neighbor_name" in query for query, _ in driver.transaction.calls)
+
+
+def test_r1_mocked_live_neo4j_queries_neighbours_for_single_seed_only(graph_database: Path) -> None:
+    driver = _RecordingDriver(build_schema_graph(graph_database))
+    result = Neo4jSchemaRetriever(graph_database, driver=driver, strict=True).retrieve_with_metadata(
+        "order items", top_k=5
+    )
+    assert result.seed_tables == ["order_items"]
+    neighbour_calls = [params for query, params in driver.transaction.calls if "AS neighbor_name" in query]
+    assert len(neighbour_calls) == 1
+    assert neighbour_calls[0]["table_names"] == ["order_items"]

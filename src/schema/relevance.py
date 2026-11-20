@@ -107,3 +107,27 @@ def fk_neighbors(payload: dict[str, Any], table_names: list[str]) -> list[str]:
         if edge["to_table"] in seeds:
             selected.add(edge["from_table"])
     return sorted(selected & known)
+
+
+def unconnected_seeds(payload: dict[str, Any], seeds: list[str], tables: list[str]) -> list[str]:
+    """Return, sorted, the seeds with no foreign key to any *other* table in ``tables``.
+
+    Direct FK neighbours (``fk_neighbors``) exist for questions that match a
+    single table: pairwise join paths add nothing there, so ``customers``
+    alone would never reach ``orders``. Giving neighbours to *every* seed cut
+    Spider table precision from 85.8% to 58.2% with no recall gain, because
+    those questions match several seeds that already join each other. So only
+    seeds left isolated after join-path expansion should gain neighbours.
+
+    A seed is connected when some FK edge, in either direction, links it to a
+    different table in ``tables``. Self-references (``employees.manager_id ->
+    employees``) do not count, and edges to tables outside ``tables``
+    (including dangling FK metadata) are ignored.
+    """
+    selected = set(tables)
+    connected: set[str] = set()
+    for edge in payload["relationships"]:
+        source, target = edge["from_table"], edge["to_table"]
+        if source != target and source in selected and target in selected:
+            connected.update((source, target))
+    return sorted(set(seeds) - connected)
