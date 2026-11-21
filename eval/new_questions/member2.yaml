@@ -1,0 +1,113 @@
+# Member 2 contribution to the 60-question set (R4).
+# Mix: 2 easy, 3 hard, 2 unanswerable, 1 ambiguous.
+# Same schema and field rules as external/agentic-sql-analyst/eval/questions.yaml.
+# Every reference_sql was run against data/stakeholder_analytics.db and checked
+# for ties and empty results (see tests/test_member2_questions.py).
+
+- id: M2-E1
+  set: easy
+  kind: reference
+  ordered: false
+  question: How many units were sold in each product category?
+  reference_sql: |
+    SELECT p.category, SUM(o.quantity) AS units_sold
+    FROM orders o
+    JOIN products p ON p.product_id = o.product_id
+    GROUP BY p.category
+
+- id: M2-E2
+  set: easy
+  kind: reference
+  ordered: false
+  question: What is the average list price of products in each category?
+  reference_sql: |
+    SELECT category, AVG(unit_price) AS avg_unit_price
+    FROM products
+    GROUP BY category
+
+- id: M2-H1
+  set: hard
+  kind: reference
+  ordered: true
+  question: How did revenue change from one month to the next during 2024?
+  reference_sql: |
+    WITH monthly AS (
+      SELECT strftime('%Y-%m', order_date) AS month, SUM(total_amount) AS revenue
+      FROM orders
+      WHERE order_date >= '2024-01-01' AND order_date < '2025-01-01'
+      GROUP BY strftime('%Y-%m', order_date)
+    )
+    SELECT month,
+           revenue - LAG(revenue) OVER (ORDER BY month) AS change_from_previous_month
+    FROM monthly
+    ORDER BY month
+  note: >
+    January 2024 is the first month in the data, so its change is NULL; an answer
+    that omits January or shows NULL/blank for it is fine to accept by hand, but
+    the reference keeps the row. Every month of 2024 has orders.
+
+- id: M2-H2
+  set: hard
+  kind: reference
+  ordered: false
+  question: Which product brought in the most revenue in each quarter of 2024?
+  reference_sql: |
+    WITH quarterly AS (
+      SELECT (CAST(strftime('%m', o.order_date) AS INTEGER) + 2) / 3 AS quarter,
+             p.product_name, SUM(o.total_amount) AS revenue
+      FROM orders o
+      JOIN products p ON p.product_id = o.product_id
+      WHERE o.order_date >= '2024-01-01' AND o.order_date < '2025-01-01'
+      GROUP BY quarter, p.product_id, p.product_name
+    ), ranked AS (
+      SELECT quarter, product_name,
+             RANK() OVER (PARTITION BY quarter ORDER BY revenue DESC) AS rk
+      FROM quarterly
+    )
+    SELECT quarter, product_name
+    FROM ranked
+    WHERE rk = 1
+  note: >
+    Checked for ties: each quarter has a single top product (the runner-up is at
+    least 1,300 behind), so RANK and ROW_NUMBER give the same 4 rows.
+
+- id: M2-H3
+  set: hard
+  kind: reference
+  ordered: false
+  question: Within each region, what share of revenue comes from each product category?
+  reference_sql: |
+    WITH region_category AS (
+      SELECT c.region, p.category, SUM(o.total_amount) AS revenue
+      FROM orders o
+      JOIN customers c ON c.customer_id = o.customer_id
+      JOIN products p ON p.product_id = o.product_id
+      GROUP BY c.region, p.category
+    )
+    SELECT region, category,
+           100.0 * revenue / SUM(revenue) OVER (PARTITION BY region) AS pct_of_region_revenue
+    FROM region_category
+  note: >
+    Share is a percentage of the region's total revenue and is left unrounded so
+    the 1e-6 float tolerance applies; an answer giving fractions (0-1) instead of
+    percentages is the same share on a different scale.
+
+- id: M2-U1
+  set: unanswerable
+  kind: unanswerable
+  question: What is the average customer rating for each product?
+  missing_field: product ratings or reviews
+  accept_missing: [rating, review, satisfaction, score, feedback]
+
+- id: M2-U2
+  set: unanswerable
+  kind: unanswerable
+  question: How does spending differ between customers under 30 and those over 30?
+  missing_field: customer age or date of birth
+  accept_missing: [age, birth, dob, demographic]
+
+- id: M2-A1
+  set: ambiguous
+  kind: ambiguous
+  question: Which region is growing the fastest?
+  undefined_terms: ["growth measure (revenue vs order count vs new customers)", "periods compared (month over month vs H1 vs H2 vs Q1 vs Q4)", "absolute vs percentage growth"]

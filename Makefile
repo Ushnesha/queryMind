@@ -4,7 +4,7 @@ DEMO_DB ?= data/analytics.db
 REPORT_DIR ?= eval/results/integrated
 
 .PHONY: test seed demo baseline-demo ui eval ablation score verify-data schema-graph benchmark \
-	stakeholder-baseline spider-pilot report-eval report-score
+	stakeholder-baseline spider-pilot report-eval report-score report-eval-60 b2-17 poster-figures \n	latency ablation-live ablation-live-17 ablation-score member3-figures
 
 test:
 	$(PYTHON) -m pytest -q
@@ -60,3 +60,37 @@ report-eval:
 
 report-score:
 	$(STAKEHOLDER_DIR)/venv/bin/python scripts/score_report_eval.py
+
+# --- Milestone 3 poster (Member 1): b2 arm, 60-question set, poster panels ---
+# b0/b1 do not depend on R1/R6 and can run first: make report-eval-60 ARMS=b0,b1
+ARMS ?= b0,b1,b2,querymind,querymind-flat
+
+b2-17:
+	$(PYTHON) -m scripts.run_report_eval --dataset stakeholder --arms b2
+
+report-eval-60:
+	$(PYTHON) -m scripts.run_report_eval --dataset stakeholder60 --arms $(ARMS)
+
+poster-figures: report-score
+	$(PYTHON) -m scripts.make_poster_figures
+
+# --- Milestone 3 (Member 3): latency (R6), live ablation (R3) ------------------------------
+# R6 before/after: Milestone 2 traces vs the 60-question QueryMind runs.
+latency:
+	$(PYTHON) -m scripts.analyze_latency
+
+# R3: run only after R1 and R6 are merged. Reuses the querymind / querymind-flat traces
+# of report-eval-60 for all_enabled / without_neo4j. Check the plan with: ABLATION_ARGS=--dry-run
+ABLATION_ARGS ?=
+ablation-live:
+	$(PYTHON) -m scripts.run_live_ablation --dataset stakeholder60 $(ABLATION_ARGS)
+
+ablation-live-17:
+	$(PYTHON) -m scripts.run_live_ablation --dataset stakeholder --repeats 3 $(ABLATION_ARGS)
+
+ablation-score:
+	$(STAKEHOLDER_DIR)/venv/bin/python scripts/score_ablation.py
+
+member3-figures:
+	$(PYTHON) -m scripts.make_member3_figures
+

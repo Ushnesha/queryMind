@@ -8,6 +8,7 @@ model:
 orchestrator:
   max_repairs: 3
   max_optimizer_rounds: 2
+  schema_retry_max_repairs: 1
 
 schema:
   default_mode: neo4j

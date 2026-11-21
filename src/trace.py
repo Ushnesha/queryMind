@@ -15,8 +15,13 @@ def add_trace(
     reason: str = "",
     *,
     iteration: int | None = None,
+    **fields: Any,
 ) -> None:
-    """Append one serializable node event to a run."""
+    """Append one serializable node event to a run.
+
+    Extra ``fields`` (e.g. ``llm_calls``, ``prompt_tokens``, ``completion_tokens``)
+    are stored on the event so per-step cost can be read from the trace (R6).
+    """
     event: dict[str, Any] = {
         "node": node,
         "status": status,
@@ -25,6 +30,7 @@ def add_trace(
     }
     if iteration is not None:
         event["iteration"] = iteration
+    event.update(fields)
     json.dumps(event, allow_nan=False)
     state.setdefault("trace", []).append(event)
 

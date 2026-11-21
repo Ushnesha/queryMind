@@ -31,6 +31,10 @@ class ModelSettings:
 class OrchestratorSettings:
     max_repairs: int = 3
     max_optimizer_rounds: int = 2
+    # Repair budget of the one flat-schema retry after a Neo4j-mode refusal (R1).
+    # 1 (not max_repairs) bounds the worst case at max_repairs + 1 + 2 generations,
+    # protecting gateway quota and the latency target (R6). 0..3.
+    schema_retry_max_repairs: int = 1
 
 
 @dataclass(frozen=True)
@@ -78,10 +82,11 @@ def load_settings(path: str | Path | None = None) -> Settings:
     routing, schema, evaluation = section("orchestrator"), section("schema"), section("evaluation")
     repairs = int(routing.get("max_repairs", 3))
     rounds = int(routing.get("max_optimizer_rounds", 2))
+    retry_repairs = int(routing.get("schema_retry_max_repairs", 1))
     top_k = int(schema.get("top_k", 5))
     mode = str(schema.get("default_mode", "neo4j"))
-    if not 0 <= repairs <= 3 or not 0 <= rounds <= 2:
-        raise ValueError("max_repairs must be 0..3 and max_optimizer_rounds must be 0..2")
+    if not 0 <= repairs <= 3 or not 0 <= rounds <= 2 or not 0 <= retry_repairs <= 3:
+        raise ValueError("max_repairs and schema_retry_max_repairs must be 0..3 and max_optimizer_rounds must be 0..2")
     if top_k < 1 or mode not in {"flat", "neo4j"}:
         raise ValueError("schema mode must be flat/neo4j and top_k must be positive")
     return Settings(
@@ -90,7 +95,7 @@ def load_settings(path: str | Path | None = None) -> Settings:
             float(model.get("temperature", 0)),
             str(os.environ.get("QUERYMIND_PROVIDER") or model.get("provider", "mock")).strip(),
         ),
-        orchestrator=OrchestratorSettings(repairs, rounds),
+        orchestrator=OrchestratorSettings(repairs, rounds, retry_repairs),
         schema=SchemaSettings(mode, top_k),
         evaluation=EvaluationSettings(resolve_path(evaluation.get("trace_dir", "eval/results"))),
     )
