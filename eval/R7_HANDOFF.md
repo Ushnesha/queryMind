@@ -1,6 +1,6 @@
 # R7 handoff: verifier quality, example cards, second annotation
 
-Read this first if you pull `milestone3/mem4_impl` (or `main` after it merges) and need to finish or
+Read this first if you pull `feature/verifier_eval` (or `main` after it merges) and need to finish or
 rerun this work.
 Scope is analysis only: nothing under `src/` changes. Poster numbers must come from the
 `poster-freeze` traces, never from hand typing.
@@ -82,7 +82,7 @@ not commit it unless the poster tool needs it). The scorer is only needed for th
 - The plan's table adds up to 40 new questions and 20 existing ones, not 43 and 17.
 - `matplotlib` is imported by the figure scripts but is missing from `requirements.txt`.
 - `tests/test_ui.py` fails to collect without `streamlit`.
-- Merge `milestone3/mem4_impl` before `milestone3/mem2_impl`, which is stacked on `milestone3/mem1_impl`.
+- Merge `feature/verifier_eval` before `milestone3/mem2_impl`, which is stacked on `milestone3/mem1_impl`.
   Member 5's branch changes `src/optimizer`, so frozen traces may differ from today's.
 
 ## Still to do
