@@ -108,7 +108,8 @@ def analyze(rows: list[dict]) -> dict:
             "result_checks": check_rates(rows)}
 
 
-def load_scored(traces: Path, repeat: str, arm: str) -> tuple[list[dict], dict]:
+def load_scored(traces: Path, repeat: str, arm: str,
+                datasets: tuple[str, ...] = ("stakeholder", "spider")) -> tuple[list[dict], dict]:
     """Score the traces with the stakeholder scorer; return rows and a per-dataset count."""
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     import score_report_eval as scorer  # imports the stakeholder's score.py; needs its interpreter
@@ -116,7 +117,7 @@ def load_scored(traces: Path, repeat: str, arm: str) -> tuple[list[dict], dict]:
     scorer.RESULTS = traces
     rows: list[dict] = []
     counts: dict[str, int] = {}
-    for name in ("stakeholder", "spider"):
+    for name in datasets:
         if (traces / name).exists():
             part = scorer.score_dataset(name).get(repeat, {}).get(arm, [])
             counts[name] = len(part)
@@ -153,13 +154,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", type=Path, default=PROJECT_ROOT / "eval/results")
     parser.add_argument("--repeat", default="r1", help="run to analyse (default r1, as the rest of the poster)")
     parser.add_argument("--arm", default="querymind")
+    parser.add_argument("--datasets", default="stakeholder,spider",
+                        help="comma list; use stakeholder to leave out the Spider questions")
     args = parser.parse_args(argv)
 
-    rows, counts = load_scored(args.traces.resolve(), args.repeat, args.arm)
+    rows, counts = load_scored(args.traces.resolve(), args.repeat, args.arm, tuple(args.datasets.split(",")))
     if not rows:
         parser.error(f"no {args.arm}/{args.repeat} traces found under {args.traces}")
     meta = {"traces": str(args.traces), "repeat": args.repeat, "arm": args.arm,
-            "questions_per_dataset": counts, "min_examples": MIN_EXAMPLES}
+            "datasets": args.datasets, "questions_per_dataset": counts, "min_examples": MIN_EXAMPLES}
     result = analyze(rows)
     write_outputs(result, meta, args.out)
     for name, m in result["semantic"].items():
