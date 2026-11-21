@@ -69,8 +69,7 @@ not commit it unless the poster tool needs it). The scorer is only needed for th
     exists and a local stand-in otherwise. Both scripts force the headless `Agg` backend.
 11. **Second annotation is not done.** The labeling scheme is not published. The template assumes
     one label per ambiguous question: `measure`, `time` or `threshold`. `label` is empty on
-    purpose: the second annotator must fill it in alone. `suggested_label` is only a hint and
-    must not be reported as an annotation. Only 9 of the plan's 10 ambiguous questions exist in
+    purpose: the second annotator must fill it in alone, and no hint labels are kept in the file. Only 9 of the plan's 10 ambiguous questions exist in
     the files so far.
 
 ## Known problems elsewhere (not fixed here, not my files)

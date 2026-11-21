@@ -7,13 +7,11 @@
 #   threshold  where to draw a line ("early", "high spender", "underperforming")
 #
 # How to use:
-#   1. Fill in `label` yourself, WITHOUT looking at the first annotator's labels or at
-#      `suggested_label` or `undefined_terms`. Independence is the whole point of Task 2.
+#   1. Fill in `label` yourself, WITHOUT looking at the first annotator's labels or at the
+#      `undefined_terms` in the question files. Independence is the whole point of Task 2.
+#      (Rule-based hint labels were removed from this file on purpose.)
 #   2. Only after labeling, compare with the first annotator:
-#        python scripts/annotation_agreement.py --a eval/annotations/member4_ambiguous.yaml \
-#            --b <first annotator file> --field label
-#   `suggested_label` is a mechanical hint (type of the first term in `undefined_terms` in the
-#   question set). It is NOT a second annotation and must never be reported as one.
+#        python scripts/annotation_agreement.py --a eval/annotations/member4_ambiguous.yaml --b <first annotator file> --field label
 #
 # Known gap: the plan says 10 ambiguous questions; these 9 are the ones found in the question
 # files so far (stakeholder 4, Member 1: 2, Member 2: 1, Member 4: 1, Member 5: 1).
@@ -21,54 +19,45 @@
 
 - id: H1
   question: Show sales trends over time.
-  suggested_label: time
   label: null
   annotator: null
 
 - id: H2
   question: Which customers signed up early but never became high spenders?
-  suggested_label: threshold
   label: null
   annotator: null
 
 - id: A1
   question: Who are our most active customers?
-  suggested_label: measure
   label: null
   annotator: null
 
 - id: A2
   question: How did we perform last quarter?
-  suggested_label: time
   label: null
   annotator: null
 
 - id: M1-A1
   question: Which products are underperforming?
-  suggested_label: measure
   label: null
   annotator: null
 
 - id: M1-A2
   question: What were our best-selling products recently?
-  suggested_label: measure
   label: null
   annotator: null
 
 - id: M2-A1
   question: Which region is growing the fastest?
-  suggested_label: measure
   label: null
   annotator: null
 
 - id: M4-A1
   question: Which region is our biggest?
-  suggested_label: measure
   label: null
   annotator: null
 
 - id: M5_A1
   question: Who are the recent customers?
-  suggested_label: time
   label: null
   annotator: null
