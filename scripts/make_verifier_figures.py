@@ -20,6 +20,9 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
+import matplotlib  # noqa: E402
+
+matplotlib.use("Agg")  # headless: no window, works in tests and on any machine
 import matplotlib.pyplot as plt  # noqa: E402
 from matplotlib.colors import to_rgba  # noqa: E402
 from matplotlib.patches import FancyBboxPatch  # noqa: E402
