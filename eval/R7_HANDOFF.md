@@ -1,7 +1,7 @@
 # R7 handoff: verifier quality, example cards, second annotation
 
 Read this first if you pull `milestone3/mem4_impl` (or `main` after it merges) and need to finish or
-rerun this work, by hand or with an AI assistant (paste this file plus `CLAUDE.md` into the chat).
+rerun this work.
 Scope is analysis only: nothing under `src/` changes. Poster numbers must come from the
 `poster-freeze` traces, never from hand typing.
 
