@@ -25,17 +25,18 @@ def ablation_variants() -> dict[str, dict[str, bool]]:
 
 def experiment_variants(*, include_syntax: bool = False) -> dict[str, dict[str, Any]]:
     """Each experimental variant changes one factor from the Neo4j full arm."""
-    switches = ablation_variants()
-    full = {"schema_mode": "neo4j", **switches["all_enabled"]}
+    # The Neo4j full arm, including the R1 flat-schema retry safety net.
+    full = {"schema_mode": "neo4j", **ablation_variants()["all_enabled"], "enable_schema_retry": True}
     variants = {
         "all_enabled": full,
         "without_neo4j": {**full, "schema_mode": "flat"},
-        "without_semantic": {"schema_mode": "neo4j", **switches["without_semantic"]},
-        "without_result_verifier": {"schema_mode": "neo4j", **switches["without_result_verifier"]},
-        "without_optimizer": {"schema_mode": "neo4j", **switches["without_optimizer"]},
+        "without_semantic": {**full, "enable_semantic": False},
+        "without_result_verifier": {**full, "enable_result_verifier": False},
+        "without_optimizer": {**full, "enable_optimizer": False},
+        "without_schema_retry": {**full, "enable_schema_retry": False},
     }
     if include_syntax:
-        variants["without_syntax"] = {"schema_mode": "neo4j", **switches["without_syntax"]}
+        variants["without_syntax"] = {**full, "enable_syntax": False}
     return variants
 
 

@@ -121,7 +121,7 @@ def test_variants_change_exactly_one_controlled_factor() -> None:
     full = variants["all_enabled"]
     assert full["schema_mode"] == "neo4j"
     assert variants["without_neo4j"]["schema_mode"] == "flat"
-    assert len(variants) == 6
+    assert len(variants) == 7  # + without_schema_retry (R1)
     for name, options in variants.items():
         if name != "all_enabled":
             assert sum(options[key] != full[key] for key in full) == 1
@@ -142,7 +142,7 @@ def test_replay_retains_synthetic_fixture_provenance() -> None:
 def test_ablation_multiquestion_reports_are_paired(db_path: Path) -> None:
     questions = [{"id": "E1", "question": "How many customers?", "sql": "SELECT COUNT(*) AS customer_count FROM customers"}]
     report = run_ablation(questions, db_path=db_path)
-    assert len(report["variants"]) == 5
+    assert len(report["variants"]) == 6
     for variant in report["variants"].values():
         assert variant["cases"][0]["question_id"] == "E1"
         assert variant["metrics"]["result_accuracy"] == 1.0

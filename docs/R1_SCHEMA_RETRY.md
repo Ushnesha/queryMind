@@ -182,3 +182,12 @@ follow-up once the PR is merged.
 3. **`missing_fields` rule.** Section 4 keeps the Neo4j attempt's list to protect
    the unanswerable baseline. If the re-run shows the flat attempt names the
    missing field better, switch to the flat list. Decide after the first eval.
+
+## 10. Resolution (Member 3, implementation)
+
+1. Quota: the retry budget is `orchestrator.schema_retry_max_repairs` (default 1, range 0..3),
+   so the worst case is `max_repairs + 1 + 2` generations. Set it to 3 for a fresh `max_repairs`.
+2. Full-schema Neo4j runs: no retry when `fallback_reason` starts with `"No identifier matches"`.
+3. `missing_fields`: as in section 4 (Neo4j list first, flat list only if it is empty).
+
+Tests: `tests/test_schema_retry.py`. Details: `docs/MEMBER3.md`.

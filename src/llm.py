@@ -44,6 +44,16 @@ class MockProvider:
         )
 
 
+def token_usage(provider: SQLProvider | None) -> tuple[int, int] | None:
+    """Return cumulative (prompt, completion) tokens, or None when not reported."""
+    if provider is None or isinstance(provider, MockProvider) or getattr(provider, "is_mock", False) is True:
+        return None
+    values = (getattr(provider, "prompt_tokens", None), getattr(provider, "completion_tokens", None))
+    if all(isinstance(v, int) and not isinstance(v, bool) and v >= 0 for v in values):
+        return values[0], values[1]
+    return None
+
+
 def model_call_count(provider: SQLProvider) -> int | None:
     """Return measured API attempts; unknown provider counters stay unknown."""
     if isinstance(provider, MockProvider) or getattr(provider, "is_mock", False) is True:
@@ -117,8 +127,12 @@ class OpenAICompatibleProvider:
         else:
             self.calls_without_usage += 1
 
-    def generate(self, question: str, schema_context: str) -> str:
-        """Call OpenAI-compatible chat completion and return the generated SQL."""
+    def generate(self, question: str, schema_context: str, *, max_tokens: int | None = None) -> str:
+        """Call OpenAI-compatible chat completion and return the generated text.
+
+        ``max_tokens`` caps the completion length (used by the answer writer, R6);
+        ``None`` leaves the gateway default, so SQL generation is unchanged.
+        """
         api_key = self._resolve_api_key()
         base_url = self._resolve_base_url()
         model = self._resolve_model()
@@ -138,6 +152,8 @@ class OpenAICompatibleProvider:
             ],
             "temperature": self.temperature,
         }
+        if max_tokens is not None:
+            payload["max_tokens"] = int(max_tokens)
         data = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(
             endpoint,
