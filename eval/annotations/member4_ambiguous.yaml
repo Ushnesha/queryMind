@@ -19,45 +19,45 @@
 
 - id: H1
   question: Show sales trends over time.
-  label: null
-  annotator: null
+  label: time
+  annotator: samyogita
 
 - id: H2
   question: Which customers signed up early but never became high spenders?
-  label: null
-  annotator: null
+  label: threshold
+  annotator: samyogita
 
 - id: A1
   question: Who are our most active customers?
-  label: null
-  annotator: null
+  label: measure
+  annotator: samyogita
 
 - id: A2
   question: How did we perform last quarter?
-  label: null
-  annotator: null
+  label: measure
+  annotator: samyogita
 
 - id: M1-A1
   question: Which products are underperforming?
-  label: null
-  annotator: null
+  label: threshold
+  annotator: samyogita
 
 - id: M1-A2
   question: What were our best-selling products recently?
-  label: null
-  annotator: null
+  label: measure
+  annotator: samyogita
 
 - id: M2-A1
   question: Which region is growing the fastest?
-  label: null
-  annotator: null
+  label: measure
+  annotator: samyogita
 
 - id: M4-A1
   question: Which region is our biggest?
-  label: null
-  annotator: null
+  label: measure
+  annotator: samyogita
 
 - id: M5_A1
   question: Who are the recent customers?
-  label: null
-  annotator: null
+  label: time
+  annotator: samyogita
