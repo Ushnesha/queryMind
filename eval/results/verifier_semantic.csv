@@ -1,0 +1,4 @@
+verdict,tp,fp,fn,tn,precision,recall
+mismatch,0,1,21,35,"0/1 (0%, CI 0-79) too few examples","0/21 (0%, CI 0-15)"
+not_answerable,6,15,0,46,"6/21 (29%, CI 14-50)","6/6 (100%, CI 61-100)"
+assumption_flagged,2,21,2,42,"2/23 (9%, CI 2-27)","2/4 (50%, CI 15-85) too few examples"
