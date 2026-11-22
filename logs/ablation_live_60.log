@@ -1,0 +1,10 @@
+stakeholder60: 50 questions x 4 variant-runs (4 live, 0 reused) ~ 200 questions through the gateway
+  r1 without_semantic         --schema-mode neo4j --disable semantic
+  r1 without_result_verifier  --schema-mode neo4j --disable result_verifier
+  r1 without_optimizer        --schema-mode neo4j --disable optimizer
+  r1 without_schema_retry     --schema-mode neo4j --disable schema_retry
+r1 without_semantic         ran 50 in  277.5s; infra failures 0
+r1 without_result_verifier  ran 50 in  398.7s; infra failures 0
+r1 without_optimizer        ran 50 in  404.9s; infra failures 0
+r1 without_schema_retry     ran 50 in  405.3s; infra failures 0
+Database contents unchanged = True; score with scripts/score_ablation.py

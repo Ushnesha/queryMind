@@ -1,0 +1,30 @@
+.venv/bin/python -m scripts.run_report_eval --dataset stakeholder60 --arms b0,b1,b2,querymind,querymind-flat
+stakeholder60 r1 b0        main                         ran 11 in   40.4s; infra failures 0
+stakeholder60 r1 b1        main                         ran 11 in   28.2s; infra failures 0
+stakeholder60 r1 b2        main                         ran 11 in   49.6s; infra failures 0
+stakeholder60 r1 querymind main                         ran 11 in  117.1s; infra failures 0
+stakeholder60 r1 querymind-flat main                         ran 11 in   70.5s; infra failures 0
+stakeholder60 r2 b0        main                         ran 11 in   36.6s; infra failures 0
+stakeholder60 r2 b1        main                         ran 11 in   24.0s; infra failures 0
+stakeholder60 r2 b2        main                         ran 11 in   48.0s; infra failures 0
+stakeholder60 r2 querymind main                         ran 11 in   76.5s; infra failures 0
+stakeholder60 r2 querymind-flat main                         ran 11 in   72.2s; infra failures 0
+stakeholder60 r3 b0        main                         ran 11 in   36.5s; infra failures 0
+stakeholder60 r3 b1        main                         ran 11 in   24.6s; infra failures 0
+stakeholder60 r3 b2        main                         ran 11 in   54.0s; infra failures 0
+stakeholder60 r3 querymind main                         ran 11 in  114.3s; infra failures 0
+stakeholder60 r3 querymind-flat main                         ran 11 in   69.0s; infra failures 0
+stakeholder60: database contents unchanged = True
+.venv/bin/python -m scripts.run_live_ablation --dataset stakeholder60 
+stakeholder60: 60 questions x 6 variant-runs (4 live, 2 reused) ~ 240 questions through the gateway
+  r1 all_enabled              reuse eval/results/report/stakeholder60/r1/querymind__main.jsonl
+  r1 without_neo4j            reuse eval/results/report/stakeholder60/r1/querymind-flat__main.jsonl
+  r1 without_semantic         --schema-mode neo4j --disable semantic
+  r1 without_result_verifier  --schema-mode neo4j --disable result_verifier
+  r1 without_optimizer        --schema-mode neo4j --disable optimizer
+  r1 without_schema_retry     --schema-mode neo4j --disable schema_retry
+r1 without_semantic         ran 11 in   58.8s; infra failures 0
+r1 without_result_verifier  ran 11 in  109.0s; infra failures 0
+r1 without_optimizer        ran 11 in  118.0s; infra failures 0
+r1 without_schema_retry     ran 11 in  117.0s; infra failures 0
+Database contents unchanged = True; score with scripts/score_ablation.py

@@ -1,0 +1,17 @@
+.venv/bin/python -m scripts.run_report_eval --dataset stakeholder60 --arms b0,b1,b2,querymind,querymind-flat
+stakeholder60 r1 b0        main                         ran 50 in  268.1s; infra failures 0
+stakeholder60 r1 b1        main                         ran 50 in  190.7s; infra failures 0
+stakeholder60 r1 b2        main                         ran 50 in  279.7s; infra failures 0
+stakeholder60 r1 querymind main                         ran 50 in  418.4s; infra failures 0
+stakeholder60 r1 querymind-flat main                         ran 50 in  300.3s; infra failures 0
+stakeholder60 r2 b0        main                         ran 50 in  254.3s; infra failures 0
+stakeholder60 r2 b1        main                         ran 50 in  192.6s; infra failures 0
+stakeholder60 r2 b2        main                         ran 50 in  302.0s; infra failures 0
+stakeholder60 r2 querymind main                         ran 50 in  431.0s; infra failures 0
+stakeholder60 r2 querymind-flat main                         ran 50 in  343.4s; infra failures 0
+stakeholder60 r3 b0        main                         ran 50 in  250.7s; infra failures 0
+stakeholder60 r3 b1        main                         ran 50 in  184.4s; infra failures 0
+stakeholder60 r3 b2        main                         ran 50 in  325.1s; infra failures 0
+stakeholder60 r3 querymind main                         ran 50 in  471.7s; infra failures 0
+stakeholder60 r3 querymind-flat main                         ran 50 in  315.9s; infra failures 0
+stakeholder60: database contents unchanged = True
