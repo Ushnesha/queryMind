@@ -9,13 +9,13 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 720 450] /Contents 4 0 R /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> >>
 endobj
 4 0 obj
-<< /Length 3865 >>
+<< /Length 3576 >>
 stream
 0.980 0.990 1.000 rg
 0.820 0.860 0.920 RG 1.50 w
 10.00 10.00 700.00 430.00 re B
 BT /F2 16.0 Tf 0.080 0.180 0.360 rg 30.00 410.00 Td (QueryMind Plan Transformation: Gated Rewrite at Scale) Tj ET
-BT /F2 10.0 Tf 0.750 0.350 0.050 rg 30.00 392.00 Td ([DEVELOPMENT PREVIEW: Controlled Scenario Suite \(R5.3\)] - Representative Case OPT10: Scale Timeout) Tj ET
+BT /F2 10.0 Tf 0.750 0.350 0.050 rg 30.00 392.00 Td ([DEVELOPMENT PREVIEW: Controlled Scenario Suite \(R5.3\)] - Representative Case OPT02: Scan Consolidation) Tj ET
 1.000 1.000 1.000 rg
 0.800 0.840 0.900 RG 1.20 w
 30.00 100.00 300.00 275.00 re B
@@ -24,26 +24,31 @@ BT /F2 10.0 Tf 0.750 0.350 0.050 rg 30.00 392.00 Td ([DEVELOPMENT PREVIEW: Contr
 30.00 345.00 300.00 30.00 re B
 BT /F2 12.0 Tf 0.150 0.300 0.550 rg 45.00 355.00 Td (BEFORE: Original Query & Plan) Tj ET
 BT /F2 9.5 Tf 0.200 0.250 0.300 rg 45.00 325.00 Td (Original SQL:) Tj ET
-BT /F1 8.0 Tf 0.350 0.400 0.450 rg 45.00 310.00 Td (SELECT c.customer_id, c.name FROM customer) Tj ET
-BT /F1 8.0 Tf 0.350 0.400 0.450 rg 45.00 298.00 Td (s c WHERE \(SELECT SUM\(o.amount\) FROM order) Tj ET
-BT /F1 8.0 Tf 0.350 0.400 0.450 rg 45.00 286.00 Td (s o WHERE o.customer_id = c.customer_id\) >) Tj ET
+BT /F1 8.0 Tf 0.350 0.400 0.450 rg 45.00 310.00 Td (SELECT \(SELECT SUM\(amount\) FROM orders WHE) Tj ET
+BT /F1 8.0 Tf 0.350 0.400 0.450 rg 45.00 298.00 Td (RE customer_id = 42\) AS total,
+       \(SEL) Tj ET
+BT /F1 8.0 Tf 0.350 0.400 0.450 rg 45.00 286.00 Td (ECT COUNT\(*\) FROM orders WHERE customer_id) Tj ET
 BT /F2 9.5 Tf 0.200 0.250 0.300 rg 45.00 255.00 Td (SQLite EXPLAIN Plan Operators:) Tj ET
 0.980 0.920 0.920 rg
 0.900 0.700 0.700 RG 1.00 w
 45.00 236.00 270.00 15.00 re B
-BT /F2 8.0 Tf 0.600 0.150 0.150 rg 50.00 240.00 Td (! SCAN c) Tj ET
+BT /F2 8.0 Tf 0.600 0.150 0.150 rg 50.00 240.00 Td (! SCAN CONSTANT ROW) Tj ET
 0.980 0.920 0.920 rg
 0.900 0.700 0.700 RG 1.00 w
 45.00 218.00 270.00 15.00 re B
-BT /F2 8.0 Tf 0.600 0.150 0.150 rg 50.00 222.00 Td (! CORRELATED SCALAR SUBQUERY 1) Tj ET
+BT /F2 8.0 Tf 0.600 0.150 0.150 rg 50.00 222.00 Td (! SCALAR SUBQUERY 1) Tj ET
 0.980 0.920 0.920 rg
 0.900 0.700 0.700 RG 1.00 w
 45.00 200.00 270.00 15.00 re B
-BT /F2 8.0 Tf 0.600 0.150 0.150 rg 50.00 204.00 Td (! SCAN o) Tj ET
+BT /F2 8.0 Tf 0.600 0.150 0.150 rg 50.00 204.00 Td (! SCAN orders) Tj ET
+0.980 0.920 0.920 rg
+0.900 0.700 0.700 RG 1.00 w
+45.00 182.00 270.00 15.00 re B
+BT /F2 8.0 Tf 0.600 0.150 0.150 rg 50.00 186.00 Td (! SCALAR SUBQUERY 2) Tj ET
 0.950 0.960 0.980 rg
 0.800 0.840 0.900 RG 1.00 w
 45.00 115.00 270.00 28.00 re B
-BT /F2 10.0 Tf 0.200 0.250 0.350 rg 55.00 124.00 Td (Scale Latency \(100k rows\): 21841.5 ms) Tj ET
+BT /F2 10.0 Tf 0.200 0.250 0.350 rg 55.00 124.00 Td (Scale Latency \(100k rows\): 6.5 ms) Tj ET
 BT /F2 18.0 Tf 0.200 0.500 0.400 rg 348.00 250.00 Td (===>) Tj ET
 0.920 0.980 0.940 rg
 0.600 0.850 0.700 RG 1.00 w
@@ -59,26 +64,17 @@ BT /F2 8.5 Tf 0.050 0.600 0.350 rg 342.00 200.00 Td (PASS) Tj ET
 390.00 345.00 300.00 30.00 re B
 BT /F2 12.0 Tf 0.050 0.450 0.300 rg 405.00 355.00 Td (AFTER: QueryMind Optimized Plan) Tj ET
 BT /F2 9.5 Tf 0.200 0.250 0.300 rg 405.00 325.00 Td (Optimized SQL:) Tj ET
-BT /F1 8.0 Tf 0.200 0.450 0.300 rg 405.00 310.00 Td (SELECT c.customer_id, c.name FROM customer) Tj ET
-BT /F1 8.0 Tf 0.200 0.450 0.300 rg 405.00 298.00 Td (s c JOIN orders o ON c.customer_id = o.cus) Tj ET
-BT /F1 8.0 Tf 0.200 0.450 0.300 rg 405.00 286.00 Td (tomer_id GROUP BY c.customer_id, c.name HA) Tj ET
+BT /F1 8.0 Tf 0.200 0.450 0.300 rg 405.00 310.00 Td (SELECT SUM\(amount\) AS total, COUNT\(*\) AS c) Tj ET
+BT /F1 8.0 Tf 0.200 0.450 0.300 rg 405.00 298.00 Td (nt FROM orders WHERE customer_id = 42) Tj ET
 BT /F2 9.5 Tf 0.200 0.250 0.300 rg 405.00 255.00 Td (Optimized Plan Operators:) Tj ET
 0.920 0.980 0.940 rg
 0.600 0.850 0.700 RG 1.00 w
 405.00 236.00 270.00 15.00 re B
-BT /F2 8.0 Tf 0.050 0.500 0.300 rg 410.00 240.00 Td (* SCAN o) Tj ET
-0.920 0.980 0.940 rg
-0.600 0.850 0.700 RG 1.00 w
-405.00 218.00 270.00 15.00 re B
-BT /F2 8.0 Tf 0.050 0.500 0.300 rg 410.00 222.00 Td (* SEARCH c USING INTEGER PRIMARY KEY \(ro) Tj ET
-0.920 0.980 0.940 rg
-0.600 0.850 0.700 RG 1.00 w
-405.00 200.00 270.00 15.00 re B
-BT /F2 8.0 Tf 0.050 0.500 0.300 rg 410.00 204.00 Td (* USE TEMP B-TREE FOR GROUP BY) Tj ET
+BT /F2 8.0 Tf 0.050 0.500 0.300 rg 410.00 240.00 Td (* SCAN orders) Tj ET
 0.900 0.970 0.930 rg
 0.600 0.850 0.700 RG 1.00 w
 405.00 115.00 270.00 28.00 re B
-BT /F2 10.0 Tf 0.050 0.500 0.300 rg 415.00 124.00 Td (Scale Latency: 41.5 ms  \(526.5x Speedup\)) Tj ET
+BT /F2 10.0 Tf 0.050 0.500 0.300 rg 415.00 124.00 Td (Scale Latency: 3.1 ms  \(2.1x Speedup\)) Tj ET
 0.950 0.980 0.950 rg
 0.650 0.850 0.700 RG 1.20 w
 30.00 30.00 660.00 50.00 re B
@@ -99,10 +95,10 @@ xref
 0000000058 00000 n 
 0000000115 00000 n 
 0000000251 00000 n 
-0000004168 00000 n 
-0000004238 00000 n 
+0000003879 00000 n 
+0000003949 00000 n 
 trailer
 << /Size 7 /Root 1 0 R >>
 startxref
-4313
+4024
 %%EOF

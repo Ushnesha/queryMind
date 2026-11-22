@@ -1,0 +1,1217 @@
+{
+  "summary": {
+    "suite_label": "CONTROLLED_DEVELOPMENT_SUITE: R5.3 scenario validation suite (not the frozen live system evaluation)",
+    "timing_protocol": "1 warm-up + 5 runs, interleaved; timeout 30.0s",
+    "small_database": "/Users/ushnesha/NextDrive/Documents/Academic/sem_3/Agentic AI/queryMind/data/analytics.db",
+    "large_database": "/Users/ushnesha/NextDrive/Documents/Academic/sem_3/Agentic AI/queryMind/data/large_analytics.db",
+    "queries_considered": 10,
+    "triggers_fired": 8,
+    "rewrites_proposed": 9,
+    "optimizer_accepted": 2,
+    "report_certified": 2,
+    "dual_db_equality_rate": "2/2",
+    "plan_improved_large_rate": "2/2",
+    "median_speedup_large_certified": 2.06,
+    "median_ms_before_large_certified": 7.19,
+    "median_ms_after_large_certified": 3.5,
+    "rejection_breakdown": {
+      "plan_unimproved_rejected": 2,
+      "distinct_guard_rejected": 2,
+      "already_optimal_skipped": 2,
+      "equality_gate_rejected": 2
+    },
+    "llm_calls": 8
+  },
+  "queries": [
+    {
+      "id": "OPT01",
+      "category": "correlated_subquery",
+      "question": "Which customers with ID up to 150 have placed at least one order?",
+      "original_sql": "SELECT c.customer_id, c.name FROM customers c WHERE c.customer_id <= 150 AND (SELECT COUNT(*) FROM orders o WHERE o.customer_id = c.customer_id) > 0",
+      "candidate_sql": "SELECT c.customer_id, c.name FROM customers c WHERE c.customer_id <= 150 AND EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = c.customer_id)",
+      "optimized_sql": "SELECT c.customer_id, c.name FROM customers c WHERE c.customer_id <= 150 AND (SELECT COUNT(*) FROM orders o WHERE o.customer_id = c.customer_id) > 0",
+      "optimizer_accepted": false,
+      "report_certified": false,
+      "reason": "Rewrite rejected (correlated subquery in plan): results equal but plan not improved.",
+      "timing_note": "unchanged SQL",
+      "llm_calls": 1,
+      "optimizer_ms": 877,
+      "small_db": {
+        "before_ms": 0.151,
+        "after_ms": 0.151,
+        "speedup": 1.0,
+        "results_equal": true,
+        "plan_improved": false,
+        "raw_orig_ms": [
+          0.155,
+          0.151,
+          0.151,
+          0.151,
+          0.164
+        ],
+        "raw_opt_ms": [],
+        "status_orig": "ok",
+        "status_opt": "ok",
+        "plan_before": [
+          [
+            2,
+            0,
+            196,
+            "SEARCH c USING INTEGER PRIMARY KEY (rowid<?)"
+          ],
+          [
+            8,
+            0,
+            0,
+            "CORRELATED SCALAR SUBQUERY 1"
+          ],
+          [
+            13,
+            8,
+            216,
+            "SCAN o"
+          ]
+        ],
+        "plan_after": [
+          [
+            2,
+            0,
+            196,
+            "SEARCH c USING INTEGER PRIMARY KEY (rowid<?)"
+          ],
+          [
+            8,
+            0,
+            0,
+            "CORRELATED SCALAR SUBQUERY 1"
+          ],
+          [
+            13,
+            8,
+            216,
+            "SCAN o"
+          ]
+        ]
+      },
+      "large_db": {
+        "before_ms": 530.155,
+        "after_ms": 530.155,
+        "speedup": 1.0,
+        "results_equal": true,
+        "plan_improved": false,
+        "raw_orig_ms": [
+          556.318,
+          501.351,
+          530.155,
+          545.028,
+          493.898
+        ],
+        "raw_opt_ms": [],
+        "status_orig": "ok",
+        "status_opt": "ok",
+        "plan_before": [
+          [
+            2,
+            0,
+            196,
+            "SEARCH c USING INTEGER PRIMARY KEY (rowid<?)"
+          ],
+          [
+            8,
+            0,
+            0,
+            "CORRELATED SCALAR SUBQUERY 1"
+          ],
+          [
+            13,
+            8,
+            216,
+            "SCAN o"
+          ]
+        ],
+        "plan_after": [
+          [
+            2,
+            0,
+            196,
+            "SEARCH c USING INTEGER PRIMARY KEY (rowid<?)"
+          ],
+          [
+            8,
+            0,
+            0,
+            "CORRELATED SCALAR SUBQUERY 1"
+          ],
+          [
+            13,
+            8,
+            216,
+            "SCAN o"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "OPT02",
+      "category": "scan_consolidation",
+      "question": "What is the total spending and order count for customer 42?",
+      "original_sql": "SELECT (SELECT SUM(amount) FROM orders WHERE customer_id = 42) AS total,\n       (SELECT COUNT(*) FROM orders WHERE customer_id = 42) AS cnt",
+      "candidate_sql": "SELECT SUM(amount) AS total, COUNT(*) AS cnt FROM orders WHERE customer_id = 42",
+      "optimized_sql": "SELECT SUM(amount) AS total, COUNT(*) AS cnt FROM orders WHERE customer_id = 42",
+      "optimizer_accepted": true,
+      "report_certified": true,
+      "reason": "full scan of large table orders (100000 rows): Combine separate table scans into single pass",
+      "timing_note": "optimized",
+      "llm_calls": 1,
+      "optimizer_ms": 15,
+      "small_db": {
+        "before_ms": 0.135,
+        "after_ms": 0.121,
+        "speedup": 1.116,
+        "results_equal": true,
+        "plan_improved": true,
+        "raw_orig_ms": [
+          0.171,
+          0.142,
+          0.135,
+          0.132,
+          0.132
+        ],
+        "raw_opt_ms": [
+          0.14,
+          0.121,
+          0.119,
+          0.122,
+          0.117
+        ],
+        "status_orig": "ok",
+        "status_opt": "ok",
+        "plan_before": [
+          [
+            1,
+            0,
+            0,
+            "SCAN CONSTANT ROW"
+          ],
+          [
+            4,
+            0,
+            0,
+            "SCALAR SUBQUERY 1"
+          ],
+          [
+            9,
+            4,
+            216,
+            "SCAN orders"
+          ],
+          [
+            24,
+            0,
+            0,
+            "SCALAR SUBQUERY 2"
+          ],
+          [
+            29,
+            24,
+            216,
+            "SCAN orders"
+          ]
+        ],
+        "plan_after": [
+          [
+            3,
+            0,
+            216,
+            "SCAN orders"
+          ]
+        ]
+      },
+      "large_db": {
+        "before_ms": 6.452,
+        "after_ms": 3.079,
+        "speedup": 2.095,
+        "results_equal": true,
+        "plan_improved": true,
+        "raw_orig_ms": [
+          6.621,
+          6.198,
+          6.502,
+          6.374,
+          6.452
+        ],
+        "raw_opt_ms": [
+          3.079,
+          3.077,
+          3.195,
+          3.02,
+          3.61
+        ],
+        "status_orig": "ok",
+        "status_opt": "ok",
+        "plan_before": [
+          [
+            1,
+            0,
+            0,
+            "SCAN CONSTANT ROW"
+          ],
+          [
+            4,
+            0,
+            0,
+            "SCALAR SUBQUERY 1"
+          ],
+          [
+            9,
+            4,
+            216,
+            "SCAN orders"
+          ],
+          [
+            24,
+            0,
+            0,
+            "SCALAR SUBQUERY 2"
+          ],
+          [
+            29,
+            24,
+            216,
+            "SCAN orders"
+          ]
+        ],
+        "plan_after": [
+          [
+            3,
+            0,
+            216,
+            "SCAN orders"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "OPT03",
+      "category": "union_consolidation",
+      "question": "Which distinct customer IDs have placed orders above 500 dollars?",
+      "original_sql": "SELECT customer_id FROM orders WHERE amount > 500 UNION SELECT customer_id FROM orders WHERE amount > 800",
+      "candidate_sql": "SELECT DISTINCT customer_id FROM orders WHERE amount > 500",
+      "optimized_sql": "SELECT DISTINCT customer_id FROM orders WHERE amount > 500",
+      "optimizer_accepted": true,
+      "report_certified": true,
+      "reason": "full scan of large table orders (100000 rows): Consolidate redundant UNION scans into single DISTINCT scan",
+      "timing_note": "optimized",
+      "llm_calls": 1,
+      "optimizer_ms": 13,
+      "small_db": {
+        "before_ms": 0.143,
+        "after_ms": 0.134,
+        "speedup": 1.067,
+        "results_equal": true,
+        "plan_improved": true,
+        "raw_orig_ms": [
+          0.149,
+          0.133,
+          0.128,
+          0.143,
+          0.151
+        ],
+        "raw_opt_ms": [
+          0.121,
+          0.115,
+          0.142,
+          0.142,
+          0.134
+        ],
+        "status_orig": "ok",
+        "status_opt": "ok",
+        "plan_before": [
+          [
+            1,
+            0,
+            0,
+            "COMPOUND QUERY"
+          ],
+          [
+            2,
+            1,
+            0,
+            "LEFT-MOST SUBQUERY"
+          ],
+          [
+            5,
+            2,
+            216,
+            "SCAN orders"
+          ],
+          [
+            14,
+            1,
+            0,
+            "UNION USING TEMP B-TREE"
+          ],
+          [
+            16,
+            14,
+            216,
+            "SCAN orders"
+          ]
+        ],
+        "plan_after": [
+          [
+            3,
+            0,
+            216,
+            "SCAN orders"
+          ],
+          [
+            14,
+            0,
+            0,
+            "USE TEMP B-TREE FOR DISTINCT"
+          ]
+        ]
+      },
+      "large_db": {
+        "before_ms": 7.918,
+        "after_ms": 3.917,
+        "speedup": 2.021,
+        "results_equal": true,
+        "plan_improved": true,
+        "raw_orig_ms": [
+          8.2,
+          7.224,
+          8.136,
+          7.26,
+          7.918
+        ],
+        "raw_opt_ms": [
+          4.439,
+          4.128,
+          3.917,
+          3.608,
+          3.788
+        ],
+        "status_orig": "ok",
+        "status_opt": "ok",
+        "plan_before": [
+          [
+            1,
+            0,
+            0,
+            "COMPOUND QUERY"
+          ],
+          [
+            2,
+            1,
+            0,
+            "LEFT-MOST SUBQUERY"
+          ],
+          [
+            5,
+            2,
+            216,
+            "SCAN orders"
+          ],
+          [
+            14,
+            1,
+            0,
+            "UNION USING TEMP B-TREE"
+          ],
+          [
+            16,
+            14,
+            216,
+            "SCAN orders"
+          ]
+        ],
+        "plan_after": [
+          [
+            3,
+            0,
+            216,
+            "SCAN orders"
+          ],
+          [
+            14,
+            0,
+            0,
+            "USE TEMP B-TREE FOR DISTINCT"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "OPT04",
+      "category": "distinct_unsafe_non_key",
+      "question": "What are the unique customer names?",
+      "original_sql": "SELECT DISTINCT name FROM customers",
+      "candidate_sql": "SELECT name FROM customers",
+      "optimized_sql": "SELECT DISTINCT name FROM customers",
+      "optimizer_accepted": false,
+      "report_certified": false,
+      "reason": "Rewrite rejected (DISTINCT needs a temp b-tree): unsafe DISTINCT removal: projected columns ['name'] do not contain a declared key of 'customers'",
+      "timing_note": "unchanged SQL",
+      "llm_calls": 1,
+      "optimizer_ms": 0,
+      "small_db": {
+        "before_ms": 0.112,
+        "after_ms": 0.112,
+        "speedup": 1.0,
+        "results_equal": true,
+        "plan_improved": false,
+        "raw_orig_ms": [
+          0.112,
+          0.112,
+          0.114,
+          0.109,
+          0.109
+        ],
+        "raw_opt_ms": [],
+        "status_orig": "ok",
+        "status_opt": "ok",
+        "plan_before": [
+          [
+            3,
+            0,
+            216,
+            "SCAN customers"
+          ],
+          [
+            11,
+            0,
+            0,
+            "USE TEMP B-TREE FOR DISTINCT"
+          ]
+        ],
+        "plan_after": [
+          [
+            3,
+            0,
+            216,
+            "SCAN customers"
+          ],
+          [
+            11,
+            0,
+            0,
+            "USE TEMP B-TREE FOR DISTINCT"
+          ]
+        ]
+      },
+      "large_db": {
+        "before_ms": 7.919,
+        "after_ms": 7.919,
+        "speedup": 1.0,
+        "results_equal": true,
+        "plan_improved": false,
+        "raw_orig_ms": [
+          7.766,
+          8.203,
+          11.825,
+          7.919,
+          7.671
+        ],
+        "raw_opt_ms": [],
+        "status_orig": "ok",
+        "status_opt": "ok",
+        "plan_before": [
+          [
+            3,
+            0,
+            216,
+            "SCAN customers"
+          ],
+          [
+            11,
+            0,
+            0,
+            "USE TEMP B-TREE FOR DISTINCT"
+          ]
+        ],
+        "plan_after": [
+          [
+            3,
+            0,
+            216,
+            "SCAN customers"
+          ],
+          [
+            11,
+            0,
+            0,
+            "USE TEMP B-TREE FOR DISTINCT"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "OPT05",
+      "category": "distinct_unsafe_join",
+      "question": "Which customers have placed high-value orders above 500 dollars?",
+      "original_sql": "SELECT DISTINCT c.customer_id, c.name FROM customers c JOIN orders o ON c.customer_id = o.customer_id WHERE o.amount > 500",
+      "candidate_sql": "SELECT c.customer_id, c.name FROM customers c JOIN orders o ON c.customer_id = o.customer_id WHERE o.amount > 500",
+      "optimized_sql": "SELECT DISTINCT c.customer_id, c.name FROM customers c JOIN orders o ON c.customer_id = o.customer_id WHERE o.amount > 500",
+      "optimizer_accepted": false,
+      "report_certified": false,
+      "reason": "Rewrite rejected (DISTINCT needs a temp b-tree): unsafe DISTINCT removal: candidate contains joins, subqueries, expressions, or complex clauses",
+      "timing_note": "unchanged SQL",
+      "llm_calls": 1,
+      "optimizer_ms": 0,
+      "small_db": {
+        "before_ms": 0.132,
+        "after_ms": 0.132,
+        "speedup": 1.0,
+        "results_equal": true,
+        "plan_improved": false,
+        "raw_orig_ms": [
+          0.134,
+          0.132,
+          0.131,
+          0.13,
+          0.134
+        ],
+        "raw_opt_ms": [],
+        "status_orig": "ok",
+        "status_opt": "ok",
+        "plan_before": [
+          [
+            4,
+            0,
+            216,
+            "SCAN o"
+          ],
+          [
+            9,
+            0,
+            45,
+            "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+          ],
+          [
+            19,
+            0,
+            0,
+            "USE TEMP B-TREE FOR DISTINCT"
+          ]
+        ],
+        "plan_after": [
+          [
+            4,
+            0,
+            216,
+            "SCAN o"
+          ],
+          [
+            9,
+            0,
+            45,
+            "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+          ],
+          [
+            19,
+            0,
+            0,
+            "USE TEMP B-TREE FOR DISTINCT"
+          ]
+        ]
+      },
+      "large_db": {
+        "before_ms": 3.979,
+        "after_ms": 3.979,
+        "speedup": 1.0,
+        "results_equal": true,
+        "plan_improved": false,
+        "raw_orig_ms": [
+          3.774,
+          4.23,
+          4.487,
+          3.922,
+          3.979
+        ],
+        "raw_opt_ms": [],
+        "status_orig": "ok",
+        "status_opt": "ok",
+        "plan_before": [
+          [
+            4,
+            0,
+            216,
+            "SCAN o"
+          ],
+          [
+            9,
+            0,
+            45,
+            "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+          ],
+          [
+            19,
+            0,
+            0,
+            "USE TEMP B-TREE FOR DISTINCT"
+          ]
+        ],
+        "plan_after": [
+          [
+            4,
+            0,
+            216,
+            "SCAN o"
+          ],
+          [
+            9,
+            0,
+            45,
+            "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+          ],
+          [
+            19,
+            0,
+            0,
+            "USE TEMP B-TREE FOR DISTINCT"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "OPT06",
+      "category": "distinct_safe_key",
+      "question": "What are the IDs and names of the first 1000 customers?",
+      "original_sql": "SELECT DISTINCT customer_id, name FROM customers WHERE customer_id <= 1000",
+      "candidate_sql": "SELECT customer_id, name FROM customers WHERE customer_id <= 1000",
+      "optimized_sql": "SELECT DISTINCT customer_id, name FROM customers WHERE customer_id <= 1000",
+      "optimizer_accepted": false,
+      "report_certified": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "timing_note": "unchanged SQL",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "small_db": {
+        "before_ms": 0.121,
+        "after_ms": 0.121,
+        "speedup": 1.0,
+        "results_equal": true,
+        "plan_improved": false,
+        "raw_orig_ms": [
+          0.134,
+          0.122,
+          0.119,
+          0.118,
+          0.121
+        ],
+        "raw_opt_ms": [],
+        "status_orig": "ok",
+        "status_opt": "ok",
+        "plan_before": [
+          [
+            3,
+            0,
+            196,
+            "SEARCH customers USING INTEGER PRIMARY KEY (rowid<?)"
+          ]
+        ],
+        "plan_after": [
+          [
+            3,
+            0,
+            196,
+            "SEARCH customers USING INTEGER PRIMARY KEY (rowid<?)"
+          ]
+        ]
+      },
+      "large_db": {
+        "before_ms": 0.509,
+        "after_ms": 0.509,
+        "speedup": 1.0,
+        "results_equal": true,
+        "plan_improved": false,
+        "raw_orig_ms": [
+          0.497,
+          0.508,
+          0.515,
+          0.509,
+          0.517
+        ],
+        "raw_opt_ms": [],
+        "status_orig": "ok",
+        "status_opt": "ok",
+        "plan_before": [
+          [
+            3,
+            0,
+            196,
+            "SEARCH customers USING INTEGER PRIMARY KEY (rowid<?)"
+          ]
+        ],
+        "plan_after": [
+          [
+            3,
+            0,
+            196,
+            "SEARCH customers USING INTEGER PRIMARY KEY (rowid<?)"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "OPT07",
+      "category": "already_optimal",
+      "question": "What is the name of customer 42?",
+      "original_sql": "SELECT name FROM customers WHERE customer_id = 42",
+      "candidate_sql": null,
+      "optimized_sql": "SELECT name FROM customers WHERE customer_id = 42",
+      "optimizer_accepted": false,
+      "report_certified": false,
+      "reason": "Plan already reasonable; no rewrite attempted.",
+      "timing_note": "unchanged SQL",
+      "llm_calls": 0,
+      "optimizer_ms": 0,
+      "small_db": {
+        "before_ms": 0.13,
+        "after_ms": 0.13,
+        "speedup": 1.0,
+        "results_equal": true,
+        "plan_improved": false,
+        "raw_orig_ms": [
+          0.129,
+          0.127,
+          0.132,
+          0.13,
+          0.238
+        ],
+        "raw_opt_ms": [],
+        "status_orig": "ok",
+        "status_opt": "ok",
+        "plan_before": [
+          [
+            2,
+            0,
+            33,
+            "SEARCH customers USING INTEGER PRIMARY KEY (rowid=?)"
+          ]
+        ],
+        "plan_after": [
+          [
+            2,
+            0,
+            33,
+            "SEARCH customers USING INTEGER PRIMARY KEY (rowid=?)"
+          ]
+        ]
+      },
+      "large_db": {
+        "before_ms": 0.136,
+        "after_ms": 0.136,
+        "speedup": 1.0,
+        "results_equal": true,
+        "plan_improved": false,
+        "raw_orig_ms": [
+          0.153,
+          0.125,
+          0.121,
+          0.137,
+          0.136
+        ],
+        "raw_opt_ms": [],
+        "status_orig": "ok",
+        "status_opt": "ok",
+        "plan_before": [
+          [
+            2,
+            0,
+            33,
+            "SEARCH customers USING INTEGER PRIMARY KEY (rowid=?)"
+          ]
+        ],
+        "plan_after": [
+          [
+            2,
+            0,
+            33,
+            "SEARCH customers USING INTEGER PRIMARY KEY (rowid=?)"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "OPT08",
+      "category": "equality_rejection",
+      "question": "What is the total spending by customer for orders over 100 dollars?",
+      "original_sql": "SELECT customer_id, SUM(amount) AS total FROM orders WHERE amount > 100 GROUP BY customer_id",
+      "candidate_sql": "SELECT customer_id, SUM(amount) AS total FROM orders GROUP BY customer_id",
+      "optimized_sql": "SELECT customer_id, SUM(amount) AS total FROM orders WHERE amount > 100 GROUP BY customer_id",
+      "optimizer_accepted": false,
+      "report_certified": false,
+      "reason": "Rewrite rejected (full scan of large table orders (100000 rows)): results differ, errored or timed out.",
+      "timing_note": "unchanged SQL",
+      "llm_calls": 1,
+      "optimizer_ms": 62,
+      "small_db": {
+        "before_ms": 0.124,
+        "after_ms": 0.124,
+        "speedup": 1.0,
+        "results_equal": true,
+        "plan_improved": false,
+        "raw_orig_ms": [
+          0.128,
+          0.125,
+          0.124,
+          0.123,
+          0.122
+        ],
+        "raw_opt_ms": [],
+        "status_orig": "ok",
+        "status_opt": "ok",
+        "plan_before": [
+          [
+            6,
+            0,
+            216,
+            "SCAN orders"
+          ],
+          [
+            11,
+            0,
+            0,
+            "USE TEMP B-TREE FOR GROUP BY"
+          ]
+        ],
+        "plan_after": [
+          [
+            6,
+            0,
+            216,
+            "SCAN orders"
+          ],
+          [
+            11,
+            0,
+            0,
+            "USE TEMP B-TREE FOR GROUP BY"
+          ]
+        ]
+      },
+      "large_db": {
+        "before_ms": 7.201,
+        "after_ms": 7.201,
+        "speedup": 1.0,
+        "results_equal": true,
+        "plan_improved": false,
+        "raw_orig_ms": [
+          9.613,
+          7.338,
+          7.141,
+          7.044,
+          7.201
+        ],
+        "raw_opt_ms": [],
+        "status_orig": "ok",
+        "status_opt": "ok",
+        "plan_before": [
+          [
+            6,
+            0,
+            216,
+            "SCAN orders"
+          ],
+          [
+            11,
+            0,
+            0,
+            "USE TEMP B-TREE FOR GROUP BY"
+          ]
+        ],
+        "plan_after": [
+          [
+            6,
+            0,
+            216,
+            "SCAN orders"
+          ],
+          [
+            11,
+            0,
+            0,
+            "USE TEMP B-TREE FOR GROUP BY"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "OPT09",
+      "category": "in_subquery_unimproved",
+      "question": "Which customers have placed an order over 900 dollars?",
+      "original_sql": "SELECT c.name FROM customers c WHERE c.customer_id IN (SELECT customer_id FROM orders WHERE amount > 900)",
+      "candidate_sql": "SELECT DISTINCT c.name FROM customers c JOIN orders o ON c.customer_id = o.customer_id WHERE o.amount > 900",
+      "optimized_sql": "SELECT c.name FROM customers c WHERE c.customer_id IN (SELECT customer_id FROM orders WHERE amount > 900)",
+      "optimizer_accepted": false,
+      "report_certified": false,
+      "reason": "Rewrite rejected (IN (SELECT ...) subquery): results equal but plan not improved.",
+      "timing_note": "unchanged SQL",
+      "llm_calls": 1,
+      "optimizer_ms": 9,
+      "small_db": {
+        "before_ms": 0.129,
+        "after_ms": 0.129,
+        "speedup": 1.0,
+        "results_equal": true,
+        "plan_improved": false,
+        "raw_orig_ms": [
+          0.135,
+          0.131,
+          0.129,
+          0.127,
+          0.128
+        ],
+        "raw_opt_ms": [],
+        "status_orig": "ok",
+        "status_opt": "ok",
+        "plan_before": [
+          [
+            2,
+            0,
+            91,
+            "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+          ],
+          [
+            6,
+            0,
+            0,
+            "LIST SUBQUERY 1"
+          ],
+          [
+            9,
+            6,
+            216,
+            "SCAN orders"
+          ],
+          [
+            18,
+            6,
+            0,
+            "CREATE BLOOM FILTER"
+          ]
+        ],
+        "plan_after": [
+          [
+            2,
+            0,
+            91,
+            "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+          ],
+          [
+            6,
+            0,
+            0,
+            "LIST SUBQUERY 1"
+          ],
+          [
+            9,
+            6,
+            216,
+            "SCAN orders"
+          ],
+          [
+            18,
+            6,
+            0,
+            "CREATE BLOOM FILTER"
+          ]
+        ]
+      },
+      "large_db": {
+        "before_ms": 4.077,
+        "after_ms": 4.077,
+        "speedup": 1.0,
+        "results_equal": true,
+        "plan_improved": false,
+        "raw_orig_ms": [
+          4.077,
+          3.65,
+          4.117,
+          3.968,
+          4.115
+        ],
+        "raw_opt_ms": [],
+        "status_orig": "ok",
+        "status_opt": "ok",
+        "plan_before": [
+          [
+            2,
+            0,
+            91,
+            "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+          ],
+          [
+            6,
+            0,
+            0,
+            "LIST SUBQUERY 1"
+          ],
+          [
+            9,
+            6,
+            216,
+            "SCAN orders"
+          ],
+          [
+            18,
+            6,
+            0,
+            "CREATE BLOOM FILTER"
+          ]
+        ],
+        "plan_after": [
+          [
+            2,
+            0,
+            91,
+            "SEARCH c USING INTEGER PRIMARY KEY (rowid=?)"
+          ],
+          [
+            6,
+            0,
+            0,
+            "LIST SUBQUERY 1"
+          ],
+          [
+            9,
+            6,
+            216,
+            "SCAN orders"
+          ],
+          [
+            18,
+            6,
+            0,
+            "CREATE BLOOM FILTER"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "OPT10",
+      "category": "scale_timeout",
+      "question": "Which customers have total spending exceeding 5000 dollars?",
+      "original_sql": "SELECT c.customer_id, c.name FROM customers c WHERE (SELECT SUM(o.amount) FROM orders o WHERE o.customer_id = c.customer_id) > 5000",
+      "candidate_sql": "SELECT c.customer_id, c.name FROM customers c JOIN orders o ON c.customer_id = o.customer_id GROUP BY c.customer_id, c.name HAVING SUM(o.amount) > 5000",
+      "optimized_sql": "SELECT c.customer_id, c.name FROM customers c WHERE (SELECT SUM(o.amount) FROM orders o WHERE o.customer_id = c.customer_id) > 5000",
+      "optimizer_accepted": false,
+      "report_certified": false,
+      "reason": "Rewrite rejected (correlated subquery in plan): results differ, errored or timed out.",
+      "timing_note": "unchanged SQL",
+      "llm_calls": 1,
+      "optimizer_ms": 30001,
+      "small_db": {
+        "before_ms": 0.138,
+        "after_ms": 0.138,
+        "speedup": 1.0,
+        "results_equal": true,
+        "plan_improved": false,
+        "raw_orig_ms": [
+          0.14,
+          0.138,
+          0.148,
+          0.134,
+          0.133
+        ],
+        "raw_opt_ms": [],
+        "status_orig": "ok",
+        "status_opt": "ok",
+        "plan_before": [
+          [
+            2,
+            0,
+            216,
+            "SCAN c"
+          ],
+          [
+            5,
+            0,
+            0,
+            "CORRELATED SCALAR SUBQUERY 1"
+          ],
+          [
+            10,
+            5,
+            216,
+            "SCAN o"
+          ]
+        ],
+        "plan_after": [
+          [
+            2,
+            0,
+            216,
+            "SCAN c"
+          ],
+          [
+            5,
+            0,
+            0,
+            "CORRELATED SCALAR SUBQUERY 1"
+          ],
+          [
+            10,
+            5,
+            216,
+            "SCAN o"
+          ]
+        ]
+      },
+      "large_db": {
+        "before_ms": null,
+        "after_ms": null,
+        "speedup": 1.0,
+        "results_equal": true,
+        "plan_improved": false,
+        "raw_orig_ms": [],
+        "raw_opt_ms": [],
+        "status_orig": "timeout (> 30.0s)",
+        "status_opt": "ok",
+        "plan_before": [
+          [
+            2,
+            0,
+            216,
+            "SCAN c"
+          ],
+          [
+            5,
+            0,
+            0,
+            "CORRELATED SCALAR SUBQUERY 1"
+          ],
+          [
+            10,
+            5,
+            216,
+            "SCAN o"
+          ]
+        ],
+        "plan_after": [
+          [
+            2,
+            0,
+            216,
+            "SCAN c"
+          ],
+          [
+            5,
+            0,
+            0,
+            "CORRELATED SCALAR SUBQUERY 1"
+          ],
+          [
+            10,
+            5,
+            216,
+            "SCAN o"
+          ]
+        ]
+      }
+    }
+  ]
+}

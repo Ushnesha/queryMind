@@ -1,0 +1,113 @@
+{
+  "runs": [
+    {
+      "dataset": "stakeholder60",
+      "repeats": 1,
+      "model": "devstral2-123b",
+      "started": "2026-11-22T01:01:55+00:00",
+      "querymind_commit": "7060202",
+      "variants": {
+        "without_semantic": {
+          "schema_mode": "neo4j",
+          "enable_syntax": true,
+          "enable_semantic": false,
+          "enable_optimizer": true,
+          "enable_result_verifier": true,
+          "enable_schema_retry": true
+        },
+        "without_result_verifier": {
+          "schema_mode": "neo4j",
+          "enable_syntax": true,
+          "enable_semantic": true,
+          "enable_optimizer": true,
+          "enable_result_verifier": false,
+          "enable_schema_retry": true
+        },
+        "without_optimizer": {
+          "schema_mode": "neo4j",
+          "enable_syntax": true,
+          "enable_semantic": true,
+          "enable_optimizer": false,
+          "enable_result_verifier": true,
+          "enable_schema_retry": true
+        },
+        "without_schema_retry": {
+          "schema_mode": "neo4j",
+          "enable_syntax": true,
+          "enable_semantic": true,
+          "enable_optimizer": true,
+          "enable_result_verifier": true,
+          "enable_schema_retry": false
+        }
+      },
+      "reused": {},
+      "infra_failures_retried": {},
+      "finished": "2026-11-22T01:26:42+00:00",
+      "database_file_sha256_unchanged": true
+    },
+    {
+      "dataset": "stakeholder60",
+      "repeats": 1,
+      "model": "devstral2-123b",
+      "started": "2026-11-22T02:13:54+00:00",
+      "querymind_commit": "66711d4",
+      "variants": {
+        "all_enabled": {
+          "schema_mode": "neo4j",
+          "enable_syntax": true,
+          "enable_semantic": true,
+          "enable_optimizer": true,
+          "enable_result_verifier": true,
+          "enable_schema_retry": true
+        },
+        "without_neo4j": {
+          "schema_mode": "flat",
+          "enable_syntax": true,
+          "enable_semantic": true,
+          "enable_optimizer": true,
+          "enable_result_verifier": true,
+          "enable_schema_retry": true
+        },
+        "without_semantic": {
+          "schema_mode": "neo4j",
+          "enable_syntax": true,
+          "enable_semantic": false,
+          "enable_optimizer": true,
+          "enable_result_verifier": true,
+          "enable_schema_retry": true
+        },
+        "without_result_verifier": {
+          "schema_mode": "neo4j",
+          "enable_syntax": true,
+          "enable_semantic": true,
+          "enable_optimizer": true,
+          "enable_result_verifier": false,
+          "enable_schema_retry": true
+        },
+        "without_optimizer": {
+          "schema_mode": "neo4j",
+          "enable_syntax": true,
+          "enable_semantic": true,
+          "enable_optimizer": false,
+          "enable_result_verifier": true,
+          "enable_schema_retry": true
+        },
+        "without_schema_retry": {
+          "schema_mode": "neo4j",
+          "enable_syntax": true,
+          "enable_semantic": true,
+          "enable_optimizer": true,
+          "enable_result_verifier": true,
+          "enable_schema_retry": false
+        }
+      },
+      "reused": {
+        "r1/all_enabled": "eval/results/report/stakeholder60/r1/querymind__main.jsonl",
+        "r1/without_neo4j": "eval/results/report/stakeholder60/r1/querymind-flat__main.jsonl"
+      },
+      "infra_failures_retried": {},
+      "finished": "2026-11-22T02:13:54+00:00",
+      "database_file_sha256_unchanged": true
+    }
+  ]
+}

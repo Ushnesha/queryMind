@@ -1,0 +1,387 @@
+{
+  "summary": "/Users/ushnesha/NextDrive/Documents/Academic/sem_3/Agentic AI/queryMind/eval/results/report/summary.json",
+  "dataset": "stakeholder60",
+  "arms": [
+    "b0",
+    "b1",
+    "b2",
+    "querymind",
+    "querymind-flat"
+  ],
+  "manifest_runs": [
+    {
+      "dataset": "stakeholder",
+      "started": "2026-11-08T19:26:15+00:00",
+      "model": "devstral2-123b",
+      "querymind_commit": null,
+      "repeats": 3
+    },
+    {
+      "dataset": "spider",
+      "started": "2026-11-08T19:42:15+00:00",
+      "model": "devstral2-123b",
+      "querymind_commit": null,
+      "repeats": 1
+    },
+    {
+      "dataset": "stakeholder",
+      "started": "2026-11-08T19:54:31+00:00",
+      "model": "devstral2-123b",
+      "querymind_commit": null,
+      "repeats": 1
+    },
+    {
+      "dataset": "spider",
+      "started": "2026-11-08T19:56:35+00:00",
+      "model": "devstral2-123b",
+      "querymind_commit": null,
+      "repeats": 1
+    },
+    {
+      "dataset": "stakeholder60",
+      "started": "2026-11-22T00:58:14+00:00",
+      "model": "devstral2-123b",
+      "querymind_commit": "7060202",
+      "repeats": 3
+    }
+  ],
+  "table": {
+    "header": [
+      "Metric (run r1)",
+      "b0",
+      "b1",
+      "b2 (k=3 vote)",
+      "QueryMind",
+      "QueryMind (flat)"
+    ],
+    "rows": [
+      [
+        "Easy accuracy ↑",
+        "13/13 (100%; 77–100)",
+        "12/13 (92%; 67–99)",
+        "12/13 (92%; 67–99)",
+        "12/13 (92%; 67–99)",
+        "12/13 (92%; 67–99)"
+      ],
+      [
+        "Hard accuracy ↑",
+        "7/17 (41%; 22–64)",
+        "9/17 (53%; 31–74)",
+        "5/17 (29%; 13–53)",
+        "10/17 (59%; 36–78)",
+        "7/17 (41%; 22–64)"
+      ],
+      [
+        "Unanswerable: correct refusal ↑",
+        "0/14 (0%; 0–22)",
+        "14/14 (100%; 78–100)",
+        "12/14 (86%; 60–96)",
+        "14/14 (100%; 78–100)",
+        "14/14 (100%; 78–100)"
+      ],
+      [
+        "False answers on unanswerable ↓",
+        "10/14 (71%; 45–88)",
+        "0/14 (0%; 0–22)",
+        "0/14 (0%; 0–22)",
+        "0/14 (0%; 0–22)",
+        "0/14 (0%; 0–22)"
+      ],
+      [
+        "Ambiguity flagged ↑",
+        "0/9 (0%; 0–30)",
+        "0/9 (0%; 0–30)",
+        "0/9 (0%; 0–30)",
+        "5/9 (56%; 27–81)",
+        "5/9 (56%; 27–81)"
+      ],
+      [
+        "Over-refusal ↓",
+        "0/36 (0%; 0–10)",
+        "1/36 (3%; 0–14)",
+        "18/36 (50%; 34–66)",
+        "6/36 (17%; 8–32)",
+        "11/36 (31%; 18–47)"
+      ],
+      [
+        "Execution success ↑",
+        "45/50 (90%; 79–96)",
+        "35/50 (70%; 56–81)",
+        "18/50 (36%; 24–50)",
+        "30/50 (60%; 46–72)",
+        "25/50 (50%; 37–63)"
+      ],
+      [
+        "p50 latency, answered (s) ↓",
+        "4.1",
+        "4.2",
+        "6.1",
+        "11.9",
+        "10.0"
+      ],
+      [
+        "LLM calls / question ↓",
+        "1.0",
+        "1.0",
+        "3.0",
+        "3.2",
+        "2.6"
+      ],
+      [
+        "Tokens / question ↓",
+        "328",
+        "339",
+        "1138",
+        "1371",
+        "1095"
+      ],
+      [
+        "vs b1: wins / losses, McNemar p",
+        "+1 / −15, p=0.00",
+        "ref.",
+        "+1 / −6, p=0.12",
+        "+7 / −2, p=0.18",
+        "+6 / −4, p=0.75"
+      ]
+    ],
+    "caption": "60-question set, run r1, one model (devstral2-123b). k/n (%; 95% Wilson CI). Scored by the stakeholder's unmodified scorer."
+  },
+  "chart": {
+    "rates": {
+      "b0": {
+        "set_easy": [
+          13,
+          13
+        ],
+        "set_hard": [
+          7,
+          17
+        ],
+        "ambiguity_flagged": [
+          0,
+          9
+        ],
+        "exec_success": [
+          45,
+          50
+        ],
+        "fabrications": [
+          10,
+          14
+        ],
+        "over_refusal": [
+          0,
+          36
+        ]
+      },
+      "b1": {
+        "set_easy": [
+          12,
+          13
+        ],
+        "set_hard": [
+          9,
+          17
+        ],
+        "ambiguity_flagged": [
+          0,
+          9
+        ],
+        "exec_success": [
+          35,
+          50
+        ],
+        "fabrications": [
+          0,
+          14
+        ],
+        "over_refusal": [
+          1,
+          36
+        ]
+      },
+      "b2": {
+        "set_easy": [
+          12,
+          13
+        ],
+        "set_hard": [
+          5,
+          17
+        ],
+        "ambiguity_flagged": [
+          0,
+          9
+        ],
+        "exec_success": [
+          18,
+          50
+        ],
+        "fabrications": [
+          0,
+          14
+        ],
+        "over_refusal": [
+          18,
+          36
+        ]
+      },
+      "querymind": {
+        "set_easy": [
+          12,
+          13
+        ],
+        "set_hard": [
+          10,
+          17
+        ],
+        "ambiguity_flagged": [
+          5,
+          9
+        ],
+        "exec_success": [
+          30,
+          50
+        ],
+        "fabrications": [
+          0,
+          14
+        ],
+        "over_refusal": [
+          6,
+          36
+        ]
+      },
+      "querymind-flat": {
+        "set_easy": [
+          12,
+          13
+        ],
+        "set_hard": [
+          7,
+          17
+        ],
+        "ambiguity_flagged": [
+          5,
+          9
+        ],
+        "exec_success": [
+          25,
+          50
+        ],
+        "fabrications": [
+          0,
+          14
+        ],
+        "over_refusal": [
+          11,
+          36
+        ]
+      }
+    },
+    "targets": {
+      "set_easy": {
+        "target_pct": 100.0,
+        "text": "100%",
+        "direction": "higher"
+      },
+      "set_hard": {
+        "target_pct": 70.0,
+        "text": "≥70%",
+        "direction": "higher"
+      },
+      "ambiguity_flagged": {
+        "target_pct": 75.0,
+        "text": "≥75%",
+        "direction": "higher"
+      },
+      "exec_success": {
+        "target_pct": 98.0,
+        "text": "≥98%",
+        "direction": "higher"
+      },
+      "fabrications": {
+        "target_pct": 6.666666666666667,
+        "text": "≤1/15",
+        "direction": "lower"
+      },
+      "over_refusal": {
+        "target_pct": 2.7777777777777777,
+        "text": "≤1",
+        "direction": "lower"
+      }
+    },
+    "p50_latency_answered_s": {
+      "b0": 4.1227,
+      "b1": 4.2236,
+      "b2": 6.0964025,
+      "querymind": 11.872361999999999,
+      "querymind-flat": 9.970595
+    }
+  },
+  "honest_results": {
+    "better": [
+      "Hard accuracy: 10/17 vs 9/17",
+      "Ambiguity flagged: 5/9 vs 0/9"
+    ],
+    "worse": [
+      "Over-refusal: 6/36 vs 1/36",
+      "Execution success: 30/50 vs 35/50"
+    ],
+    "same": [
+      "Easy accuracy: 12/13 vs 12/13",
+      "Unanswerable: correct refusal: 14/14 vs 14/14",
+      "False answers on unanswerable: 0/14 vs 0/14"
+    ],
+    "cost": [
+      "3.2× the LLM calls of b1",
+      "4.0× the tokens of b1",
+      "p50 latency on answered questions 11.9 s vs 4.2 s"
+    ],
+    "overall": "Overall (all questions, paired): QueryMind alone correct on 7, b1 alone on 2; exact McNemar p = 0.18. Not a significant difference at n = 50."
+  },
+  "paired_r1": {
+    "b0 vs b1": {
+      "n": 50,
+      "a_only": 1,
+      "b_only": 15,
+      "p_exact_mcnemar": 0.000518798828125
+    },
+    "b2 vs b1": {
+      "n": 50,
+      "a_only": 1,
+      "b_only": 6,
+      "p_exact_mcnemar": 0.125
+    },
+    "querymind vs b1": {
+      "n": 50,
+      "a_only": 7,
+      "b_only": 2,
+      "p_exact_mcnemar": 0.1796875
+    },
+    "querymind-flat vs b1": {
+      "n": 50,
+      "a_only": 6,
+      "b_only": 4,
+      "p_exact_mcnemar": 0.75390625
+    },
+    "querymind vs b0": {
+      "n": 50,
+      "a_only": 21,
+      "b_only": 2,
+      "p_exact_mcnemar": 6.604194641113281e-05
+    },
+    "querymind vs b2": {
+      "n": 50,
+      "a_only": 10,
+      "b_only": 0,
+      "p_exact_mcnemar": 0.001953125
+    },
+    "querymind vs querymind-flat": {
+      "n": 50,
+      "a_only": 3,
+      "b_only": 0,
+      "p_exact_mcnemar": 0.25
+    }
+  }
+}
