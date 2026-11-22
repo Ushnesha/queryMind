@@ -18,9 +18,9 @@ STAKEHOLDER_DB = ROOT / "data/stakeholder_analytics.db"
 FIELDS = {"id", "question", "set", "kind", "ordered", "reference_sql", "missing_field",
           "accept_missing", "undefined_terms", "note"}
 
-# member3 and member4 have not submitted; member5 submitted a file the stakeholder
+# member5 submitted a file the stakeholder
 # loader rejects, so all 7 of its questions are excluded until it is resubmitted.
-PENDING_MEMBERS = ["member3", "member4", "member5"]
+PENDING_MEMBERS = ["member5"]
 
 PLAN_SET_TARGET = {"easy": 15, "hard": 20, "unanswerable": 15, "ambiguous": 10}
 
@@ -52,17 +52,17 @@ def test_only_allowed_fields_and_required_fields_per_kind():
 
 def test_current_counts():
     items = _items()
-    assert len(items) == 34  # plan target 60 (57 as actually allotted)
+    assert len(items) == 50  # plan target 60 (57 as actually allotted)
     assert Counter(item["set"] for item in items) == {
-        "easy": 9,           # plan target 15
-        "hard": 11,          # plan target 20
-        "unanswerable": 9,   # plan target 15
-        "ambiguous": 5,      # plan target 10
+        "easy": 13,          # plan target 15
+        "hard": 17,          # plan target 20
+        "unanswerable": 13,  # plan target 15
+        "ambiguous": 7,      # plan target 10
     }
-    assert Counter(item["kind"] for item in items) == {"reference": 17, "unanswerable": 10, "ambiguous": 7}
+    assert Counter(item["kind"] for item in items) == {"reference": 27, "unanswerable": 14, "ambiguous": 9}
 
 
-@pytest.mark.xfail(strict=False, reason="waiting for member files")
+@pytest.mark.xfail(strict=False, reason="member5 excluded (non-loadable format)")
 def test_plan_final_mix():
     assert not PENDING_MEMBERS
     assert Counter(item["set"] for item in _items()) == PLAN_SET_TARGET

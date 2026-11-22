@@ -1,4 +1,4 @@
-# QueryMind merged evaluation set (R4) - PARTIAL, 3 member files pending.
+# QueryMind merged evaluation set (R4) - FROZEN 2026-11-21 at 50 questions (member5 excluded).
 # Field rules and the reference matching rule are documented in the header of
 # external/agentic-sql-analyst/eval/questions.yaml; this file uses the same schema.
 # Generated 2026-11-20 by the question-set coordinator (Member 2). Entries are
@@ -8,11 +8,13 @@
 #   external/agentic-sql-analyst/eval/questions.yaml  48beeaa (stakeholder repo)  17 questions
 #   eval/new_questions/member1.yaml                   d3308f0 (= origin/milestone3/mem1_impl)  9 questions
 #   eval/new_questions/member2.yaml                   9521c60 (milestone3/mem2_impl)  8 questions
+#   eval/new_questions/member3.yaml                   9931dd5 (milestone3/mem3_impl)  8 questions
+#   eval/new_questions/member4.yaml                   4c1cff9 (feature/verifier_eval)  8 questions
 #   eval/new_questions/member5.yaml                   2215ae4 (origin/feature/optimizer_scale)  0 of 7 merged
 #
-# Counts (34 total)
-#   by set  : easy 9, hard 11, unanswerable 9, ambiguous 5   (plan target 15/20/15/10)
-#   by kind : reference 17, unanswerable 10, ambiguous 7     (what the scorer uses)
+# Counts (50 total)
+#   by set  : easy 13, hard 17, unanswerable 13, ambiguous 7   (plan target 15/20/15/10)
+#   by kind : reference 27, unanswerable 14, ambiguous 9      (what the scorer uses)
 #   The plan's 15/20/15/10 targets refer to `set`. `set` and `kind` differ: the
 #   stakeholder's H1 and H2 are set hard / kind ambiguous, and H3 is set hard /
 #   kind unanswerable.
@@ -20,8 +22,6 @@
 # Known gaps
 #   The plan allots 40 new questions (9+8+8+8+7), not 43, and the stakeholder file
 #   has 17, not 20, so even when complete the set is 57, not 60. No filler added.
-# PENDING: member3.yaml not yet submitted (8 questions expected: 2 easy, 3 hard, 2 unanswerable, 1 ambiguous)
-# PENDING: member4.yaml not yet submitted (8 questions expected: 2 easy, 3 hard, 2 unanswerable, 1 ambiguous)
 # PENDING: member5.yaml submitted in a non-loadable format, all 7 excluded (7 questions expected: 2 easy, 3 hard, 1 unanswerable, 1 ambiguous)
 #
 # Excluded
@@ -40,6 +40,9 @@
 #   M1-E1 (order count by region) is close to E3 (revenue by region); different measure
 #   M2-A1 (which region is growing fastest) overlaps H1 (sales trends over time) on time granularity and measure
 #   M5_H3 duplicates M1-H3 (customers above average spend); moot while M5 is excluded
+#   M3-E1 and M4-E1 are the SAME question and reference SQL (customers per region)
+#   M3-U1 / M4-U1 / both ask about shipping cost; M3-U2 / M4-U2 both ask about discounts
+#   M4-A1 (which region is biggest) is close to M1-E1/E3 (per-region measures)
 
 # --------------------------------------------------------------------------- #
 # Easy stratum - single-table aggregates and two-table JOINs
@@ -459,3 +462,202 @@
   kind: ambiguous
   question: Which region is growing the fastest?
   undefined_terms: ["growth measure (revenue vs order count vs new customers)", "periods compared (month over month vs H1 vs H2 vs Q1 vs Q4)", "absolute vs percentage growth"]
+
+# --------------------------------------------------------------------------- #
+# Member 3 (eval/new_questions/member3.yaml)
+# --------------------------------------------------------------------------- #
+
+- id: M3-E1
+  set: easy
+  kind: reference
+  ordered: false
+  question: How many customers are there in each region?
+  reference_sql: |
+    SELECT region, COUNT(*) AS customer_count
+    FROM customers
+    GROUP BY region
+
+- id: M3-E2
+  set: easy
+  kind: reference
+  ordered: false
+  question: How many units were sold in total across all orders?
+  reference_sql: |
+    SELECT SUM(quantity) AS units_sold
+    FROM orders
+
+- id: M3-H1
+  set: hard
+  kind: reference
+  ordered: false
+  question: What is the average number of orders per customer in each region?
+  reference_sql: |
+    SELECT c.region,
+           1.0 * COUNT(o.order_id) / COUNT(DISTINCT c.customer_id) AS orders_per_customer
+    FROM customers c
+    LEFT JOIN orders o ON o.customer_id = c.customer_id
+    GROUP BY c.region
+  note: >
+    Customers with no orders count in the denominator (LEFT JOIN). With 300 orders
+    over 20 customers every customer has orders, so an INNER JOIN gives the same rows.
+
+- id: M3-H2
+  set: hard
+  kind: reference
+  ordered: false
+  question: For each product category, what percentage of its units were sold in the second half of 2024?
+  reference_sql: |
+    SELECT p.category,
+           100.0 * SUM(CASE WHEN o.order_date >= '2024-07-01' THEN o.quantity ELSE 0 END)
+                 / SUM(o.quantity) AS pct_units_second_half
+    FROM orders o
+    JOIN products p ON p.product_id = o.product_id
+    GROUP BY p.category
+  note: >
+    Second half = July 1 to December 31, 2024 (all orders are in 2024). Left unrounded
+    so the 1e-6 float tolerance applies; a fraction (0-1) is the same share on a
+    different scale.
+
+- id: M3-H3
+  set: hard
+  kind: reference
+  ordered: false
+  question: Which customers placed more orders than the average customer in their region?
+  reference_sql: |
+    WITH per_customer AS (
+      SELECT c.customer_id, c.customer_name, c.region, COUNT(o.order_id) AS order_count
+      FROM customers c
+      LEFT JOIN orders o ON o.customer_id = c.customer_id
+      GROUP BY c.customer_id, c.customer_name, c.region
+    )
+    SELECT customer_name
+    FROM per_customer pc
+    WHERE order_count > (SELECT AVG(order_count) FROM per_customer r WHERE r.region = pc.region)
+  note: >
+    The average is per region (correlated comparison), not the overall average.
+    Customer names are unique in this database.
+
+- id: M3-U1
+  set: unanswerable
+  kind: unanswerable
+  question: What was the total shipping cost for orders in each region?
+  missing_field: shipping cost
+  accept_missing: [shipping, freight, delivery cost, postage]
+
+- id: M3-U2
+  set: unanswerable
+  kind: unanswerable
+  question: Which discount codes were used most often last year?
+  missing_field: discount or promotion codes
+  accept_missing: [discount, coupon, promo, promotion, voucher]
+
+- id: M3-A1
+  set: ambiguous
+  kind: ambiguous
+  question: Show me our big orders.
+  undefined_terms: ["what makes an order big (total_amount vs quantity)", "the cutoff (fixed threshold vs top N vs above average)"]
+
+# --------------------------------------------------------------------------- #
+# Member 4 (eval/new_questions/member4.yaml)
+# --------------------------------------------------------------------------- #
+
+- id: M4-E1
+  set: easy
+  kind: reference
+  ordered: false
+  question: How many customers are there in each region?
+  reference_sql: |
+    SELECT region, COUNT(*) AS customer_count
+    FROM customers
+    GROUP BY region
+
+- id: M4-E2
+  set: easy
+  kind: reference
+  ordered: false
+  question: What was the total revenue in March 2024?
+  reference_sql: |
+    SELECT SUM(total_amount) AS march_revenue
+    FROM orders
+    WHERE order_date >= '2024-03-01' AND order_date < '2024-04-01'
+
+- id: M4-H1
+  set: hard
+  kind: reference
+  ordered: false
+  question: Which customer spent the most in each product category?
+  reference_sql: |
+    WITH spend AS (
+      SELECT p.category, c.customer_name, SUM(o.total_amount) AS total_spent
+      FROM orders o
+      JOIN customers c ON c.customer_id = o.customer_id
+      JOIN products p ON p.product_id = o.product_id
+      GROUP BY p.category, c.customer_id, c.customer_name
+    ), ranked AS (
+      SELECT category, customer_name,
+             RANK() OVER (PARTITION BY category ORDER BY total_spent DESC) AS rk
+      FROM spend
+    )
+    SELECT category, customer_name
+    FROM ranked
+    WHERE rk = 1
+  note: >
+    Checked for ties: each category has a single top customer (the runner-up is
+    at least 189 behind), so RANK and ROW_NUMBER give the same 3 rows.
+
+- id: M4-H2
+  set: hard
+  kind: reference
+  ordered: true
+  question: What is the running total of revenue by month during 2024?
+  reference_sql: |
+    WITH monthly AS (
+      SELECT strftime('%Y-%m', order_date) AS month, SUM(total_amount) AS revenue
+      FROM orders
+      WHERE order_date >= '2024-01-01' AND order_date < '2025-01-01'
+      GROUP BY strftime('%Y-%m', order_date)
+    )
+    SELECT month, SUM(revenue) OVER (ORDER BY month) AS running_revenue
+    FROM monthly
+    ORDER BY month
+  note: >
+    Every month of 2024 has orders, so there are 12 rows. The running total is a
+    float sum; the scorer's 1e-6 rounding absorbs summation-order differences.
+
+- id: M4-H3
+  set: hard
+  kind: reference
+  ordered: false
+  question: How much revenue came from orders placed before the customer signed up?
+  reference_sql: |
+    SELECT SUM(o.total_amount) AS revenue_before_signup
+    FROM orders o
+    JOIN customers c ON c.customer_id = o.customer_id
+    WHERE o.order_date < c.signup_date
+  note: >
+    The seeded data has orders dated before the customer's signup_date (a data
+    quirk, not an error in the question). The answer is one non-zero number.
+
+- id: M4-U1
+  set: unanswerable
+  kind: unanswerable
+  question: What is the average shipping cost per order?
+  missing_field: shipping cost
+  accept_missing: [shipping, freight, carrier, postage, delivery cost]
+
+- id: M4-U2
+  set: unanswerable
+  kind: unanswerable
+  question: What discount was applied to each order?
+  missing_field: discount or promotion data
+  accept_missing: [discount, coupon, promo, markdown, rebate]
+
+- id: M4-A1
+  set: ambiguous
+  kind: ambiguous
+  question: Which region is our biggest?
+  undefined_terms: ["size measure (revenue vs order count vs customer count)"]
+  note: >
+    Revenue, orders and customers rank the regions differently (West leads on
+    revenue and customers, East ties West on orders), so one silent choice can
+    be wrong. Correct behaviour is to answer AND state the measure used.
