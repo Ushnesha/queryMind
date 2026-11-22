@@ -12,6 +12,7 @@ from src.db import connect_readonly, validate_readonly
 from src.llm import MockProvider, SQLProvider, get_provider
 from src.verifiers.syntax import check_syntax
 
+from .distinct_guard import check_distinct_guard
 from .equality import TIMEOUT_S, results_equal
 from .explain import explain_query_plan, plan_improved, plan_signals
 
@@ -155,6 +156,10 @@ def _attempt(
         return
     if candidate.rstrip("; \n") == sql.rstrip("; \n"):
         result["reason"] = f"LLM returned the same SQL ({trigger})."
+        return
+    guard_ok, guard_reason = check_distinct_guard(sql, candidate, db_path=db_path)
+    if not guard_ok:
+        result["reason"] = f"Rewrite rejected ({trigger}): {guard_reason}"
         return
     result["equality_ok"] = results_equal(sql, candidate, db_path, timeout_s)
     if not result["equality_ok"]:
