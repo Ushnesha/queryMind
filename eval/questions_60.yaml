@@ -1,4 +1,4 @@
-# QueryMind merged evaluation set (R4) - 60 questions (2026-11-21); member5 converted and extras are DRAFTS pending review.
+# QueryMind merged evaluation set (R4) - FROZEN 2026-11-21 at 60 questions (poster-freeze).
 # Field rules and the reference matching rule are documented in the header of
 # external/agentic-sql-analyst/eval/questions.yaml; this file uses the same schema.
 # Generated 2026-11-20 by the question-set coordinator (Member 2). Entries are
@@ -10,8 +10,8 @@
 #   eval/new_questions/member2.yaml                   9521c60 (milestone3/mem2_impl)  8 questions
 #   eval/new_questions/member3.yaml                   9931dd5 (milestone3/mem3_impl)  8 questions
 #   eval/new_questions/member4.yaml                   4c1cff9 (feature/verifier_eval)  7 of 8 (M4-E1 dropped, duplicate of M3-E1)
-#   eval/new_questions/member5_converted.yaml         DRAFT conversion of member5.yaml  6 of 7 (M5_H3 dropped, duplicate of M1-H3)
-#   eval/new_questions/extra.yaml                     DRAFT by Claude for Member 1  5 questions
+#   eval/new_questions/member5_converted.yaml         conversion approved by Member 5  6 of 7 (M5_H3 dropped, duplicate of M1-H3)
+#   eval/new_questions/extra.yaml                     drafted with Claude, approved by the team  5 questions
 #
 # Counts (60 total)
 #   by set  : easy 15, hard 20, unanswerable 15, ambiguous 10  (plan target 15/20/15/10: met)
@@ -23,8 +23,7 @@
 # Known gaps
 #   The plan allots 40 new questions (9+8+8+8+7), not 43, so the member files give at
 #   most 57. extra.yaml adds 5 (2 easy, 1 hard, 2 ambiguous) to reach the 15/20/15/10 mix.
-# PENDING: Member 5 approval of member5_converted.yaml (M5-H1 threshold, M5-H2 no-op year filter)
-# PENDING: team review of extra.yaml
+# Approved 2026-11-21: member5_converted.yaml (Member 5, as written) and extra.yaml (team).
 #
 # Excluded
 #   member5.yaml as submitted: the stakeholder loader rejects its format and its SQL
@@ -650,7 +649,7 @@
     be wrong. Correct behaviour is to answer AND state the measure used.
 
 # --------------------------------------------------------------------------- #
-# Member 5, converted to the stakeholder schema (DRAFT, pending Member 5)
+# Member 5, converted to the stakeholder schema (approved by Member 5)
 # (eval/new_questions/member5_converted.yaml)
 # --------------------------------------------------------------------------- #
 
@@ -675,7 +674,7 @@
     GROUP BY c.customer_id, c.customer_name
     HAVING COUNT(o.order_id) > 2
   note: >
-    Pending Member 5: all 20 customers qualify, so the threshold does not filter.
+    All 20 customers qualify, so the threshold does not filter (kept as written by Member 5).
 
 - id: M5-H2
   set: hard
@@ -689,7 +688,7 @@
     WHERE o.order_date >= '2024-01-01' AND o.order_date < '2025-01-01'
     GROUP BY c.customer_id, c.customer_name
   note: >
-    Pending Member 5: all orders are in 2024, so the date filter is a no-op.
+    All orders are in 2024, so the date filter is a no-op (kept as written by Member 5).
     Float averages; the scorer's 1e-6 tolerance applies.
 
 - id: M5-U1
@@ -719,7 +718,7 @@
     is every customer here because all orders are in 2024.
 
 # --------------------------------------------------------------------------- #
-# Extra questions to reach the plan's mix (DRAFT by Claude, pending team review)
+# Extra questions to reach the plan's mix (drafted with Claude, approved by the team)
 # (eval/new_questions/extra.yaml)
 # --------------------------------------------------------------------------- #
 

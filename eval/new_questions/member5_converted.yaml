@@ -1,5 +1,5 @@
-# DRAFT - Member 5's questions converted to the stakeholder schema and format.
-# PENDING MEMBER 5 APPROVAL. Source: eval/new_questions/member5.yaml (unchanged).
+# Member 5's questions converted to the stakeholder schema and format.
+# APPROVED by Member 5 on 2026-11-21, as written (M5-H1 and M5-H2 kept unchanged). Source: eval/new_questions/member5.yaml (unchanged).
 #
 # Why a conversion was needed: member5.yaml targets the QueryMind demo schema
 # (customers.name, customers.email, orders.amount) in a different YAML format, so
@@ -10,10 +10,10 @@
 #   M5_E2 -> M5-U2   The stakeholder schema has no email column, so this is now an
 #                    unanswerable question (missing field: email). Wording unchanged.
 #   M5_H1 -> M5-H1   name -> customer_name, amount -> total_amount.
-#                    FLAG for Member 5: every one of the 20 customers has more than two
-#                    orders (7 to 22 each), so the answer is "all customers". Consider a
-#                    higher threshold (e.g. more than 15 orders).
-#   M5_H2 -> M5-H2   Columns renamed. FLAG for Member 5: every order is dated 2024, so
+#                    Known: every one of the 20 customers has more than two
+#                    orders (7 to 22 each), so the answer is "all customers". Kept as
+#                    written by Member 5.
+#   M5_H2 -> M5-H2   Columns renamed. Known: every order is dated 2024, so
 #                    the year filter does not change the answer.
 #   M5_H3            Dropped: duplicates M1-H3 (customers above average spending).
 #   M5_U1 -> M5-U1   Format only.
@@ -43,7 +43,7 @@
     GROUP BY c.customer_id, c.customer_name
     HAVING COUNT(o.order_id) > 2
   note: >
-    Pending Member 5: all 20 customers qualify, so the threshold does not filter.
+    All 20 customers qualify, so the threshold does not filter (kept as written by Member 5).
 
 - id: M5-H2
   set: hard
@@ -57,7 +57,7 @@
     WHERE o.order_date >= '2024-01-01' AND o.order_date < '2025-01-01'
     GROUP BY c.customer_id, c.customer_name
   note: >
-    Pending Member 5: all orders are in 2024, so the date filter is a no-op.
+    All orders are in 2024, so the date filter is a no-op (kept as written by Member 5).
     Float averages; the scorer's 1e-6 tolerance applies.
 
 - id: M5-U1
