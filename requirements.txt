@@ -3,5 +3,6 @@ pytest==8.3.4
 PyYAML==6.0.2
 python-dotenv==1.1.0
 streamlit==1.45.1
+certifi==2026.10.23  # CA bundle for live gateway calls (src/llm.py tls_context)
 matplotlib==3.9.2  # poster figures (scripts/poster_style.py)
 # Neo4j, LangGraph, sqlglot, and a live model SDK belong to their feature branches.

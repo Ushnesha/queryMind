@@ -22,7 +22,7 @@ def test_provider_uses_completion_model_env_without_reading_dotenv(monkeypatch) 
 def test_provider_request_only_differs_by_schema_context(monkeypatch) -> None:
     calls = []
 
-    def fake_urlopen(request, timeout):
+    def fake_urlopen(request, timeout, **kwargs):
         calls.append((request.full_url, json.loads(request.data), timeout))
         return BytesIO(json.dumps({"choices": [{"message": {"content": "```sql\nSELECT 1\n```"}}]}).encode())
 

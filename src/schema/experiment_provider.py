@@ -13,6 +13,8 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
+from src.llm import tls_context
+
 _SYSTEM_PROMPT = (
     "Translate the user's question into SQLite SQL using only the supplied schema. "
     "Return exactly one read-only SELECT or WITH statement, without Markdown or explanations. "
@@ -82,7 +84,7 @@ class OpenCodeProvider:
             headers={"Authorization": "Bearer " + self.api_key, "Content-Type": "application/json"},
         )
         try:
-            with urlopen(request, timeout=self.timeout_seconds) as response:
+            with urlopen(request, timeout=self.timeout_seconds, context=tls_context()) as response:
                 document: dict[str, Any] = json.load(response)
         except HTTPError as exc:
             raise RuntimeError(f"Configured model request failed (HTTP {exc.code}).") from None

@@ -237,7 +237,7 @@ def test_live_provider_successful_request(monkeypatch: pytest.MonkeyPatch, base_
         def __exit__(self, *args: object) -> None:
             pass
 
-    def mock_urlopen(req: urllib.request.Request, timeout: float = 30.0) -> MockHTTPResponse:
+    def mock_urlopen(req: urllib.request.Request, timeout: float = 30.0, **kwargs: object) -> MockHTTPResponse:
         captured_request["url"] = req.full_url
         captured_request["headers"] = dict(req.headers)
         captured_request["data"] = json.loads(req.data.decode("utf-8"))
@@ -301,3 +301,21 @@ def test_live_provider_url_error_handling(monkeypatch: pytest.MonkeyPatch) -> No
     with pytest.raises(ValueError, match="Provider network error"):
         provider.generate("How many items?", "TABLE items (id INT)")
 
+
+
+def test_tls_context_uses_certifi_unless_ssl_cert_file_is_set(monkeypatch) -> None:
+    import ssl
+    import certifi
+    from src import llm
+
+    seen = []
+    real = ssl.create_default_context
+    monkeypatch.setattr(llm.ssl, "create_default_context", lambda **kw: seen.append(kw) or real(**kw))
+
+    monkeypatch.delenv("SSL_CERT_FILE", raising=False)
+    assert isinstance(llm.tls_context(), ssl.SSLContext)
+    assert seen[-1] == {"cafile": certifi.where()}
+
+    monkeypatch.setenv("SSL_CERT_FILE", certifi.where())
+    llm.tls_context()
+    assert seen[-1] == {}

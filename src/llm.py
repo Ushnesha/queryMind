@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import ssl
 from typing import Protocol
 import urllib.error
 import urllib.request
@@ -42,6 +43,22 @@ class MockProvider:
             "The offline mock supports only 'Who are the top 3 customers by total spending?' "
             "and 'How many customers are there?'. A real SQL provider is a future implementation."
         )
+
+
+def tls_context() -> ssl.SSLContext:
+    """Return a verifying TLS context that works without per-machine setup.
+
+    Some macOS Python builds ship without a usable CA store, so urllib fails with
+    CERTIFICATE_VERIFY_FAILED. An explicit SSL_CERT_FILE wins; otherwise certifi's
+    bundle is used when installed, else the interpreter's default store.
+    """
+    if os.environ.get("SSL_CERT_FILE"):
+        return ssl.create_default_context()
+    try:
+        import certifi
+    except ImportError:
+        return ssl.create_default_context()
+    return ssl.create_default_context(cafile=certifi.where())
 
 
 def token_usage(provider: SQLProvider | None) -> tuple[int, int] | None:
@@ -168,7 +185,7 @@ class OpenAICompatibleProvider:
 
         try:
             self.llm_calls += 1
-            with urllib.request.urlopen(req, timeout=self.timeout) as response:
+            with urllib.request.urlopen(req, timeout=self.timeout, context=tls_context()) as response:
                 body = response.read().decode("utf-8")
                 res_json = json.loads(body)
                 self._record_usage(res_json.get("usage"))
