@@ -1,0 +1,74 @@
+# Extra questions to bring the merged set to the plan's 15/20/15/10 mix (R4).
+# DRAFTED BY CLAUDE (AI-assisted) for Member 1 - PENDING TEAM REVIEW before the freeze.
+# Mix: 2 easy, 1 hard, 2 ambiguous. Same schema and field rules as
+# external/agentic-sql-analyst/eval/questions.yaml.
+#
+# Chosen to avoid overlapping the existing 55: signup_date and product attributes
+# were barely used, and no question asks for gaps between orders or for a vague
+# price threshold or seasonality. Every reference_sql was run against
+# data/stakeholder_analytics.db, returns rows, and was checked for ties.
+
+- id: X-E1
+  set: easy
+  kind: reference
+  ordered: false
+  question: How many customers signed up in each month?
+  reference_sql: |
+    SELECT strftime('%Y-%m', signup_date) AS signup_month, COUNT(*) AS customers
+    FROM customers
+    GROUP BY strftime('%Y-%m', signup_date)
+  note: >
+    Signups run from January to April 2024, so there are 4 rows (3, 6, 2, 9).
+
+- id: X-E2
+  set: easy
+  kind: reference
+  ordered: false
+  question: List the products in the Furniture category with their prices.
+  reference_sql: |
+    SELECT product_name, unit_price
+    FROM products
+    WHERE category = 'Furniture'
+  note: >
+    5 rows. A single-table filter with no aggregate.
+
+- id: X-H1
+  set: hard
+  kind: reference
+  ordered: false
+  question: For each customer, what is the average number of days between consecutive orders?
+  reference_sql: |
+    WITH gaps AS (
+      SELECT o.customer_id,
+             julianday(o.order_date)
+               - julianday(LAG(o.order_date) OVER (PARTITION BY o.customer_id
+                                                    ORDER BY o.order_date, o.order_id)) AS gap_days
+      FROM orders o
+    )
+    SELECT c.customer_name, AVG(g.gap_days) AS avg_days_between_orders
+    FROM gaps g
+    JOIN customers c ON c.customer_id = g.customer_id
+    WHERE g.gap_days IS NOT NULL
+    GROUP BY c.customer_id, c.customer_name
+  note: >
+    Window function (LAG). The mean of consecutive gaps always equals
+    (last order - first order) / (orders - 1), so same-day orders (11 pairs) and the
+    tie-break order cannot change the answer. Every customer has at least 7 orders,
+    so all 20 appear. Float averages; the scorer's 1e-6 tolerance applies.
+
+- id: X-A1
+  set: ambiguous
+  kind: ambiguous
+  question: Which products are expensive?
+  undefined_terms: ["the price cutoff (fixed amount vs above average vs top N)", "list price vs price actually paid"]
+  note: >
+    Unit prices range from a few dollars to 420, and the categories differ, so a
+    per-category or overall cutoff gives different lists.
+
+- id: X-A2
+  set: ambiguous
+  kind: ambiguous
+  question: Which product categories are seasonal?
+  undefined_terms: ["what counts as seasonal (month-to-month variation vs a quarter peak)", "measure (revenue vs units)"]
+  note: >
+    Only one year of data, so any seasonality claim needs a stated definition.
