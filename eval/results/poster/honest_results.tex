@@ -1,21 +1,21 @@
-\textbf{Honest results} (50-question set, run r1)
+\textbf{Honest results} (60-question set, run r1)
 \par\textit{Where QueryMind beats b1}
 \begin{itemize}
-\item Hard accuracy: 10/17 vs 9/17
-\item Ambiguity flagged: 5/9 vs 0/9
+\item Ambiguity flagged: 7/12 vs 0/12
 \end{itemize}
 \par\textit{Where it does not}
 \begin{itemize}
-\item Over-refusal: 6/36 vs 1/36
-\item Execution success: 30/50 vs 35/50
-\item Tie — Easy accuracy: 12/13 vs 12/13
-\item Tie — Unanswerable: correct refusal: 14/14 vs 14/14
-\item Tie — False answers on unanswerable: 0/14 vs 0/14
+\item Over-refusal: 8/44 vs 3/44
+\item Execution success: 36/60 vs 41/60
+\item Tie — Easy accuracy: 14/15 vs 14/15
+\item Tie — Hard accuracy: 12/20 vs 12/20
+\item Tie — Unanswerable: correct refusal: 16/16 vs 16/16
+\item Tie — False answers on unanswerable: 0/16 vs 0/16
 \end{itemize}
 \par\textit{What it costs}
 \begin{itemize}
-\item 3.2$\times$ the LLM calls of b1
-\item 4.0$\times$ the tokens of b1
-\item p50 latency on answered questions 11.9 s vs 4.2 s
+\item 3.3$\times$ the LLM calls of b1
+\item 4.3$\times$ the tokens of b1
+\item p50 latency on answered questions 11.1 s vs 4.2 s
 \end{itemize}
-Overall (all questions, paired): QueryMind alone correct on 7, b1 alone on 2; exact McNemar p = 0.18. Not a significant difference at n = 50.
+Overall (all questions, paired): QueryMind alone correct on 9, b1 alone on 3; exact McNemar p = 0.15. Not a significant difference at n = 60.

@@ -125,6 +125,31 @@
         "database_file_sha256": {
           "stakeholder_analytics.db": "e5f691407d5e990a927f1189bdf6b5bae23f62841f359a37d3e31ea7186fba7f"
         }
+      },
+      {
+        "dataset": "stakeholder60",
+        "started": "2026-11-22T02:58:29+00:00",
+        "model": "devstral2-123b",
+        "baseline_commit": "c0b0cda",
+        "repeats": 3,
+        "arms": [
+          "b0",
+          "b1",
+          "b2",
+          "querymind",
+          "querymind-flat"
+        ],
+        "querymind_commit": "d81b900",
+        "infra_failures_retried": {},
+        "b2": {
+          "samples": 3,
+          "temperature": 0.7
+        },
+        "finished": "2026-11-22T03:12:51+00:00",
+        "database_file_sha256_unchanged": true,
+        "database_file_sha256": {
+          "stakeholder_analytics.db": "e5f691407d5e990a927f1189bdf6b5bae23f62841f359a37d3e31ea7186fba7f"
+        }
       }
     ]
   },
@@ -1136,9 +1161,9 @@
           },
           "set_hard": {
             "repeats": 3,
-            "mean": 0.411764705882353,
-            "min": 0.4117647058823529,
-            "max": 0.4117647058823529
+            "mean": 0.5,
+            "min": 0.5,
+            "max": 0.5
           },
           "unanswerable_refused_correctly": {
             "repeats": 3,
@@ -1148,9 +1173,9 @@
           },
           "fabrications": {
             "repeats": 3,
-            "mean": 0.7380952380952381,
-            "min": 0.7142857142857143,
-            "max": 0.7857142857142857
+            "mean": 0.7083333333333334,
+            "min": 0.6875,
+            "max": 0.75
           },
           "ambiguity_flagged": {
             "repeats": 3,
@@ -1166,29 +1191,29 @@
           },
           "exec_success": {
             "repeats": 3,
-            "mean": 0.9133333333333334,
-            "min": 0.9,
-            "max": 0.94
+            "mean": 0.8944444444444444,
+            "min": 0.8833333333333333,
+            "max": 0.9166666666666666
           },
           "answer_accuracy_reference": {
             "repeats": 3,
-            "mean": 0.7407407407407408,
-            "min": 0.7407407407407407,
-            "max": 0.7407407407407407
+            "mean": 0.78125,
+            "min": 0.78125,
+            "max": 0.78125
           }
         },
         "b1": {
           "set_easy": {
             "repeats": 3,
-            "mean": 0.923076923076923,
-            "min": 0.9230769230769231,
-            "max": 0.9230769230769231
+            "mean": 0.9333333333333332,
+            "min": 0.9333333333333333,
+            "max": 0.9333333333333333
           },
           "set_hard": {
             "repeats": 3,
-            "mean": 0.5294117647058824,
-            "min": 0.5294117647058824,
-            "max": 0.5294117647058824
+            "mean": 0.6,
+            "min": 0.6,
+            "max": 0.6
           },
           "unanswerable_refused_correctly": {
             "repeats": 3,
@@ -1210,41 +1235,41 @@
           },
           "over_refusal": {
             "repeats": 3,
-            "mean": 0.018518518518518517,
-            "min": 0.0,
-            "max": 0.027777777777777776
+            "mean": 0.06060606060606061,
+            "min": 0.045454545454545456,
+            "max": 0.06818181818181818
           },
           "exec_success": {
             "repeats": 3,
-            "mean": 0.7066666666666667,
-            "min": 0.7,
-            "max": 0.72
+            "mean": 0.6888888888888888,
+            "min": 0.6833333333333333,
+            "max": 0.7
           },
           "answer_accuracy_reference": {
             "repeats": 3,
-            "mean": 0.7407407407407408,
-            "min": 0.7407407407407407,
-            "max": 0.7407407407407407
+            "mean": 0.78125,
+            "min": 0.78125,
+            "max": 0.78125
           }
         },
         "b2": {
           "set_easy": {
             "repeats": 3,
-            "mean": 0.8974358974358975,
-            "min": 0.8461538461538461,
-            "max": 0.9230769230769231
+            "mean": 0.9111111111111111,
+            "min": 0.8666666666666667,
+            "max": 0.9333333333333333
           },
           "set_hard": {
             "repeats": 3,
-            "mean": 0.23529411764705885,
-            "min": 0.17647058823529413,
-            "max": 0.29411764705882354
+            "mean": 0.2833333333333333,
+            "min": 0.25,
+            "max": 0.35
           },
           "unanswerable_refused_correctly": {
             "repeats": 3,
-            "mean": 0.7619047619047619,
-            "min": 0.7142857142857143,
-            "max": 0.8571428571428571
+            "mean": 0.7708333333333334,
+            "min": 0.75,
+            "max": 0.8125
           },
           "fabrications": {
             "repeats": 3,
@@ -1260,35 +1285,35 @@
           },
           "over_refusal": {
             "repeats": 3,
-            "mean": 0.48148148148148145,
-            "min": 0.4444444444444444,
-            "max": 0.5
+            "mean": 0.44696969696969696,
+            "min": 0.4318181818181818,
+            "max": 0.45454545454545453
           },
           "exec_success": {
             "repeats": 3,
-            "mean": 0.37333333333333335,
-            "min": 0.36,
-            "max": 0.4
+            "mean": 0.4055555555555556,
+            "min": 0.4,
+            "max": 0.4166666666666667
           },
           "answer_accuracy_reference": {
             "repeats": 3,
-            "mean": 0.5679012345679012,
-            "min": 0.5185185185185185,
-            "max": 0.6296296296296297
+            "mean": 0.59375,
+            "min": 0.5625,
+            "max": 0.65625
           }
         },
         "querymind": {
           "set_easy": {
             "repeats": 3,
-            "mean": 0.923076923076923,
-            "min": 0.9230769230769231,
-            "max": 0.9230769230769231
+            "mean": 0.9333333333333332,
+            "min": 0.9333333333333333,
+            "max": 0.9333333333333333
           },
           "set_hard": {
             "repeats": 3,
-            "mean": 0.5490196078431372,
-            "min": 0.47058823529411764,
-            "max": 0.5882352941176471
+            "mean": 0.5666666666666667,
+            "min": 0.5,
+            "max": 0.6
           },
           "unanswerable_refused_correctly": {
             "repeats": 3,
@@ -1304,41 +1329,41 @@
           },
           "ambiguity_flagged": {
             "repeats": 3,
-            "mean": 0.5555555555555556,
-            "min": 0.5555555555555556,
-            "max": 0.5555555555555556
+            "mean": 0.5833333333333334,
+            "min": 0.5833333333333334,
+            "max": 0.5833333333333334
           },
           "over_refusal": {
             "repeats": 3,
-            "mean": 0.13888888888888887,
-            "min": 0.1111111111111111,
-            "max": 0.16666666666666666
+            "mean": 0.1590909090909091,
+            "min": 0.13636363636363635,
+            "max": 0.18181818181818182
           },
           "exec_success": {
             "repeats": 3,
-            "mean": 0.62,
+            "mean": 0.6166666666666667,
             "min": 0.6,
-            "max": 0.64
+            "max": 0.6333333333333333
           },
           "answer_accuracy_reference": {
             "repeats": 3,
-            "mean": 0.7160493827160493,
-            "min": 0.6666666666666666,
-            "max": 0.7407407407407407
+            "mean": 0.7291666666666666,
+            "min": 0.6875,
+            "max": 0.75
           }
         },
         "querymind-flat": {
           "set_easy": {
             "repeats": 3,
-            "mean": 0.923076923076923,
-            "min": 0.9230769230769231,
-            "max": 0.9230769230769231
+            "mean": 0.9333333333333332,
+            "min": 0.9333333333333333,
+            "max": 0.9333333333333333
           },
           "set_hard": {
             "repeats": 3,
-            "mean": 0.411764705882353,
-            "min": 0.4117647058823529,
-            "max": 0.4117647058823529
+            "mean": 0.43333333333333335,
+            "min": 0.4,
+            "max": 0.45
           },
           "unanswerable_refused_correctly": {
             "repeats": 3,
@@ -1354,1127 +1379,1131 @@
           },
           "ambiguity_flagged": {
             "repeats": 3,
-            "mean": 0.5555555555555556,
-            "min": 0.5555555555555556,
-            "max": 0.5555555555555556
+            "mean": 0.5833333333333334,
+            "min": 0.5833333333333334,
+            "max": 0.5833333333333334
           },
           "over_refusal": {
             "repeats": 3,
-            "mean": 0.2777777777777778,
+            "mean": 0.2727272727272727,
             "min": 0.25,
-            "max": 0.3055555555555556
+            "max": 0.29545454545454547
           },
           "exec_success": {
             "repeats": 3,
-            "mean": 0.52,
-            "min": 0.5,
-            "max": 0.54
+            "mean": 0.5333333333333333,
+            "min": 0.5166666666666667,
+            "max": 0.55
           },
           "answer_accuracy_reference": {
             "repeats": 3,
-            "mean": 0.6296296296296297,
-            "min": 0.6296296296296297,
-            "max": 0.6296296296296297
+            "mean": 0.6458333333333334,
+            "min": 0.625,
+            "max": 0.65625
           }
         }
       },
       "b2_behaviour": {
-        "runs": 150,
+        "runs": 180,
         "majority_count_distribution": {
-          "0": 52,
-          "1": 42,
-          "2": 26,
-          "3": 30
+          "0": 63,
+          "1": 44,
+          "2": 35,
+          "3": 38
         },
-        "selected": 56,
-        "no_majority_abstentions": 50,
-        "refusal_consensus": 44,
+        "selected": 73,
+        "no_majority_abstentions": 54,
+        "refusal_consensus": 53,
         "error_types": {}
       },
       "summaries": {
         "r1": {
           "b0": {
-            "n": 50,
+            "n": 60,
             "exec_success": [
-              45,
-              50
+              53,
+              60
             ],
             "exec_success_when_attempted": [
-              45,
-              50
+              53,
+              60
             ],
             "refusals": 0,
             "answer_accuracy_reference": [
-              20,
-              27
+              25,
+              32
             ],
             "over_refusal": [
               0,
-              36
+              44
             ],
             "assumptions_on_reference": [
               0,
-              27
+              32
             ],
             "infra_errors_remaining": 0,
             "missing_records": 0,
             "write_attempts": 0,
             "latency_s": {
-              "n": 50,
-              "p50": 4.23475,
-              "p95": 12.6629,
+              "n": 60,
+              "p50": 4.0567,
+              "p95": 11.4091,
               "over_15s": 1
             },
             "latency_answered_s": {
-              "n": 45,
-              "p50": 4.1227,
+              "n": 53,
+              "p50": 3.9907,
               "p95": 9.3963
             },
-            "tokens_per_question": 328.46,
-            "token_records": 50,
+            "tokens_per_question": 322.1,
+            "token_records": 60,
             "llm_calls_per_question": 1.0,
             "set_ambiguous": [
               0,
-              7
+              10
             ],
             "set_easy": [
-              13,
-              13
+              15,
+              15
             ],
             "set_hard": [
-              7,
-              17
+              10,
+              20
             ],
             "set_unanswerable": [
               0,
-              13
+              15
             ],
             "unanswerable_refused_correctly": [
               0,
-              14
+              16
             ],
             "fabrications": [
-              10,
-              14
+              11,
+              16
             ],
             "ambiguity_flagged": [
               0,
-              9
+              12
             ]
           },
           "b1": {
-            "n": 50,
+            "n": 60,
             "exec_success": [
-              35,
-              50
+              41,
+              60
             ],
             "exec_success_when_attempted": [
-              35,
-              35
+              41,
+              41
             ],
-            "refusals": 15,
+            "refusals": 19,
             "answer_accuracy_reference": [
-              20,
-              27
+              25,
+              32
             ],
             "over_refusal": [
-              1,
-              36
+              3,
+              44
             ],
             "assumptions_on_reference": [
               0,
-              27
+              32
             ],
             "infra_errors_remaining": 0,
             "missing_records": 0,
             "write_attempts": 0,
             "latency_s": {
-              "n": 50,
-              "p50": 2.67145,
-              "p95": 9.83,
+              "n": 60,
+              "p50": 2.46465,
+              "p95": 9.819600000000001,
               "over_15s": 0
             },
             "latency_answered_s": {
-              "n": 35,
+              "n": 41,
               "p50": 4.2236,
-              "p95": 11.372
+              "p95": 9.83
             },
-            "tokens_per_question": 339.0,
-            "token_records": 50,
+            "tokens_per_question": 333.73333333333335,
+            "token_records": 60,
             "llm_calls_per_question": 1.0,
             "set_ambiguous": [
               0,
-              7
+              10
             ],
             "set_easy": [
-              12,
-              13
+              14,
+              15
             ],
             "set_hard": [
-              9,
-              17
+              12,
+              20
             ],
             "set_unanswerable": [
-              13,
-              13
+              15,
+              15
             ],
             "unanswerable_refused_correctly": [
-              14,
-              14
+              16,
+              16
             ],
             "fabrications": [
               0,
-              14
+              16
             ],
             "ambiguity_flagged": [
               0,
-              9
+              12
             ]
           },
           "b2": {
-            "n": 50,
+            "n": 60,
             "exec_success": [
-              18,
-              50
+              24,
+              60
             ],
             "exec_success_when_attempted": [
-              18,
-              18
+              24,
+              24
             ],
-            "refusals": 32,
+            "refusals": 36,
             "answer_accuracy_reference": [
-              17,
-              27
+              21,
+              32
             ],
             "over_refusal": [
-              18,
-              36
+              20,
+              44
             ],
             "assumptions_on_reference": [
               0,
-              27
+              32
             ],
             "infra_errors_remaining": 0,
             "missing_records": 0,
             "write_attempts": 0,
             "latency_s": {
-              "n": 50,
-              "p50": 4.620748,
-              "p95": 15.262915999999999,
+              "n": 60,
+              "p50": 3.8205485,
+              "p95": 13.58634,
               "over_15s": 3
             },
             "latency_answered_s": {
-              "n": 18,
-              "p50": 6.0964025,
-              "p95": 19.734797999999998
+              "n": 24,
+              "p50": 5.836199000000001,
+              "p95": 15.436261
             },
-            "tokens_per_question": 1137.68,
-            "token_records": 50,
+            "tokens_per_question": 1134.4166666666667,
+            "token_records": 60,
             "llm_calls_per_question": 3.0,
             "set_ambiguous": [
               0,
-              7
+              10
             ],
             "set_easy": [
-              12,
-              13
+              14,
+              15
             ],
             "set_hard": [
-              5,
-              17
+              7,
+              20
             ],
             "set_unanswerable": [
-              12,
-              13
+              13,
+              15
             ],
             "unanswerable_refused_correctly": [
-              12,
-              14
+              13,
+              16
             ],
             "fabrications": [
               0,
-              14
+              16
             ],
             "ambiguity_flagged": [
               0,
-              9
+              12
             ]
           },
           "querymind": {
-            "n": 50,
+            "n": 60,
             "exec_success": [
-              30,
-              50
+              36,
+              60
             ],
             "exec_success_when_attempted": [
-              30,
-              30
-            ],
-            "refusals": 20,
-            "answer_accuracy_reference": [
-              20,
-              27
-            ],
-            "over_refusal": [
-              6,
+              36,
               36
             ],
+            "refusals": 24,
+            "answer_accuracy_reference": [
+              24,
+              32
+            ],
+            "over_refusal": [
+              8,
+              44
+            ],
             "assumptions_on_reference": [
-              19,
-              27
+              23,
+              32
             ],
             "infra_errors_remaining": 0,
             "missing_records": 0,
             "write_attempts": 0,
             "latency_s": {
-              "n": 50,
-              "p50": 7.6190925,
+              "n": 60,
+              "p50": 7.7805444999999995,
               "p95": 23.341715,
-              "over_15s": 9
-            },
-            "latency_answered_s": {
-              "n": 30,
-              "p50": 11.872361999999999,
-              "p95": 24.674581999999997
-            },
-            "tokens_per_question": 1371.26,
-            "token_records": 50,
-            "llm_calls_per_question": 3.22,
-            "set_ambiguous": [
-              4,
-              7
-            ],
-            "set_easy": [
-              12,
-              13
-            ],
-            "set_hard": [
-              10,
-              17
-            ],
-            "set_unanswerable": [
-              13,
-              13
-            ],
-            "unanswerable_refused_correctly": [
-              14,
-              14
-            ],
-            "fabrications": [
-              0,
-              14
-            ],
-            "ambiguity_flagged": [
-              5,
-              9
-            ]
-          },
-          "querymind-flat": {
-            "n": 50,
-            "exec_success": [
-              25,
-              50
-            ],
-            "exec_success_when_attempted": [
-              25,
-              25
-            ],
-            "refusals": 25,
-            "answer_accuracy_reference": [
-              17,
-              27
-            ],
-            "over_refusal": [
-              11,
-              36
-            ],
-            "assumptions_on_reference": [
-              14,
-              27
-            ],
-            "infra_errors_remaining": 0,
-            "missing_records": 0,
-            "write_attempts": 0,
-            "latency_s": {
-              "n": 50,
-              "p50": 3.5677535000000002,
-              "p95": 16.917633000000002,
-              "over_15s": 6
-            },
-            "latency_answered_s": {
-              "n": 25,
-              "p50": 9.970595,
-              "p95": 18.069909
-            },
-            "tokens_per_question": 1094.76,
-            "token_records": 50,
-            "llm_calls_per_question": 2.6,
-            "set_ambiguous": [
-              4,
-              7
-            ],
-            "set_easy": [
-              12,
-              13
-            ],
-            "set_hard": [
-              7,
-              17
-            ],
-            "set_unanswerable": [
-              13,
-              13
-            ],
-            "unanswerable_refused_correctly": [
-              14,
-              14
-            ],
-            "fabrications": [
-              0,
-              14
-            ],
-            "ambiguity_flagged": [
-              5,
-              9
-            ]
-          }
-        },
-        "r2": {
-          "b0": {
-            "n": 50,
-            "exec_success": [
-              47,
-              50
-            ],
-            "exec_success_when_attempted": [
-              47,
-              50
-            ],
-            "refusals": 0,
-            "answer_accuracy_reference": [
-              20,
-              27
-            ],
-            "over_refusal": [
-              0,
-              36
-            ],
-            "assumptions_on_reference": [
-              0,
-              27
-            ],
-            "infra_errors_remaining": 0,
-            "missing_records": 0,
-            "write_attempts": 0,
-            "latency_s": {
-              "n": 50,
-              "p50": 3.9855,
-              "p95": 10.7365,
-              "over_15s": 1
-            },
-            "latency_answered_s": {
-              "n": 47,
-              "p50": 3.9908,
-              "p95": 10.7365
-            },
-            "tokens_per_question": 323.4,
-            "token_records": 50,
-            "llm_calls_per_question": 1.0,
-            "set_ambiguous": [
-              0,
-              7
-            ],
-            "set_easy": [
-              13,
-              13
-            ],
-            "set_hard": [
-              7,
-              17
-            ],
-            "set_unanswerable": [
-              0,
-              13
-            ],
-            "unanswerable_refused_correctly": [
-              0,
-              14
-            ],
-            "fabrications": [
-              11,
-              14
-            ],
-            "ambiguity_flagged": [
-              0,
-              9
-            ]
-          },
-          "b1": {
-            "n": 50,
-            "exec_success": [
-              36,
-              50
-            ],
-            "exec_success_when_attempted": [
-              36,
-              36
-            ],
-            "refusals": 14,
-            "answer_accuracy_reference": [
-              20,
-              27
-            ],
-            "over_refusal": [
-              0,
-              36
-            ],
-            "assumptions_on_reference": [
-              0,
-              27
-            ],
-            "infra_errors_remaining": 0,
-            "missing_records": 0,
-            "write_attempts": 0,
-            "latency_s": {
-              "n": 50,
-              "p50": 2.7028499999999998,
-              "p95": 12.803799999999999,
-              "over_15s": 1
+              "over_15s": 10
             },
             "latency_answered_s": {
               "n": 36,
-              "p50": 3.6820000000000004,
-              "p95": 13.2339
+              "p50": 11.142344000000001,
+              "p95": 24.674581999999997
             },
-            "tokens_per_question": 343.52,
-            "token_records": 50,
-            "llm_calls_per_question": 1.0,
+            "tokens_per_question": 1418.7666666666667,
+            "token_records": 60,
+            "llm_calls_per_question": 3.3333333333333335,
             "set_ambiguous": [
-              0,
-              7
+              6,
+              10
             ],
             "set_easy": [
+              14,
+              15
+            ],
+            "set_hard": [
               12,
-              13
-            ],
-            "set_hard": [
-              9,
-              17
+              20
             ],
             "set_unanswerable": [
-              13,
-              13
+              15,
+              15
             ],
             "unanswerable_refused_correctly": [
-              14,
-              14
+              16,
+              16
             ],
             "fabrications": [
               0,
-              14
+              16
             ],
             "ambiguity_flagged": [
-              0,
-              9
+              7,
+              12
             ]
           },
-          "b2": {
-            "n": 50,
-            "exec_success": [
-              18,
-              50
-            ],
-            "exec_success_when_attempted": [
-              18,
-              18
-            ],
-            "refusals": 32,
-            "answer_accuracy_reference": [
-              14,
-              27
-            ],
-            "over_refusal": [
-              18,
-              36
-            ],
-            "assumptions_on_reference": [
-              0,
-              27
-            ],
-            "infra_errors_remaining": 0,
-            "missing_records": 0,
-            "write_attempts": 0,
-            "latency_s": {
-              "n": 50,
-              "p50": 5.3257449999999995,
-              "p95": 15.364742,
-              "over_15s": 3
-            },
-            "latency_answered_s": {
-              "n": 18,
-              "p50": 6.3422055,
-              "p95": 12.725464
-            },
-            "tokens_per_question": 1150.8,
-            "token_records": 50,
-            "llm_calls_per_question": 3.0,
-            "set_ambiguous": [
-              0,
-              7
-            ],
-            "set_easy": [
-              11,
-              13
-            ],
-            "set_hard": [
-              3,
-              17
-            ],
-            "set_unanswerable": [
-              10,
-              13
-            ],
-            "unanswerable_refused_correctly": [
-              10,
-              14
-            ],
-            "fabrications": [
-              0,
-              14
-            ],
-            "ambiguity_flagged": [
-              0,
-              9
-            ]
-          },
-          "querymind": {
-            "n": 50,
+          "querymind-flat": {
+            "n": 60,
             "exec_success": [
               31,
-              50
+              60
             ],
             "exec_success_when_attempted": [
               31,
               31
             ],
-            "refusals": 19,
+            "refusals": 29,
             "answer_accuracy_reference": [
-              18,
-              27
+              21,
+              32
             ],
             "over_refusal": [
-              5,
-              36
+              13,
+              44
             ],
             "assumptions_on_reference": [
-              20,
-              27
+              17,
+              32
             ],
             "infra_errors_remaining": 0,
             "missing_records": 0,
             "write_attempts": 0,
             "latency_s": {
-              "n": 50,
-              "p50": 7.708436,
-              "p95": 24.780366,
-              "over_15s": 9
+              "n": 60,
+              "p50": 6.1976575,
+              "p95": 16.883183000000002,
+              "over_15s": 6
             },
             "latency_answered_s": {
               "n": 31,
-              "p50": 11.162445,
-              "p95": 27.621096
+              "p50": 9.88547,
+              "p95": 18.069909
             },
-            "tokens_per_question": 1367.54,
-            "token_records": 50,
-            "llm_calls_per_question": 3.28,
+            "tokens_per_question": 1105.1,
+            "token_records": 60,
+            "llm_calls_per_question": 2.6333333333333333,
             "set_ambiguous": [
-              4,
-              7
+              6,
+              10
             ],
             "set_easy": [
-              12,
-              13
+              14,
+              15
             ],
             "set_hard": [
-              8,
-              17
+              9,
+              20
             ],
             "set_unanswerable": [
-              13,
-              13
+              15,
+              15
             ],
             "unanswerable_refused_correctly": [
-              14,
-              14
+              16,
+              16
             ],
             "fabrications": [
               0,
-              14
+              16
             ],
             "ambiguity_flagged": [
-              5,
-              9
+              7,
+              12
             ]
-          },
-          "querymind-flat": {
-            "n": 50,
+          }
+        },
+        "r2": {
+          "b0": {
+            "n": 60,
             "exec_success": [
-              27,
-              50
+              55,
+              60
             ],
             "exec_success_when_attempted": [
-              27,
-              27
+              55,
+              60
             ],
-            "refusals": 23,
+            "refusals": 0,
             "answer_accuracy_reference": [
-              17,
-              27
+              25,
+              32
             ],
             "over_refusal": [
-              9,
-              36
+              0,
+              44
             ],
             "assumptions_on_reference": [
-              16,
-              27
+              0,
+              32
             ],
             "infra_errors_remaining": 0,
             "missing_records": 0,
             "write_attempts": 0,
             "latency_s": {
-              "n": 50,
-              "p50": 6.2538245,
-              "p95": 19.333817,
-              "over_15s": 8
+              "n": 60,
+              "p50": 3.82115,
+              "p95": 9.5755,
+              "over_15s": 1
             },
             "latency_answered_s": {
-              "n": 27,
-              "p50": 11.979234,
-              "p95": 21.208154999999998
+              "n": 55,
+              "p50": 3.8432,
+              "p95": 10.7365
             },
-            "tokens_per_question": 1199.18,
-            "token_records": 50,
-            "llm_calls_per_question": 2.78,
+            "tokens_per_question": 317.85,
+            "token_records": 60,
+            "llm_calls_per_question": 1.0,
             "set_ambiguous": [
-              4,
-              7
+              0,
+              10
             ],
             "set_easy": [
-              12,
-              13
+              15,
+              15
             ],
             "set_hard": [
-              7,
-              17
+              10,
+              20
             ],
             "set_unanswerable": [
-              13,
-              13
+              0,
+              15
             ],
             "unanswerable_refused_correctly": [
+              0,
+              16
+            ],
+            "fabrications": [
+              12,
+              16
+            ],
+            "ambiguity_flagged": [
+              0,
+              12
+            ]
+          },
+          "b1": {
+            "n": 60,
+            "exec_success": [
+              42,
+              60
+            ],
+            "exec_success_when_attempted": [
+              42,
+              42
+            ],
+            "refusals": 18,
+            "answer_accuracy_reference": [
+              25,
+              32
+            ],
+            "over_refusal": [
+              2,
+              44
+            ],
+            "assumptions_on_reference": [
+              0,
+              32
+            ],
+            "infra_errors_remaining": 0,
+            "missing_records": 0,
+            "write_attempts": 0,
+            "latency_s": {
+              "n": 60,
+              "p50": 2.42605,
+              "p95": 10.455,
+              "over_15s": 1
+            },
+            "latency_answered_s": {
+              "n": 42,
+              "p50": 3.6456,
+              "p95": 12.803799999999999
+            },
+            "tokens_per_question": 337.6333333333333,
+            "token_records": 60,
+            "llm_calls_per_question": 1.0,
+            "set_ambiguous": [
+              0,
+              10
+            ],
+            "set_easy": [
               14,
-              14
+              15
+            ],
+            "set_hard": [
+              12,
+              20
+            ],
+            "set_unanswerable": [
+              15,
+              15
+            ],
+            "unanswerable_refused_correctly": [
+              16,
+              16
             ],
             "fabrications": [
               0,
-              14
+              16
             ],
             "ambiguity_flagged": [
+              0,
+              12
+            ]
+          },
+          "b2": {
+            "n": 60,
+            "exec_success": [
+              24,
+              60
+            ],
+            "exec_success_when_attempted": [
+              24,
+              24
+            ],
+            "refusals": 36,
+            "answer_accuracy_reference": [
+              18,
+              32
+            ],
+            "over_refusal": [
+              20,
+              44
+            ],
+            "assumptions_on_reference": [
+              0,
+              32
+            ],
+            "infra_errors_remaining": 0,
+            "missing_records": 0,
+            "write_attempts": 0,
+            "latency_s": {
+              "n": 60,
+              "p50": 4.527759,
+              "p95": 13.720186,
+              "over_15s": 3
+            },
+            "latency_answered_s": {
+              "n": 24,
+              "p50": 6.221362,
+              "p95": 11.100895000000001
+            },
+            "tokens_per_question": 1144.3,
+            "token_records": 60,
+            "llm_calls_per_question": 3.0,
+            "set_ambiguous": [
+              0,
+              10
+            ],
+            "set_easy": [
+              13,
+              15
+            ],
+            "set_hard": [
               5,
-              9
+              20
+            ],
+            "set_unanswerable": [
+              12,
+              15
+            ],
+            "unanswerable_refused_correctly": [
+              12,
+              16
+            ],
+            "fabrications": [
+              0,
+              16
+            ],
+            "ambiguity_flagged": [
+              0,
+              12
+            ]
+          },
+          "querymind": {
+            "n": 60,
+            "exec_success": [
+              37,
+              60
+            ],
+            "exec_success_when_attempted": [
+              37,
+              37
+            ],
+            "refusals": 23,
+            "answer_accuracy_reference": [
+              22,
+              32
+            ],
+            "over_refusal": [
+              7,
+              44
+            ],
+            "assumptions_on_reference": [
+              23,
+              32
+            ],
+            "infra_errors_remaining": 0,
+            "missing_records": 0,
+            "write_attempts": 0,
+            "latency_s": {
+              "n": 60,
+              "p50": 8.036049,
+              "p95": 18.563557,
+              "over_15s": 9
+            },
+            "latency_answered_s": {
+              "n": 37,
+              "p50": 10.965529,
+              "p95": 27.621096
+            },
+            "tokens_per_question": 1345.3666666666666,
+            "token_records": 60,
+            "llm_calls_per_question": 3.2666666666666666,
+            "set_ambiguous": [
+              6,
+              10
+            ],
+            "set_easy": [
+              14,
+              15
+            ],
+            "set_hard": [
+              10,
+              20
+            ],
+            "set_unanswerable": [
+              15,
+              15
+            ],
+            "unanswerable_refused_correctly": [
+              16,
+              16
+            ],
+            "fabrications": [
+              0,
+              16
+            ],
+            "ambiguity_flagged": [
+              7,
+              12
+            ]
+          },
+          "querymind-flat": {
+            "n": 60,
+            "exec_success": [
+              33,
+              60
+            ],
+            "exec_success_when_attempted": [
+              33,
+              33
+            ],
+            "refusals": 27,
+            "answer_accuracy_reference": [
+              21,
+              32
+            ],
+            "over_refusal": [
+              11,
+              44
+            ],
+            "assumptions_on_reference": [
+              19,
+              32
+            ],
+            "infra_errors_remaining": 0,
+            "missing_records": 0,
+            "write_attempts": 0,
+            "latency_s": {
+              "n": 60,
+              "p50": 6.664361,
+              "p95": 19.172155999999998,
+              "over_15s": 8
+            },
+            "latency_answered_s": {
+              "n": 33,
+              "p50": 10.067954,
+              "p95": 21.208154999999998
+            },
+            "tokens_per_question": 1192.4,
+            "token_records": 60,
+            "llm_calls_per_question": 2.783333333333333,
+            "set_ambiguous": [
+              6,
+              10
+            ],
+            "set_easy": [
+              14,
+              15
+            ],
+            "set_hard": [
+              9,
+              20
+            ],
+            "set_unanswerable": [
+              15,
+              15
+            ],
+            "unanswerable_refused_correctly": [
+              16,
+              16
+            ],
+            "fabrications": [
+              0,
+              16
+            ],
+            "ambiguity_flagged": [
+              7,
+              12
             ]
           }
         },
         "r3": {
           "b0": {
-            "n": 50,
+            "n": 60,
             "exec_success": [
-              45,
-              50
+              53,
+              60
             ],
             "exec_success_when_attempted": [
-              45,
-              50
+              53,
+              60
             ],
             "refusals": 0,
             "answer_accuracy_reference": [
-              20,
-              27
+              25,
+              32
             ],
             "over_refusal": [
               0,
-              36
+              44
             ],
             "assumptions_on_reference": [
               0,
-              27
+              32
             ],
             "infra_errors_remaining": 0,
             "missing_records": 0,
             "write_attempts": 0,
             "latency_s": {
-              "n": 50,
-              "p50": 3.9193499999999997,
-              "p95": 14.1176,
+              "n": 60,
+              "p50": 3.8440000000000003,
+              "p95": 9.5664,
               "over_15s": 2
             },
             "latency_answered_s": {
-              "n": 45,
-              "p50": 3.9057,
+              "n": 53,
+              "p50": 3.7823,
               "p95": 8.0547
             },
-            "tokens_per_question": 327.58,
-            "token_records": 50,
+            "tokens_per_question": 321.3333333333333,
+            "token_records": 60,
             "llm_calls_per_question": 1.0,
             "set_ambiguous": [
               0,
-              7
+              10
             ],
             "set_easy": [
-              13,
-              13
+              15,
+              15
             ],
             "set_hard": [
-              7,
-              17
+              10,
+              20
             ],
             "set_unanswerable": [
               0,
-              13
+              15
             ],
             "unanswerable_refused_correctly": [
               0,
-              14
+              16
             ],
             "fabrications": [
-              10,
-              14
+              11,
+              16
             ],
             "ambiguity_flagged": [
               0,
-              9
+              12
             ]
           },
           "b1": {
-            "n": 50,
+            "n": 60,
             "exec_success": [
-              35,
-              50
+              41,
+              60
             ],
             "exec_success_when_attempted": [
-              35,
-              35
+              41,
+              41
             ],
-            "refusals": 15,
+            "refusals": 19,
             "answer_accuracy_reference": [
-              20,
-              27
+              25,
+              32
             ],
             "over_refusal": [
-              1,
-              36
+              3,
+              44
             ],
             "assumptions_on_reference": [
               0,
-              27
+              32
             ],
             "infra_errors_remaining": 0,
             "missing_records": 0,
             "write_attempts": 0,
             "latency_s": {
-              "n": 50,
-              "p50": 2.49005,
-              "p95": 10.2435,
+              "n": 60,
+              "p50": 2.22145,
+              "p95": 9.3866,
               "over_15s": 1
             },
             "latency_answered_s": {
-              "n": 35,
+              "n": 41,
               "p50": 3.3057,
-              "p95": 10.508700000000001
+              "p95": 10.2435
             },
-            "tokens_per_question": 340.78,
-            "token_records": 50,
+            "tokens_per_question": 335.35,
+            "token_records": 60,
             "llm_calls_per_question": 1.0,
             "set_ambiguous": [
               0,
-              7
+              10
             ],
             "set_easy": [
-              12,
-              13
+              14,
+              15
             ],
             "set_hard": [
-              9,
-              17
+              12,
+              20
             ],
             "set_unanswerable": [
-              13,
-              13
+              15,
+              15
             ],
             "unanswerable_refused_correctly": [
-              14,
-              14
+              16,
+              16
             ],
             "fabrications": [
               0,
-              14
+              16
             ],
             "ambiguity_flagged": [
               0,
-              9
+              12
             ]
           },
           "b2": {
-            "n": 50,
+            "n": 60,
             "exec_success": [
-              20,
-              50
+              25,
+              60
             ],
             "exec_success_when_attempted": [
-              20,
-              20
+              25,
+              25
             ],
-            "refusals": 30,
+            "refusals": 35,
             "answer_accuracy_reference": [
-              15,
-              27
+              18,
+              32
             ],
             "over_refusal": [
-              16,
-              36
+              19,
+              44
             ],
             "assumptions_on_reference": [
               0,
-              27
+              32
             ],
             "infra_errors_remaining": 0,
             "missing_records": 0,
             "write_attempts": 0,
             "latency_s": {
-              "n": 50,
-              "p50": 5.1504639999999995,
-              "p95": 19.288760999999997,
+              "n": 60,
+              "p50": 4.928190000000001,
+              "p95": 17.065742999999998,
               "over_15s": 5
             },
             "latency_answered_s": {
-              "n": 20,
-              "p50": 6.203358,
+              "n": 25,
+              "p50": 6.001229,
               "p95": 17.065742999999998
             },
-            "tokens_per_question": 1167.42,
-            "token_records": 50,
+            "tokens_per_question": 1161.45,
+            "token_records": 60,
             "llm_calls_per_question": 3.0,
             "set_ambiguous": [
               0,
-              7
+              10
             ],
             "set_easy": [
-              12,
-              13
+              14,
+              15
             ],
             "set_hard": [
-              4,
-              17
+              5,
+              20
             ],
             "set_unanswerable": [
-              9,
-              13
+              11,
+              15
             ],
             "unanswerable_refused_correctly": [
-              10,
-              14
+              12,
+              16
             ],
             "fabrications": [
               0,
-              14
+              16
             ],
             "ambiguity_flagged": [
               0,
-              9
+              12
             ]
           },
           "querymind": {
-            "n": 50,
+            "n": 60,
+            "exec_success": [
+              38,
+              60
+            ],
+            "exec_success_when_attempted": [
+              38,
+              38
+            ],
+            "refusals": 22,
+            "answer_accuracy_reference": [
+              24,
+              32
+            ],
+            "over_refusal": [
+              6,
+              44
+            ],
+            "assumptions_on_reference": [
+              25,
+              32
+            ],
+            "infra_errors_remaining": 0,
+            "missing_records": 0,
+            "write_attempts": 0,
+            "latency_s": {
+              "n": 60,
+              "p50": 8.349474,
+              "p95": 26.612510999999998,
+              "over_15s": 13
+            },
+            "latency_answered_s": {
+              "n": 38,
+              "p50": 12.184077,
+              "p95": 31.082812999999998
+            },
+            "tokens_per_question": 1458.5833333333333,
+            "token_records": 60,
+            "llm_calls_per_question": 3.4,
+            "set_ambiguous": [
+              6,
+              10
+            ],
+            "set_easy": [
+              14,
+              15
+            ],
+            "set_hard": [
+              12,
+              20
+            ],
+            "set_unanswerable": [
+              15,
+              15
+            ],
+            "unanswerable_refused_correctly": [
+              16,
+              16
+            ],
+            "fabrications": [
+              0,
+              16
+            ],
+            "ambiguity_flagged": [
+              7,
+              12
+            ]
+          },
+          "querymind-flat": {
+            "n": 60,
             "exec_success": [
               32,
-              50
+              60
             ],
             "exec_success_when_attempted": [
               32,
               32
             ],
-            "refusals": 18,
+            "refusals": 28,
             "answer_accuracy_reference": [
               20,
-              27
+              32
             ],
             "over_refusal": [
-              4,
-              36
-            ],
-            "assumptions_on_reference": [
-              21,
-              27
-            ],
-            "infra_errors_remaining": 0,
-            "missing_records": 0,
-            "write_attempts": 0,
-            "latency_s": {
-              "n": 50,
-              "p50": 8.296835000000002,
-              "p95": 26.612510999999998,
-              "over_15s": 12
-            },
-            "latency_answered_s": {
-              "n": 32,
-              "p50": 12.261914,
-              "p95": 31.082812999999998
-            },
-            "tokens_per_question": 1433.0,
-            "token_records": 50,
-            "llm_calls_per_question": 3.32,
-            "set_ambiguous": [
-              4,
-              7
-            ],
-            "set_easy": [
               12,
-              13
-            ],
-            "set_hard": [
-              10,
-              17
-            ],
-            "set_unanswerable": [
-              13,
-              13
-            ],
-            "unanswerable_refused_correctly": [
-              14,
-              14
-            ],
-            "fabrications": [
-              0,
-              14
-            ],
-            "ambiguity_flagged": [
-              5,
-              9
-            ]
-          },
-          "querymind-flat": {
-            "n": 50,
-            "exec_success": [
-              26,
-              50
-            ],
-            "exec_success_when_attempted": [
-              26,
-              26
-            ],
-            "refusals": 24,
-            "answer_accuracy_reference": [
-              17,
-              27
-            ],
-            "over_refusal": [
-              10,
-              36
+              44
             ],
             "assumptions_on_reference": [
-              15,
-              27
+              18,
+              32
             ],
             "infra_errors_remaining": 0,
             "missing_records": 0,
             "write_attempts": 0,
             "latency_s": {
-              "n": 50,
-              "p50": 6.3854695,
-              "p95": 18.333785,
+              "n": 60,
+              "p50": 6.598587,
+              "p95": 17.153309,
               "over_15s": 5
             },
             "latency_answered_s": {
-              "n": 26,
-              "p50": 10.4120475,
+              "n": 32,
+              "p50": 9.8444505,
               "p95": 19.25091
             },
-            "tokens_per_question": 1162.58,
-            "token_records": 50,
-            "llm_calls_per_question": 2.72,
+            "tokens_per_question": 1158.3666666666666,
+            "token_records": 60,
+            "llm_calls_per_question": 2.7333333333333334,
             "set_ambiguous": [
-              4,
-              7
+              6,
+              10
             ],
             "set_easy": [
-              12,
-              13
+              14,
+              15
             ],
             "set_hard": [
-              7,
-              17
+              8,
+              20
             ],
             "set_unanswerable": [
-              13,
-              13
+              15,
+              15
             ],
             "unanswerable_refused_correctly": [
-              14,
-              14
+              16,
+              16
             ],
             "fabrications": [
               0,
-              14
+              16
             ],
             "ambiguity_flagged": [
-              5,
-              9
+              7,
+              12
             ]
           }
         }
       },
       "querymind_behaviour": {
         "querymind": {
-          "runs": 150,
-          "first_attempt_verification_failures": 3,
-          "runs_with_repairs": 3,
+          "runs": 180,
+          "first_attempt_verification_failures": 5,
+          "runs_with_repairs": 5,
           "repairs_recovered_to_execution": 3,
           "repairs_recovered_correct": 3,
-          "error_types": {},
-          "optimizer_invoked": 93,
+          "error_types": {
+            "RepairLimitReached": 2
+          },
+          "optimizer_invoked": 111,
           "optimizer_rewrites_applied": 2,
           "optimizer_rewrites_result_equal": 2,
           "schema_backend": {
-            "neo4j": 150
+            "neo4j": 180
           },
           "semantic_judge_unavailable": 0,
           "llm_calls_distribution": {
             "1": 16,
-            "2": 41,
-            "4": 78,
+            "2": 51,
+            "4": 96,
             "5": 12,
-            "7": 3
+            "7": 3,
+            "8": 1,
+            "9": 1
           },
           "calls_without_token_usage": 0
         },
         "querymind-flat": {
-          "runs": 150,
+          "runs": 180,
           "first_attempt_verification_failures": 5,
           "runs_with_repairs": 5,
           "repairs_recovered_to_execution": 5,
           "repairs_recovered_correct": 5,
           "error_types": {},
-          "optimizer_invoked": 78,
+          "optimizer_invoked": 96,
           "optimizer_rewrites_applied": 0,
           "optimizer_rewrites_result_equal": 0,
           "schema_backend": {
-            "flat": 150
+            "flat": 180
           },
           "semantic_judge_unavailable": 0,
           "llm_calls_distribution": {
-            "1": 72,
-            "4": 67,
+            "1": 84,
+            "4": 85,
             "5": 6,
             "7": 5
           },
@@ -2483,65 +2512,65 @@
       },
       "consistency": {
         "b0": [
-          50,
-          50
+          60,
+          60
         ],
         "b1": [
-          50,
-          50
+          60,
+          60
         ],
         "b2": [
-          40,
-          50
+          48,
+          60
         ],
         "querymind": [
-          46,
-          50
+          56,
+          60
         ],
         "querymind-flat": [
-          50,
-          50
+          59,
+          60
         ]
       },
       "paired_r1": {
         "b0 vs b1": {
-          "n": 50,
+          "n": 60,
           "a_only": 1,
-          "b_only": 15,
-          "p_exact_mcnemar": 0.000518798828125
+          "b_only": 17,
+          "p_exact_mcnemar": 0.00014495849609375
         },
         "b2 vs b1": {
-          "n": 50,
+          "n": 60,
           "a_only": 1,
-          "b_only": 6,
-          "p_exact_mcnemar": 0.125
+          "b_only": 8,
+          "p_exact_mcnemar": 0.0390625
         },
         "querymind vs b1": {
-          "n": 50,
-          "a_only": 7,
-          "b_only": 2,
-          "p_exact_mcnemar": 0.1796875
+          "n": 60,
+          "a_only": 9,
+          "b_only": 3,
+          "p_exact_mcnemar": 0.14599609375
         },
         "querymind-flat vs b1": {
-          "n": 50,
-          "a_only": 6,
-          "b_only": 4,
-          "p_exact_mcnemar": 0.75390625
+          "n": 60,
+          "a_only": 8,
+          "b_only": 5,
+          "p_exact_mcnemar": 0.5810546875
         },
         "querymind vs b0": {
-          "n": 50,
-          "a_only": 21,
-          "b_only": 2,
-          "p_exact_mcnemar": 6.604194641113281e-05
+          "n": 60,
+          "a_only": 25,
+          "b_only": 3,
+          "p_exact_mcnemar": 2.744048833847046e-05
         },
         "querymind vs b2": {
-          "n": 50,
-          "a_only": 10,
+          "n": 60,
+          "a_only": 13,
           "b_only": 0,
-          "p_exact_mcnemar": 0.001953125
+          "p_exact_mcnemar": 0.000244140625
         },
         "querymind vs querymind-flat": {
-          "n": 50,
+          "n": 60,
           "a_only": 3,
           "b_only": 0,
           "p_exact_mcnemar": 0.25

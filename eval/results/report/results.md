@@ -121,21 +121,21 @@ Rates are run r1 with 95% Wilson intervals (stakeholder `score.wilson`).
 
 | Metric | b0 (frozen single call) | b1 (b0 + refusal sentence) | b2 (k=3 samples, result vote) | QueryMind (Neo4j schema) | QueryMind, flat schema (diagnostic) |
 |---|---:|---:|---:|---:|---:|
-| Easy accuracy (set easy) | 13/13 (100%; CI 77–100) | 12/13 (92%; CI 67–99) | 12/13 (92%; CI 67–99) | 12/13 (92%; CI 67–99) | 12/13 (92%; CI 67–99) |
-| Hard accuracy (set hard) | 7/17 (41%; CI 22–64) | 9/17 (53%; CI 31–74) | 5/17 (29%; CI 13–53) | 10/17 (59%; CI 36–78) | 7/17 (41%; CI 22–64) |
-| Unanswerable refused + field named | 0/14 (0%; CI 0–22) | 14/14 (100%; CI 78–100) | 12/14 (86%; CI 60–96) | 14/14 (100%; CI 78–100) | 14/14 (100%; CI 78–100) |
-| Fabrications on unanswerable (lower is better) | 10/14 (71%; CI 45–88) | 0/14 (0%; CI 0–22) | 0/14 (0%; CI 0–22) | 0/14 (0%; CI 0–22) | 0/14 (0%; CI 0–22) |
-| Ambiguity flagged (assumption stated) | 0/9 (0%; CI 0–30) | 0/9 (0%; CI 0–30) | 0/9 (0%; CI 0–30) | 5/9 (56%; CI 27–81) | 5/9 (56%; CI 27–81) |
-| Assumptions stated on unambiguous reference questions | 0/27 (0%; CI 0–12) | 0/27 (0%; CI 0–12) | 0/27 (0%; CI 0–12) | 19/27 (70%; CI 52–84) | 14/27 (52%; CI 34–69) |
-| Over-refusal (refused an answerable question) | 0/36 (0%; CI 0–10) | 1/36 (3%; CI 0–14) | 18/36 (50%; CI 34–66) | 6/36 (17%; CI 8–32) | 11/36 (31%; CI 18–47) |
-| Execution success (all questions) | 45/50 (90%; CI 79–96) | 35/50 (70%; CI 56–81) | 18/50 (36%; CI 24–50) | 30/50 (60%; CI 46–72) | 25/50 (50%; CI 37–63) |
-| Execution success when an answer was attempted | 45/50 (90%; CI 79–96) | 35/35 (100%; CI 90–100) | 18/18 (100%; CI 82–100) | 30/30 (100%; CI 89–100) | 25/25 (100%; CI 87–100) |
+| Easy accuracy (set easy) | 15/15 (100%; CI 80–100) | 14/15 (93%; CI 70–99) | 14/15 (93%; CI 70–99) | 14/15 (93%; CI 70–99) | 14/15 (93%; CI 70–99) |
+| Hard accuracy (set hard) | 10/20 (50%; CI 30–70) | 12/20 (60%; CI 39–78) | 7/20 (35%; CI 18–57) | 12/20 (60%; CI 39–78) | 9/20 (45%; CI 26–66) |
+| Unanswerable refused + field named | 0/16 (0%; CI 0–19) | 16/16 (100%; CI 81–100) | 13/16 (81%; CI 57–93) | 16/16 (100%; CI 81–100) | 16/16 (100%; CI 81–100) |
+| Fabrications on unanswerable (lower is better) | 11/16 (69%; CI 44–86) | 0/16 (0%; CI 0–19) | 0/16 (0%; CI 0–19) | 0/16 (0%; CI 0–19) | 0/16 (0%; CI 0–19) |
+| Ambiguity flagged (assumption stated) | 0/12 (0%; CI 0–24) | 0/12 (0%; CI 0–24) | 0/12 (0%; CI 0–24) | 7/12 (58%; CI 32–81) | 7/12 (58%; CI 32–81) |
+| Assumptions stated on unambiguous reference questions | 0/32 (0%; CI 0–11) | 0/32 (0%; CI 0–11) | 0/32 (0%; CI 0–11) | 23/32 (72%; CI 55–84) | 17/32 (53%; CI 36–69) |
+| Over-refusal (refused an answerable question) | 0/44 (0%; CI 0–8) | 3/44 (7%; CI 2–18) | 20/44 (45%; CI 32–60) | 8/44 (18%; CI 10–32) | 13/44 (30%; CI 18–44) |
+| Execution success (all questions) | 53/60 (88%; CI 78–94) | 41/60 (68%; CI 56–79) | 24/60 (40%; CI 29–53) | 36/60 (60%; CI 47–71) | 31/60 (52%; CI 39–64) |
+| Execution success when an answer was attempted | 53/60 (88%; CI 78–94) | 41/41 (100%; CI 91–100) | 24/24 (100%; CI 86–100) | 36/36 (100%; CI 90–100) | 31/31 (100%; CI 89–100) |
 | Write attempts in generated SQL | 0 | 0 | 0 | 0 | 0 |
-| p50 / p95 end-to-end latency (s) | 4.23 / 12.66 | 2.67 / 9.83 | 4.62 / 15.26 | 7.62 / 23.34 | 3.57 / 16.92 |
-| p50 latency, answered questions only (s) | 4.12 | 4.22 | 6.10 | 11.87 | 9.97 |
-| Questions over 15 s | 1/50 | 0/50 | 3/50 | 9/50 | 6/50 |
-| LLM calls / question (mean) | 1.00 | 1.00 | 3.00 | 3.22 | 2.60 |
-| Tokens / question (prompt+completion, mean) | 328 | 339 | 1138 | 1371 | 1095 |
+| p50 / p95 end-to-end latency (s) | 4.06 / 11.41 | 2.46 / 9.82 | 3.82 / 13.59 | 7.78 / 23.34 | 6.20 / 16.88 |
+| p50 latency, answered questions only (s) | 3.99 | 4.22 | 5.84 | 11.14 | 9.89 |
+| Questions over 15 s | 1/60 | 0/60 | 3/60 | 10/60 | 6/60 |
+| LLM calls / question (mean) | 1.00 | 1.00 | 3.00 | 3.33 | 2.63 |
+| Tokens / question (prompt+completion, mean) | 322 | 334 | 1134 | 1419 | 1105 |
 | Gateway errors remaining after retries | 0 | 0 | 0 | 0 | 0 |
 
 Rates are run r1 with 95% Wilson intervals (stakeholder `score.wilson`).
@@ -144,23 +144,23 @@ Rates are run r1 with 95% Wilson intervals (stakeholder `score.wilson`).
 
 | Arm | r1 correct (all kinds) | r2 correct (all kinds) | r3 correct (all kinds) | Same verdict in every run |
 |---|---:|---:|---:|---:|
-| b0 (frozen single call) | 20/50 | 20/50 | 20/50 | 50/50 |
-| b1 (b0 + refusal sentence) | 34/50 | 34/50 | 34/50 | 50/50 |
-| b2 (k=3 samples, result vote) | 29/50 | 24/50 | 25/50 | 40/50 |
-| QueryMind (Neo4j schema) | 39/50 | 37/50 | 39/50 | 46/50 |
-| QueryMind, flat schema (diagnostic) | 36/50 | 36/50 | 36/50 | 50/50 |
+| b0 (frozen single call) | 25/60 | 25/60 | 25/60 | 60/60 |
+| b1 (b0 + refusal sentence) | 41/60 | 41/60 | 41/60 | 60/60 |
+| b2 (k=3 samples, result vote) | 34/60 | 30/60 | 30/60 | 48/60 |
+| QueryMind (Neo4j schema) | 47/60 | 45/60 | 47/60 | 56/60 |
+| QueryMind, flat schema (diagnostic) | 44/60 | 44/60 | 43/60 | 59/60 |
 
 ### Paired comparison on r1 (exact McNemar, all scored questions)
 
 | Pair (A vs B) | Questions | Only A correct | Only B correct | p |
 |---|---:|---:|---:|---:|
-| b0 vs b1 | 50 | 1 | 15 | 0.001 |
-| b2 vs b1 | 50 | 1 | 6 | 0.125 |
-| querymind vs b1 | 50 | 7 | 2 | 0.180 |
-| querymind-flat vs b1 | 50 | 6 | 4 | 0.754 |
-| querymind vs b0 | 50 | 21 | 2 | 0.000 |
-| querymind vs b2 | 50 | 10 | 0 | 0.002 |
-| querymind vs querymind-flat | 50 | 3 | 0 | 0.250 |
+| b0 vs b1 | 60 | 1 | 17 | 0.000 |
+| b2 vs b1 | 60 | 1 | 8 | 0.039 |
+| querymind vs b1 | 60 | 9 | 3 | 0.146 |
+| querymind-flat vs b1 | 60 | 8 | 5 | 0.581 |
+| querymind vs b0 | 60 | 25 | 3 | 0.000 |
+| querymind vs b2 | 60 | 13 | 0 | 0.000 |
+| querymind vs querymind-flat | 60 | 3 | 0 | 0.250 |
 
 ### Per-question verdicts (r1)
 
@@ -204,42 +204,56 @@ Rates are run r1 with 95% Wilson intervals (stakeholder `score.wilson`).
 | M3-U1 | unanswerable | unanswerable | FAIL: FABRICATED: returned a result set for missing data | PASS: refused, named 'shipping cost' | PASS: refused, named 'shipping cost' | PASS: refused, named 'shipping cost' | PASS: refused, named 'shipping cost' |
 | M3-U2 | unanswerable | unanswerable | FAIL: no refusal and no result | PASS: refused, named 'discount codes' | PASS: refused, named '<discount codes>' | PASS: refused, named '<discount codes>' | PASS: refused, named '<discount codes>' |
 | M4-A1 | ambiguous | ambiguous | FAIL: silently chose one interpretation | FAIL: silently chose one interpretation | FAIL: silently chose one interpretation | PASS: stated assumptions | PASS: stated assumptions |
-| M4-E1 | easy | reference | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) |
 | M4-E2 | easy | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
 | M4-H1 | hard | reference | PASS: matches reference: columns [2, 1] (unordered) | PASS: matches reference: columns [2, 1] (unordered) | PASS: matches reference: columns [1, 0] (unordered) | PASS: matches reference: columns [1, 0] (unordered) | PASS: matches reference: columns [1, 0] (unordered) |
 | M4-H2 | hard | reference | PASS: matches reference: columns [0, 2] (order enforced) | PASS: matches reference: columns [0, 1] (order enforced) | PASS: matches reference: columns [0, 2] (order enforced) | PASS: matches reference: columns [0, 2] (order enforced) | PASS: matches reference: columns [0, 2] (order enforced) |
 | M4-H3 | hard | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | FAIL: refused an answerable question (over-refusal) | FAIL: refused an answerable question (over-refusal) | FAIL: refused an answerable question (over-refusal) |
 | M4-U1 | unanswerable | unanswerable | FAIL: FABRICATED: returned a result set for missing data | PASS: refused, named 'shipping_cost' | PASS: refused, named 'shipping_cost' | PASS: refused, named 'shipping cost' | PASS: refused, named 'shipping cost' |
 | M4-U2 | unanswerable | unanswerable | FAIL: FABRICATED: returned a result set for missing data | PASS: refused, named 'discount information' | PASS: refused, named '<discount>' | PASS: refused, named '<discount>' | PASS: refused, named '<discount>' |
+| M5-A1 | ambiguous | ambiguous | FAIL: silently chose one interpretation | FAIL: silently chose one interpretation | FAIL: silently chose one interpretation | PASS: stated assumptions | PASS: stated assumptions |
+| M5-E1 | easy | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
+| M5-H1 | hard | reference | PASS: matches reference: columns [1, 2, 3] (unordered) | PASS: matches reference: columns [1, 2, 3] (unordered) | PASS: matches reference: columns [1, 2, 3] (unordered) | PASS: matches reference: columns [1, 2, 3] (unordered) | PASS: matches reference: columns [1, 2, 3] (unordered) |
+| M5-H2 | hard | reference | PASS: matches reference: columns [1, 2] (unordered) | PASS: matches reference: columns [1, 2] (unordered) | PASS: matches reference: columns [1, 2] (unordered) | PASS: matches reference: columns [1, 2] (unordered) | PASS: matches reference: columns [1, 2] (unordered) |
+| M5-U1 | unanswerable | unanswerable | FAIL: no refusal and no result | PASS: refused, named 'shipping address' | FAIL: refused but named 'None' | PASS: refused, named 'shipping address' | PASS: refused, named 'shipping address' |
+| M5-U2 | unanswerable | unanswerable | FAIL: FABRICATED: returned a result set for missing data | PASS: refused, named 'email address' | PASS: refused, named 'email address' | PASS: refused, named 'email address' | PASS: refused, named '<email address>' |
 | U1 | unanswerable | unanswerable | FAIL: FABRICATED: returned a result set for missing data | PASS: refused, named 'sales representative' | PASS: refused, named '<sales representative>' | PASS: refused, named '<sales representative>' | PASS: refused, named '<sales representative>' |
 | U2 | unanswerable | unanswerable | FAIL: FABRICATED: returned a result set for missing data | PASS: refused, named 'churn data' | PASS: refused, named 'churn information' | PASS: refused, named 'churn information' | PASS: refused, named '<churn information>' |
 | U3 | unanswerable | unanswerable | FAIL: no refusal and no result | PASS: refused, named 'marketing channel' | PASS: refused, named '<marketing channel>' | PASS: refused, named 'marketing channel' | PASS: refused, named '<marketing channel>' |
 | U4 | unanswerable | unanswerable | FAIL: FABRICATED: returned a result set for missing data | PASS: refused, named 'stock quantity or inventory information' | PASS: refused, named '<inventory quantity>' | PASS: refused, named '<stock quantity>' | PASS: refused, named '<stock quantity>' |
 | U5 | unanswerable | unanswerable | FAIL: FABRICATED: returned a result set for missing data | PASS: refused, named 'delivery time or related date fields' | PASS: refused, named '<delivery time>' | PASS: refused, named '<delivery time>' | PASS: refused, named '<delivery time>' |
+| X-A1 | ambiguous | ambiguous | FAIL: silently chose one interpretation | FAIL: refused an answerable question (over-refusal) | FAIL: silently chose one interpretation | PASS: stated assumptions | PASS: stated assumptions |
+| X-A2 | ambiguous | ambiguous | FAIL: silently chose one interpretation | FAIL: refused an answerable question (over-refusal) | FAIL: refused an answerable question (over-refusal) | FAIL: refused an answerable question (over-refusal) | FAIL: refused an answerable question (over-refusal) |
+| X-E1 | easy | reference | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) |
+| X-E2 | easy | reference | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) |
+| X-H1 | hard | reference | PASS: matches reference: columns [1, 2] (unordered) | PASS: matches reference: columns [1, 2] (unordered) | FAIL: refused an answerable question (over-refusal) | FAIL: refused an answerable question (over-refusal) | FAIL: refused an answerable question (over-refusal) |
 
 ### QueryMind (Neo4j schema) behaviour (all runs)
 
 ```json
 {
-  "runs": 150,
-  "first_attempt_verification_failures": 3,
-  "runs_with_repairs": 3,
+  "runs": 180,
+  "first_attempt_verification_failures": 5,
+  "runs_with_repairs": 5,
   "repairs_recovered_to_execution": 3,
   "repairs_recovered_correct": 3,
-  "error_types": {},
-  "optimizer_invoked": 93,
+  "error_types": {
+    "RepairLimitReached": 2
+  },
+  "optimizer_invoked": 111,
   "optimizer_rewrites_applied": 2,
   "optimizer_rewrites_result_equal": 2,
   "schema_backend": {
-    "neo4j": 150
+    "neo4j": 180
   },
   "semantic_judge_unavailable": 0,
   "llm_calls_distribution": {
     "1": 16,
-    "2": 41,
-    "4": 78,
+    "2": 51,
+    "4": 96,
     "5": 12,
-    "7": 3
+    "7": 3,
+    "8": 1,
+    "9": 1
   },
   "calls_without_token_usage": 0
 }
@@ -249,22 +263,22 @@ Rates are run r1 with 95% Wilson intervals (stakeholder `score.wilson`).
 
 ```json
 {
-  "runs": 150,
+  "runs": 180,
   "first_attempt_verification_failures": 5,
   "runs_with_repairs": 5,
   "repairs_recovered_to_execution": 5,
   "repairs_recovered_correct": 5,
   "error_types": {},
-  "optimizer_invoked": 78,
+  "optimizer_invoked": 96,
   "optimizer_rewrites_applied": 0,
   "optimizer_rewrites_result_equal": 0,
   "schema_backend": {
-    "flat": 150
+    "flat": 180
   },
   "semantic_judge_unavailable": 0,
   "llm_calls_distribution": {
-    "1": 72,
-    "4": 67,
+    "1": 84,
+    "4": 85,
     "5": 6,
     "7": 5
   },

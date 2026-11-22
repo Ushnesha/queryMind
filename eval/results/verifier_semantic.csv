@@ -1,4 +1,4 @@
 verdict,tp,fp,fn,tn,precision,recall
-mismatch,0,1,7,19,"0/1 (0%, CI 0-79) too few examples","0/7 (0%, CI 0-35)"
-not_answerable,14,6,0,30,"14/20 (70%, CI 48-85)","14/14 (100%, CI 78-100)"
-assumption_flagged,5,19,4,22,"5/24 (21%, CI 9-40)","5/9 (56%, CI 27-81)"
+mismatch,1,1,7,23,"1/2 (50%, CI 9-91) too few examples","1/8 (12%, CI 2-47)"
+not_answerable,16,8,0,36,"16/24 (67%, CI 47-82)","16/16 (100%, CI 81-100)"
+assumption_flagged,7,23,5,25,"7/30 (23%, CI 12-41)","7/12 (58%, CI 32-81)"

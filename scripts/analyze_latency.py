@@ -142,8 +142,18 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--before", default=DEFAULT_BEFORE, help="Glob of 'before' trace files")
     parser.add_argument("--after", default=DEFAULT_AFTER, help="Glob of 'after' trace files")
     parser.add_argument("--out", type=Path, default=OUT_DIR)
+    parser.add_argument("--questions", type=Path, default=None,
+                        help="Question file whose IDs the 'after' records are limited to (default: "
+                             "eval/questions_60.yaml with the default --after), like the stakeholder scorer")
     args = parser.parse_args(argv)
     before, after = load_records(args.before), load_records(args.after)
+    questions = args.questions or (PROJECT_ROOT / "eval/questions_60.yaml" if args.after == DEFAULT_AFTER else None)
+    if questions is not None:
+        import yaml
+
+        # Traces keep records of questions later dropped from the set (e.g. a removed duplicate).
+        wanted = {item["id"] for item in yaml.safe_load(questions.read_text(encoding="utf-8")) or []}
+        after = [r for r in after if r.get("question_id") in wanted]
     if not before:
         parser.error(f"No 'before' records match {args.before}")
     result = compare(before, after)

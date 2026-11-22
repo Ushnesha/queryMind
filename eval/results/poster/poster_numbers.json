@@ -43,6 +43,13 @@
       "model": "devstral2-123b",
       "querymind_commit": "7060202",
       "repeats": 3
+    },
+    {
+      "dataset": "stakeholder60",
+      "started": "2026-11-22T02:58:29+00:00",
+      "model": "devstral2-123b",
+      "querymind_commit": "d81b900",
+      "repeats": 3
     }
   ],
   "table": {
@@ -57,225 +64,225 @@
     "rows": [
       [
         "Easy accuracy ↑",
-        "13/13 (100%; 77–100)",
-        "12/13 (92%; 67–99)",
-        "12/13 (92%; 67–99)",
-        "12/13 (92%; 67–99)",
-        "12/13 (92%; 67–99)"
+        "15/15 (100%; 80–100)",
+        "14/15 (93%; 70–99)",
+        "14/15 (93%; 70–99)",
+        "14/15 (93%; 70–99)",
+        "14/15 (93%; 70–99)"
       ],
       [
         "Hard accuracy ↑",
-        "7/17 (41%; 22–64)",
-        "9/17 (53%; 31–74)",
-        "5/17 (29%; 13–53)",
-        "10/17 (59%; 36–78)",
-        "7/17 (41%; 22–64)"
+        "10/20 (50%; 30–70)",
+        "12/20 (60%; 39–78)",
+        "7/20 (35%; 18–57)",
+        "12/20 (60%; 39–78)",
+        "9/20 (45%; 26–66)"
       ],
       [
         "Unanswerable: correct refusal ↑",
-        "0/14 (0%; 0–22)",
-        "14/14 (100%; 78–100)",
-        "12/14 (86%; 60–96)",
-        "14/14 (100%; 78–100)",
-        "14/14 (100%; 78–100)"
+        "0/16 (0%; 0–19)",
+        "16/16 (100%; 81–100)",
+        "13/16 (81%; 57–93)",
+        "16/16 (100%; 81–100)",
+        "16/16 (100%; 81–100)"
       ],
       [
         "False answers on unanswerable ↓",
-        "10/14 (71%; 45–88)",
-        "0/14 (0%; 0–22)",
-        "0/14 (0%; 0–22)",
-        "0/14 (0%; 0–22)",
-        "0/14 (0%; 0–22)"
+        "11/16 (69%; 44–86)",
+        "0/16 (0%; 0–19)",
+        "0/16 (0%; 0–19)",
+        "0/16 (0%; 0–19)",
+        "0/16 (0%; 0–19)"
       ],
       [
         "Ambiguity flagged ↑",
-        "0/9 (0%; 0–30)",
-        "0/9 (0%; 0–30)",
-        "0/9 (0%; 0–30)",
-        "5/9 (56%; 27–81)",
-        "5/9 (56%; 27–81)"
+        "0/12 (0%; 0–24)",
+        "0/12 (0%; 0–24)",
+        "0/12 (0%; 0–24)",
+        "7/12 (58%; 32–81)",
+        "7/12 (58%; 32–81)"
       ],
       [
         "Over-refusal ↓",
-        "0/36 (0%; 0–10)",
-        "1/36 (3%; 0–14)",
-        "18/36 (50%; 34–66)",
-        "6/36 (17%; 8–32)",
-        "11/36 (31%; 18–47)"
+        "0/44 (0%; 0–8)",
+        "3/44 (7%; 2–18)",
+        "20/44 (45%; 32–60)",
+        "8/44 (18%; 10–32)",
+        "13/44 (30%; 18–44)"
       ],
       [
         "Execution success ↑",
-        "45/50 (90%; 79–96)",
-        "35/50 (70%; 56–81)",
-        "18/50 (36%; 24–50)",
-        "30/50 (60%; 46–72)",
-        "25/50 (50%; 37–63)"
+        "53/60 (88%; 78–94)",
+        "41/60 (68%; 56–79)",
+        "24/60 (40%; 29–53)",
+        "36/60 (60%; 47–71)",
+        "31/60 (52%; 39–64)"
       ],
       [
         "p50 latency, answered (s) ↓",
-        "4.1",
+        "4.0",
         "4.2",
-        "6.1",
-        "11.9",
-        "10.0"
+        "5.8",
+        "11.1",
+        "9.9"
       ],
       [
         "LLM calls / question ↓",
         "1.0",
         "1.0",
         "3.0",
-        "3.2",
+        "3.3",
         "2.6"
       ],
       [
         "Tokens / question ↓",
-        "328",
-        "339",
-        "1138",
-        "1371",
-        "1095"
+        "322",
+        "334",
+        "1134",
+        "1419",
+        "1105"
       ],
       [
         "vs b1: wins / losses, McNemar p",
-        "+1 / −15, p=0.00",
+        "+1 / −17, p=0.00",
         "ref.",
-        "+1 / −6, p=0.12",
-        "+7 / −2, p=0.18",
-        "+6 / −4, p=0.75"
+        "+1 / −8, p=0.04",
+        "+9 / −3, p=0.15",
+        "+8 / −5, p=0.58"
       ]
     ],
-    "caption": "50-question set, run r1, one model (devstral2-123b). k/n (%; 95% Wilson CI). Scored by the stakeholder's unmodified scorer."
+    "caption": "60-question set, run r1, one model (devstral2-123b). k/n (%; 95% Wilson CI). Scored by the stakeholder's unmodified scorer."
   },
   "chart": {
     "rates": {
       "b0": {
         "set_easy": [
-          13,
-          13
+          15,
+          15
         ],
         "set_hard": [
-          7,
-          17
+          10,
+          20
         ],
         "ambiguity_flagged": [
           0,
-          9
+          12
         ],
         "exec_success": [
-          45,
-          50
+          53,
+          60
         ],
         "fabrications": [
-          10,
-          14
+          11,
+          16
         ],
         "over_refusal": [
           0,
-          36
+          44
         ]
       },
       "b1": {
         "set_easy": [
-          12,
-          13
+          14,
+          15
         ],
         "set_hard": [
-          9,
-          17
+          12,
+          20
         ],
         "ambiguity_flagged": [
           0,
-          9
+          12
         ],
         "exec_success": [
-          35,
-          50
+          41,
+          60
         ],
         "fabrications": [
           0,
-          14
+          16
         ],
         "over_refusal": [
-          1,
-          36
+          3,
+          44
         ]
       },
       "b2": {
         "set_easy": [
-          12,
-          13
+          14,
+          15
         ],
         "set_hard": [
-          5,
-          17
+          7,
+          20
         ],
         "ambiguity_flagged": [
           0,
-          9
+          12
         ],
         "exec_success": [
-          18,
-          50
+          24,
+          60
         ],
         "fabrications": [
           0,
-          14
+          16
         ],
         "over_refusal": [
-          18,
-          36
+          20,
+          44
         ]
       },
       "querymind": {
         "set_easy": [
-          12,
-          13
+          14,
+          15
         ],
         "set_hard": [
-          10,
-          17
+          12,
+          20
         ],
         "ambiguity_flagged": [
-          5,
-          9
+          7,
+          12
         ],
         "exec_success": [
-          30,
-          50
+          36,
+          60
         ],
         "fabrications": [
           0,
-          14
+          16
         ],
         "over_refusal": [
-          6,
-          36
+          8,
+          44
         ]
       },
       "querymind-flat": {
         "set_easy": [
-          12,
-          13
+          14,
+          15
         ],
         "set_hard": [
-          7,
-          17
+          9,
+          20
         ],
         "ambiguity_flagged": [
-          5,
-          9
+          7,
+          12
         ],
         "exec_success": [
-          25,
-          50
+          31,
+          60
         ],
         "fabrications": [
           0,
-          14
+          16
         ],
         "over_refusal": [
-          11,
-          36
+          13,
+          44
         ]
       }
     },
@@ -306,79 +313,79 @@
         "direction": "lower"
       },
       "over_refusal": {
-        "target_pct": 2.7777777777777777,
+        "target_pct": 2.272727272727273,
         "text": "≤1",
         "direction": "lower"
       }
     },
     "p50_latency_answered_s": {
-      "b0": 4.1227,
+      "b0": 3.9907,
       "b1": 4.2236,
-      "b2": 6.0964025,
-      "querymind": 11.872361999999999,
-      "querymind-flat": 9.970595
+      "b2": 5.836199000000001,
+      "querymind": 11.142344000000001,
+      "querymind-flat": 9.88547
     }
   },
   "honest_results": {
     "better": [
-      "Hard accuracy: 10/17 vs 9/17",
-      "Ambiguity flagged: 5/9 vs 0/9"
+      "Ambiguity flagged: 7/12 vs 0/12"
     ],
     "worse": [
-      "Over-refusal: 6/36 vs 1/36",
-      "Execution success: 30/50 vs 35/50"
+      "Over-refusal: 8/44 vs 3/44",
+      "Execution success: 36/60 vs 41/60"
     ],
     "same": [
-      "Easy accuracy: 12/13 vs 12/13",
-      "Unanswerable: correct refusal: 14/14 vs 14/14",
-      "False answers on unanswerable: 0/14 vs 0/14"
+      "Easy accuracy: 14/15 vs 14/15",
+      "Hard accuracy: 12/20 vs 12/20",
+      "Unanswerable: correct refusal: 16/16 vs 16/16",
+      "False answers on unanswerable: 0/16 vs 0/16"
     ],
     "cost": [
-      "3.2× the LLM calls of b1",
-      "4.0× the tokens of b1",
-      "p50 latency on answered questions 11.9 s vs 4.2 s"
+      "3.3× the LLM calls of b1",
+      "4.3× the tokens of b1",
+      "p50 latency on answered questions 11.1 s vs 4.2 s"
     ],
-    "overall": "Overall (all questions, paired): QueryMind alone correct on 7, b1 alone on 2; exact McNemar p = 0.18. Not a significant difference at n = 50."
+    "overall": "Overall (all questions, paired): QueryMind alone correct on 9, b1 alone on 3; exact McNemar p = 0.15. Not a significant difference at n = 60."
   },
   "paired_r1": {
     "b0 vs b1": {
-      "n": 50,
+      "n": 60,
       "a_only": 1,
-      "b_only": 15,
-      "p_exact_mcnemar": 0.000518798828125
+      "b_only": 17,
+      "p_exact_mcnemar": 0.00014495849609375
     },
     "b2 vs b1": {
-      "n": 50,
+      "n": 60,
       "a_only": 1,
-      "b_only": 6,
-      "p_exact_mcnemar": 0.125
+      "b_only": 8,
+      "p_exact_mcnemar": 0.0390625
     },
     "querymind vs b1": {
-      "n": 50,
-      "a_only": 7,
-      "b_only": 2,
-      "p_exact_mcnemar": 0.1796875
+      "n": 60,
+      "a_only": 9,
+      "b_only": 3,
+      "p_exact_mcnemar": 0.14599609375
     },
     "querymind-flat vs b1": {
-      "n": 50,
-      "a_only": 6,
-      "b_only": 4,
-      "p_exact_mcnemar": 0.75390625
+      "n": 60,
+      "a_only": 8,
+      "b_only": 5,
+      "p_exact_mcnemar": 0.5810546875
     },
     "querymind vs b0": {
-      "n": 50,
-      "a_only": 21,
-      "b_only": 2,
-      "p_exact_mcnemar": 6.604194641113281e-05
+      "n": 60,
+      "a_only": 25,
+      "b_only": 3,
+      "p_exact_mcnemar": 2.744048833847046e-05
     },
     "querymind vs b2": {
-      "n": 50,
-      "a_only": 10,
+      "n": 60,
+      "a_only": 13,
       "b_only": 0,
-      "p_exact_mcnemar": 0.001953125
+      "p_exact_mcnemar": 0.000244140625
     },
     "querymind vs querymind-flat": {
-      "n": 50,
+      "n": 60,
       "a_only": 3,
       "b_only": 0,
       "p_exact_mcnemar": 0.25

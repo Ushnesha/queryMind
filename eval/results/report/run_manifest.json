@@ -124,6 +124,31 @@
       "database_file_sha256": {
         "stakeholder_analytics.db": "e5f691407d5e990a927f1189bdf6b5bae23f62841f359a37d3e31ea7186fba7f"
       }
+    },
+    {
+      "dataset": "stakeholder60",
+      "started": "2026-11-22T02:58:29+00:00",
+      "model": "devstral2-123b",
+      "baseline_commit": "c0b0cda",
+      "repeats": 3,
+      "arms": [
+        "b0",
+        "b1",
+        "b2",
+        "querymind",
+        "querymind-flat"
+      ],
+      "querymind_commit": "d81b900",
+      "infra_failures_retried": {},
+      "b2": {
+        "samples": 3,
+        "temperature": 0.7
+      },
+      "finished": "2026-11-22T03:12:51+00:00",
+      "database_file_sha256_unchanged": true,
+      "database_file_sha256": {
+        "stakeholder_analytics.db": "e5f691407d5e990a927f1189bdf6b5bae23f62841f359a37d3e31ea7186fba7f"
+      }
     }
   ]
 }
