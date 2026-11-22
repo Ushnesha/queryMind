@@ -23,6 +23,11 @@ from src.llm import MockProvider, get_provider
 from src.orchestrator import run_querymind
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+# --disable NAME -> run_querymind keyword. Read-only safety can never be disabled.
+SWITCHES = {
+    "syntax": "enable_syntax", "semantic": "enable_semantic", "optimizer": "enable_optimizer",
+    "result_verifier": "enable_result_verifier", "schema_retry": "enable_schema_retry",
+}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -34,6 +39,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--schema-mode", choices=("flat", "neo4j"))
     parser.add_argument("--run-tag")
     parser.add_argument("--arm-name", default="querymind", help="Arm label written to the trace")
+    parser.add_argument("--disable", action="append", default=[], choices=sorted(SWITCHES),
+                        help="Switch one agent off for the ablation (R3); repeatable")
     args = parser.parse_args(argv)
 
     load_dotenv(PROJECT_ROOT / ".env", override=False)
@@ -52,7 +59,8 @@ def main(argv: list[str] | None = None) -> int:
         if isinstance(provider, MockProvider):
             parser.error("Mock provider selected")
         state = run_querymind(item["question"], schema_mode=args.schema_mode, db_path=db_path,
-                              provider=provider, settings=settings)
+                              provider=provider, settings=settings,
+                              **{SWITCHES[name]: False for name in args.disable})
         model = provider._resolve_model() if hasattr(provider, "_resolve_model") else type(provider).__name__
         record = to_stakeholder_record(
             item["id"], item["question"], state,
@@ -60,7 +68,7 @@ def main(argv: list[str] | None = None) -> int:
             prompt_tokens=getattr(provider, "prompt_tokens", None),
             completion_tokens=getattr(provider, "completion_tokens", None),
             calls_without_usage=getattr(provider, "calls_without_usage", None),
-            run_tag=args.run_tag, arm=args.arm_name,
+            run_tag=args.run_tag, arm=args.arm_name, disabled=sorted(set(args.disable)),
         )
         with args.trace.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(record, ensure_ascii=False, default=str) + "\n")

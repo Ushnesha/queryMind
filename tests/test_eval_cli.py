@@ -66,8 +66,8 @@ def test_ablation_cli_writes_each_configuration_case(db_path: Path, tmp_path: Pa
     output = tmp_path / 'ablation.json'
     assert ablation_main(['--db-path', str(db_path), '--output', str(output)]) == 0
     report = json.loads(output.read_text())
-    assert len(report['variants']) == 5
-    assert len(output.with_suffix('.jsonl').read_text().splitlines()) == 50
+    assert len(report['variants']) == 6  # + without_schema_retry (R1)
+    assert len(output.with_suffix('.jsonl').read_text().splitlines()) == 60
     assert report['variants']['without_neo4j']['flags']['schema_mode'] == 'flat'
 
 

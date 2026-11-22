@@ -51,6 +51,7 @@ def to_stakeholder_record(
     calls_without_usage: int | None = None,
     run_tag: str | None = None,
     arm: str = "querymind",
+    disabled: list[str] | None = None,
 ) -> dict[str, Any]:
     """Build one stakeholder-format trace record from a final AgentState."""
     status = state.get("status")
@@ -122,6 +123,12 @@ def to_stakeholder_record(
         "qm_schema_backend": retrieval.get("backend"),
         "qm_schema_fallback": retrieval.get("backend") == "flat_fallback",
         "qm_schema_note": retrieval.get("fallback_reason") or None,
+        # R1 flat-schema retry: {"triggered", "trigger", "outcome"} (docs/R1_SCHEMA_RETRY.md).
+        "qm_schema_retry": metrics.get("schema_retry"),
+        # R6 per-step cost: total ms and {llm_calls, prompt_tokens, completion_tokens} per node.
+        "qm_node_latency_ms": metrics.get("node_latency_ms"),
+        "qm_node_tokens": metrics.get("node_tokens"),
+        "qm_disabled": list(disabled or []),
         "qm_retrieved_tables": metrics.get("retrieved_tables"),
         "qm_final_answer": (state.get("final_answer") or "")[:1000],
     }

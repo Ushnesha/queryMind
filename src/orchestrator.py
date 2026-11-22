@@ -8,7 +8,7 @@ from typing import Any, Callable, TypeVar
 from src.agents import generate_response, generate_sql
 from src.config import Settings, load_settings, resolve_path
 from src.db import execute_sql
-from src.llm import MockProvider, SQLProvider, get_provider, model_call_count
+from src.llm import MockProvider, SQLProvider, get_provider, model_call_count, token_usage
 from src.optimizer import optimize_sql
 from src.schema import retrieve_schema, retrieve_schema_with_metadata
 from src.state import AgentState
@@ -37,6 +37,14 @@ class Components:
     generate_response: Callable[[AgentState], str] = generate_response
 
 
+NEO4J_PLACEHOLDER_MARKER = "Neo4j retrieval is a starter placeholder"
+FULL_SCHEMA_PREFIX = "No identifier matches"
+NOT_ANSWERABLE_PREFIX = "NOT_ANSWERABLE:"
+REPAIR_LIMIT_PREFIX = "SQL verification failed after the configured repair limit: "
+# Refusal points that a wider schema can fix (docs/R1_SCHEMA_RETRY.md section 2).
+RETRY_TRIGGERS = ("not_answerable", "semantic_unanswerable", "repairs_exhausted")
+
+
 def run_querymind(
     question: str,
     schema_mode: str | None = None,
@@ -49,11 +57,15 @@ def run_querymind(
     provider: SQLProvider | None = None,
     settings: Settings | None = None,
     components: Components | None = None,
+    enable_schema_retry: bool = True,
 ) -> AgentState:
     """Run the integrated pipeline, returning JSON-safe state even on node failure.
 
     Disabling syntax analysis never disables the read-only execution guard.
     The configured provider controls model access; mock mode stays offline.
+    In Neo4j mode a refusal is retried once with the full flat schema, and the
+    retry's SQL is accepted only if it passes the same verification
+    (``enable_schema_retry``; see docs/R1_SCHEMA_RETRY.md).
     """
     started = perf_counter()
     nodes = components or Components()
@@ -73,12 +85,15 @@ def run_querymind(
     sql_provider = None
 
     def call_node(name: str, callback: Callable[[], T], *, iteration: int | None = None) -> T:
+        """Run one node, recording its wall time, model calls and tokens in the trace."""
         node_start = perf_counter()
         before = model_call_count(sql_provider) if sql_provider is not None else 0
+        tokens_before = token_usage(sql_provider)
+        status, reason = "pass", ""
         try:
-            result = callback()
+            return callback()
         except Exception as exc:
-            add_trace(state, name, "error", (perf_counter() - node_start) * 1000, str(exc), iteration=iteration)
+            status, reason = "error", str(exc)
             raise
         finally:
             after = model_call_count(sql_provider) if sql_provider is not None else 0
@@ -86,8 +101,8 @@ def run_querymind(
                 state["metrics"]["llm_calls"] = None
             elif state["metrics"]["llm_calls"] is not None:
                 state["metrics"]["llm_calls"] += max(0, after - before)
-        add_trace(state, name, "pass", (perf_counter() - node_start) * 1000, iteration=iteration)
-        return result
+            add_trace(state, name, status, (perf_counter() - node_start) * 1000, reason, iteration=iteration,
+                      **_usage_fields(before, after, tokens_before, token_usage(sql_provider)))
 
     def describe(status: str, reason: str) -> None:
         state["trace"][-1].update(status=status, reason=reason)
@@ -108,9 +123,13 @@ def run_querymind(
             raise ValueError("schema_mode must be 'flat' or 'neo4j'")
         if not 0 <= config.orchestrator.max_repairs <= 3 or not 0 <= config.orchestrator.max_optimizer_rounds <= 2:
             raise ValueError("Repair and optimizer budgets must be within 0..3 and 0..2")
+        retry_budget = getattr(config.orchestrator, "schema_retry_max_repairs", 1)
+        if not 0 <= retry_budget <= 3:
+            raise ValueError("schema_retry_max_repairs must be within 0..3")
         database_path = resolve_path(db_path) if db_path is not None else config.database.path
         sql_provider = provider or get_provider(config.model.provider)
         state["schema_mode"] = mode
+        state["metrics"]["schema_retry"] = {"triggered": False, "trigger": None, "outcome": None}
         def retrieve() -> str:
             if nodes.retrieve_schema is not retrieve_schema:
                 return nodes.retrieve_schema(question, mode=mode, db_path=database_path, top_k=config.schema.top_k)
@@ -127,89 +146,129 @@ def run_querymind(
             return retrieved.context
 
         state["schema_context"] = call_node("schema_retriever", retrieve)
-        if "Neo4j retrieval is a starter placeholder" in state["schema_context"]:
+        if NEO4J_PLACEHOLDER_MARKER in state["schema_context"]:
             describe("fallback", state["metrics"].get("retrieval", {}).get("fallback_reason")
                      or "Neo4j unavailable; using flat SQLite schema.")
-        feedback = ""
-        while True:
-            attempt = state["repair_count"] + 1
-            state["metrics"]["generation_calls"] += 1
-            try:
-                state["sql"] = call_node("sql_generator", lambda: nodes.generate_sql(
-                    question, state["schema_context"], provider=sql_provider, feedback=feedback or None
-                ), iteration=attempt).strip()
-            except ValueError as exc:
-                refuse(str(exc))
+
+        def generate_and_verify(budget: int) -> tuple[str | None, str]:
+            """Generate -> safety -> syntax -> semantic, repairing up to ``budget`` times.
+
+            Returns ``(None, "")`` once the SQL passes every enabled check, or
+            ``(trigger, reason)`` when the attempt ends in a refusal. Triggers are
+            ``not_answerable``, ``semantic_unanswerable``, ``repairs_exhausted``
+            and ``generator_error`` (the last is never retried).
+            """
+            feedback = ""
+            repairs = 0
+            while True:
+                state["metrics"]["generation_calls"] += 1
+                # Numbering by generation keeps iteration == 1 meaning the run's first generation.
+                attempt = state["metrics"]["generation_calls"]
+                try:
+                    state["sql"] = call_node("sql_generator", lambda: nodes.generate_sql(
+                        question, state["schema_context"], provider=sql_provider, feedback=feedback or None
+                    ), iteration=attempt).strip()
+                except ValueError as exc:
+                    return "generator_error", str(exc)
+                state["sql_history"].append(state["sql"])
+                if state["sql"].upper().startswith(NOT_ANSWERABLE_PREFIX):
+                    state["missing_fields"] = [field.strip() for field in state["sql"].split(":", 1)[1].split(",") if field.strip()]
+                    return "not_answerable", "Required data is missing: " + ", ".join(state["missing_fields"])
+
+                # 1. Safety check (mandatory lexical / policy guard)
+                safety = call_node("safety_verifier", lambda: nodes.check_safety(state["sql"]), iteration=attempt)
+                state["safety_ok"] = bool(safety["ok"])
+                describe("pass" if safety["ok"] else "fail", safety.get("error") or "Read-only guard passed.")
+                failure = "" if safety["ok"] else (safety.get("error") or "Read-only safety verification failed.")
+
+                # 2. Syntax check (SQLite EXPLAIN on protected connection)
+                if safety["ok"] and enable_syntax:
+                    syntax = call_node("syntax_verifier", lambda: nodes.check_syntax(state["sql"], db_path=database_path), iteration=attempt)
+                    state["syntax_ok"] = bool(syntax["ok"])
+                    failure = "" if syntax["ok"] else (syntax.get("error") or "SQLite syntax verification failed.")
+                    describe("pass" if syntax["ok"] else "fail", failure or "SQLite compilation passed.")
+                elif not enable_syntax:
+                    skipped("syntax_verifier", iteration=attempt)
+                state["syntax_error"] = failure
+
+                # 3. Semantic check (if safety and syntax pass)
+                if safety["ok"] and not failure:
+                    if enable_semantic:
+                        semantic = call_node("semantic_verifier", lambda: nodes.verify_semantics(
+                            question, state["sql"], state["schema_context"],
+                            **({"provider": sql_provider, "use_llm": not getattr(sql_provider, "is_mock", False)
+                                and not isinstance(sql_provider, MockProvider)}
+                               if nodes.verify_semantics is verify_semantics else {})
+                        ), iteration=attempt)
+                        placeholder = semantic.get("status") == "placeholder"
+                        state.update(
+                            semantic_ok=bool(semantic["matches_question"] and semantic["answerable"] and not placeholder),
+                            semantic_reason=semantic["reason"],
+                            answerable=bool(semantic["answerable"]),
+                            missing_fields=list(semantic["missing_fields"]),
+                            assumptions=list(semantic["assumptions"]),
+                        )
+                        describe("placeholder" if placeholder else ("pass" if state["semantic_ok"] else "fail"), semantic["reason"])
+
+                        # If missing required data: refuse without burning repairs
+                        if not semantic["answerable"]:
+                            return "semantic_unanswerable", semantic["reason"]
+
+                        # If semantic mismatch: trigger repair
+                        if not semantic["matches_question"]:
+                            failure = semantic["reason"]
+                    else:
+                        state["semantic_reason"] = "Semantic verification disabled for ablation."
+                        skipped("semantic_verifier", iteration=attempt)
+
+                # If all enabled checks passed: query is verified, proceed to optimization/execution
+                if safety["ok"] and not failure:
+                    return None, ""
+
+                # Handle verification failure (safety, syntax, or semantic mismatch)
+                if repairs >= budget:
+                    return "repairs_exhausted", REPAIR_LIMIT_PREFIX + failure
+
+                repairs += 1
+                state["repair_count"] += 1  # total across both attempts (a cost figure)
+                feedback = f"Previous SQL:\n{state['sql']}\n\nVerification failure:\n{failure}"
+                add_trace(
+                    state, "repair", "retry", 0.0,
+                    f"Repair attempt {state['repair_count']}: {failure}",
+                    iteration=state["metrics"]["generation_calls"] + 1,
+                )
+
+        def retry_eligible() -> bool:
+            if not enable_schema_retry or mode != "neo4j" or NEO4J_PLACEHOLDER_MARKER in state["schema_context"]:
+                return False
+            retrieval = state["metrics"].get("retrieval") or {}
+            if retrieval.get("backend") == "flat_fallback":
+                return False
+            # Retrieval already returned every table; a flat retry would resend the same schema.
+            return not str(retrieval.get("fallback_reason") or "").startswith(FULL_SCHEMA_PREFIX)
+
+        trigger, reason = generate_and_verify(config.orchestrator.max_repairs)
+        if trigger is not None:
+            if trigger not in RETRY_TRIGGERS or not retry_eligible():
+                refuse(reason)
                 return _finish(state, nodes, started, provider=sql_provider)
-            state["sql_history"].append(state["sql"])
-            if state["sql"].upper().startswith("NOT_ANSWERABLE:"):
-                state["missing_fields"] = [field.strip() for field in state["sql"].split(":", 1)[1].split(",") if field.strip()]
-                refuse("Required data is missing: " + ", ".join(state["missing_fields"]))
+            first = {"reason": reason, "missing_fields": list(state["missing_fields"]),
+                     "assumptions": list(state["assumptions"]), "schema_context": state["schema_context"]}
+            state["metrics"]["schema_retry"].update(triggered=True, trigger=trigger)
+            add_trace(state, "schema_retry", "retry", 0.0, reason)
+            # Neo4j retrieval metrics stay untouched: they describe the retrieval under evaluation.
+            state["schema_context"] = call_node("schema_retriever", lambda: nodes.retrieve_schema(
+                question, mode="flat", db_path=database_path, top_k=config.schema.top_k))
+            state.update(status="success", answerable=True, semantic_ok=False, syntax_ok=False, safety_ok=False,
+                         syntax_error="", missing_fields=[], assumptions=[], semantic_reason="Not checked.")
+            flat_trigger, flat_reason = generate_and_verify(retry_budget)
+            if flat_trigger is not None:
+                state["metrics"]["schema_retry"]["outcome"] = "refused"
+                state.update(missing_fields=first["missing_fields"] or list(state["missing_fields"]),
+                             assumptions=first["assumptions"], schema_context=first["schema_context"])
+                refuse(first["reason"] + " Flat-schema retry also refused: " + flat_reason)
                 return _finish(state, nodes, started, provider=sql_provider)
-
-            # 1. Safety check (mandatory lexical / policy guard)
-            safety = call_node("safety_verifier", lambda: nodes.check_safety(state["sql"]), iteration=attempt)
-            state["safety_ok"] = bool(safety["ok"])
-            describe("pass" if safety["ok"] else "fail", safety.get("error") or "Read-only guard passed.")
-            failure = "" if safety["ok"] else (safety.get("error") or "Read-only safety verification failed.")
-
-            # 2. Syntax check (SQLite EXPLAIN on protected connection)
-            if safety["ok"] and enable_syntax:
-                syntax = call_node("syntax_verifier", lambda: nodes.check_syntax(state["sql"], db_path=database_path), iteration=attempt)
-                state["syntax_ok"] = bool(syntax["ok"])
-                failure = "" if syntax["ok"] else (syntax.get("error") or "SQLite syntax verification failed.")
-                describe("pass" if syntax["ok"] else "fail", failure or "SQLite compilation passed.")
-            elif not enable_syntax:
-                skipped("syntax_verifier", iteration=attempt)
-            state["syntax_error"] = failure
-
-            # 3. Semantic check (if safety and syntax pass)
-            if safety["ok"] and not failure:
-                if enable_semantic:
-                    semantic = call_node("semantic_verifier", lambda: nodes.verify_semantics(
-                        question, state["sql"], state["schema_context"],
-                        **({"provider": sql_provider, "use_llm": not getattr(sql_provider, "is_mock", False)
-                            and not isinstance(sql_provider, MockProvider)}
-                           if nodes.verify_semantics is verify_semantics else {})
-                    ), iteration=attempt)
-                    placeholder = semantic.get("status") == "placeholder"
-                    state.update(
-                        semantic_ok=bool(semantic["matches_question"] and semantic["answerable"] and not placeholder),
-                        semantic_reason=semantic["reason"],
-                        answerable=bool(semantic["answerable"]),
-                        missing_fields=list(semantic["missing_fields"]),
-                        assumptions=list(semantic["assumptions"]),
-                    )
-                    describe("placeholder" if placeholder else ("pass" if state["semantic_ok"] else "fail"), semantic["reason"])
-
-                    # If missing required data: refuse immediately without burning repairs
-                    if not semantic["answerable"]:
-                        refuse(semantic["reason"])
-                        return _finish(state, nodes, started, provider=sql_provider)
-
-                    # If semantic mismatch: trigger repair
-                    if not semantic["matches_question"]:
-                        failure = semantic["reason"]
-                else:
-                    state["semantic_reason"] = "Semantic verification disabled for ablation."
-                    skipped("semantic_verifier", iteration=attempt)
-
-            # If all enabled checks passed: query is verified, proceed to optimization/execution
-            if safety["ok"] and not failure:
-                break
-
-            # Handle verification failure (safety, syntax, or semantic mismatch)
-            if state["repair_count"] >= config.orchestrator.max_repairs:
-                refuse("SQL verification failed after the configured repair limit: " + failure)
-                return _finish(state, nodes, started, provider=sql_provider)
-
-            state["repair_count"] += 1
-            feedback = f"Previous SQL:\n{state['sql']}\n\nVerification failure:\n{failure}"
-            add_trace(
-                state, "repair", "retry", 0.0,
-                f"Repair attempt {state['repair_count']}: {failure}",
-                iteration=state["repair_count"] + 1,
-            )
+            state["metrics"]["schema_retry"]["outcome"] = "answered"
 
         state["original_sql"] = state["sql"]
         if enable_optimizer and config.orchestrator.max_optimizer_rounds:
@@ -264,11 +323,40 @@ def run_querymind(
     return _finish(state, nodes, started, provider=sql_provider)
 
 
+def _usage_fields(calls_before: int | None, calls_after: int | None,
+                 tokens_before: tuple[int, int] | None, tokens_after: tuple[int, int] | None) -> dict[str, int]:
+    """Per-node model usage for the trace; empty when the node made no measured model call."""
+    if calls_before is None or calls_after is None or calls_after <= calls_before:
+        return {}
+    fields = {"llm_calls": calls_after - calls_before}
+    if tokens_before is not None and tokens_after is not None:
+        fields.update(prompt_tokens=max(0, tokens_after[0] - tokens_before[0]),
+                      completion_tokens=max(0, tokens_after[1] - tokens_before[1]))
+    return fields
+
+
+def summarize_node_usage(trace: list[dict[str, Any]]) -> tuple[dict[str, float], dict[str, dict[str, int]]]:
+    """Total wall time (ms) and model usage per node over one run's trace (R6)."""
+    latency: dict[str, float] = {}
+    tokens: dict[str, dict[str, int]] = {}
+    for event in trace:
+        node = str(event.get("node"))
+        if isinstance(event.get("latency_ms"), (int, float)):
+            latency[node] = round(latency.get(node, 0.0) + float(event["latency_ms"]), 3)
+        if "llm_calls" in event:
+            usage = tokens.setdefault(node, {"llm_calls": 0, "prompt_tokens": 0, "completion_tokens": 0})
+            for key in usage:
+                usage[key] += int(event.get(key) or 0)
+    return latency, tokens
+
+
 def _finish(state: AgentState, nodes: Components, started: float, *, provider: SQLProvider | None = None) -> AgentState:
     """Always produce a response and total timing, including refusal/error paths."""
     response_start = perf_counter()
+    usage: dict[str, int] = {}
     try:
         before = model_call_count(provider) if provider is not None else 0
+        tokens_before = token_usage(provider)
         try:
             state["final_answer"] = nodes.generate_response(
                 state, **({"provider": provider} if nodes.generate_response is generate_response else {})
@@ -279,9 +367,11 @@ def _finish(state: AgentState, nodes: Components, started: float, *, provider: S
                 state["metrics"]["llm_calls"] = None
             elif state["metrics"]["llm_calls"] is not None:
                 state["metrics"]["llm_calls"] += max(0, after - before)
-        add_trace(state, "response_generator", "pass", (perf_counter() - response_start) * 1000)
+            usage = _usage_fields(before, after, tokens_before, token_usage(provider))
+        add_trace(state, "response_generator", "pass", (perf_counter() - response_start) * 1000, **usage)
     except Exception as exc:
         state.update(status="error", error=str(exc), final_answer="QueryMind could not format the response.")
-        add_trace(state, "response_generator", "error", (perf_counter() - response_start) * 1000, str(exc))
+        add_trace(state, "response_generator", "error", (perf_counter() - response_start) * 1000, str(exc), **usage)
     state["metrics"]["total_latency_ms"] = round((perf_counter() - started) * 1000, 3)
+    state["metrics"]["node_latency_ms"], state["metrics"]["node_tokens"] = summarize_node_usage(state.get("trace", []))
     return state
