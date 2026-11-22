@@ -300,6 +300,18 @@ def test_live_provider_url_error_handling(monkeypatch: pytest.MonkeyPatch) -> No
     provider = OpenAICompatibleProvider()
     with pytest.raises(ValueError, match="Provider network error"):
         provider.generate("How many items?", "TABLE items (id INT)")
+    assert provider.provider_errors == ["Provider network error: Connection refused"]
+
+
+def test_live_provider_records_invalid_json_as_provider_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("OPENCODE_API_KEY", "test-key")
+    monkeypatch.setenv("COMPLETION_MODEL", "test-model")
+    monkeypatch.setattr(urllib.request, "urlopen", lambda *a, **k: io.BytesIO(b"<html>bad gateway</html>"))
+
+    provider = OpenAICompatibleProvider()
+    with pytest.raises(ValueError, match="Provider returned invalid response format"):
+        provider.generate("How many items?", "TABLE items (id INT)")
+    assert len(provider.provider_errors) == 1
 
 
 

@@ -69,6 +69,7 @@ def main(argv: list[str] | None = None) -> int:
             completion_tokens=getattr(provider, "completion_tokens", None),
             calls_without_usage=getattr(provider, "calls_without_usage", None),
             run_tag=args.run_tag, arm=args.arm_name, disabled=sorted(set(args.disable)),
+            provider_errors=getattr(provider, "provider_errors", None),
         )
         with args.trace.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(record, ensure_ascii=False, default=str) + "\n")

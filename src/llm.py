@@ -100,6 +100,17 @@ class OpenAICompatibleProvider:
         self.prompt_tokens = 0
         self.completion_tokens = 0
         self.calls_without_usage = 0
+        # Every gateway failure raised, whichever node made the call. Later nodes
+        # (judges, optimizer, answer writer) fall back silently, so evaluation reads
+        # this to retry the record instead of scoring a degraded run (see
+        # src/evaluation/stakeholder.py).
+        self.provider_errors: list[str] = []
+
+    def _fail(self, message: str, exc: BaseException) -> ValueError:
+        self.provider_errors.append(message[:500])
+        error = ValueError(message)
+        error.__cause__ = exc
+        return error
 
     def _resolve_api_key(self) -> str:
         key = (
@@ -190,18 +201,20 @@ class OpenAICompatibleProvider:
                 res_json = json.loads(body)
                 self._record_usage(res_json.get("usage"))
                 choices = res_json.get("choices")
-                if not choices or not isinstance(choices, list):
-                    raise ValueError(f"Provider returned invalid response format: {body[:200]}")
-                message = choices[0].get("message", {})
-                content = message.get("content", "")
-                return (content or "").strip()
         except urllib.error.HTTPError as exc:
             err_body = exc.read().decode("utf-8", errors="replace") if hasattr(exc, "read") else ""
-            raise ValueError(f"Provider HTTP error {exc.code}: {err_body or exc.reason}") from exc
+            raise self._fail(f"Provider HTTP error {exc.code}: {err_body or exc.reason}", exc) from exc
         except urllib.error.URLError as exc:
-            raise ValueError(f"Provider network error: {exc.reason}") from exc
+            raise self._fail(f"Provider network error: {exc.reason}", exc) from exc
         except (TimeoutError, OSError) as exc:
-            raise ValueError(f"Provider connection error: {exc}") from exc
+            raise self._fail(f"Provider connection error: {exc}", exc) from exc
+        except json.JSONDecodeError as exc:
+            raise self._fail(f"Provider returned invalid response format: {exc}", exc) from exc
+        if not choices or not isinstance(choices, list):
+            raise self._fail(f"Provider returned invalid response format: {body[:200]}", ValueError(body[:200]))
+        message = choices[0].get("message", {})
+        content = message.get("content", "")
+        return (content or "").strip()
 
 
 def get_provider(name: str = "mock") -> SQLProvider:

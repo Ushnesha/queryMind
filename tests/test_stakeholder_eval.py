@@ -55,6 +55,23 @@ def test_gateway_failure_is_not_counted_as_refusal():
     assert record["refused"] is False and record["error_type"] == "ProviderError"
 
 
+def test_gateway_failure_in_a_later_node_is_a_provider_error_not_a_success():
+    # The judge, optimizer or answer writer failed and fell back silently: the run
+    # "succeeded" but measured a degraded pipeline, so it must be retried.
+    state = _state()
+    record = to_stakeholder_record("Q1", "question?", state, model="m", provider_name="opencode",
+                                   prompt_tokens=10, completion_tokens=5,
+                                   provider_errors=["Provider network error: timed out"])
+    assert record["error_type"] == "ProviderError" and record["refused"] is False
+    assert record["error"] == "Provider network error: timed out" and record["qm_provider_errors"] == 1
+
+
+def test_no_provider_errors_leaves_the_record_unchanged():
+    record = to_stakeholder_record("Q1", "question?", _state(), model="m", provider_name="opencode",
+                                   prompt_tokens=10, completion_tokens=5, provider_errors=[])
+    assert record["error_type"] is None and record["exec_ok"] is True and record["qm_provider_errors"] == 0
+
+
 def test_failed_result_verification_is_not_an_answer():
     record = _record(_state(status="error", error="Result structure failed verification."))
     assert record["exec_ok"] is False and record["error_type"] == "ResultVerificationFailed"

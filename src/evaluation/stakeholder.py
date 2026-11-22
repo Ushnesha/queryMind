@@ -52,8 +52,16 @@ def to_stakeholder_record(
     run_tag: str | None = None,
     arm: str = "querymind",
     disabled: list[str] | None = None,
+    provider_errors: list[str] | None = None,
 ) -> dict[str, Any]:
-    """Build one stakeholder-format trace record from a final AgentState."""
+    """Build one stakeholder-format trace record from a final AgentState.
+
+    ``provider_errors`` are the gateway failures the provider raised during the
+    run (``OpenAICompatibleProvider.provider_errors``). Any of them makes the
+    record a ProviderError, even if the run finished: the judges, optimizer and
+    answer writer fall back silently, so the run measured a degraded pipeline
+    and must be re-run, not scored.
+    """
     status = state.get("status")
     metrics = state.get("metrics") or {}
     reason = state.get("semantic_reason") or ""
@@ -61,13 +69,21 @@ def to_stakeholder_record(
     sql_history = list(state.get("sql_history") or [])
     first_sql = sql_history[0] if sql_history else ""
 
-    provider_failure = status == "refused" and is_provider_error(reason) or is_provider_error(error)
+    provider_errors = [text for text in (provider_errors or []) if text]
+    provider_failure = (status == "refused" and is_provider_error(reason) or is_provider_error(error)
+                        or bool(provider_errors))
     refused = status == "refused" and not provider_failure
     executed = status == "success" and any(
         step.get("node") == "executor" and step.get("status") == "pass" for step in state.get("trace") or []
     )
     if provider_failure:
-        error_type, error_text = "ProviderError", (reason if status == "refused" else error)
+        if status == "refused" and is_provider_error(reason):
+            error_text = reason
+        elif is_provider_error(error):
+            error_text = error
+        else:
+            error_text = provider_errors[0]
+        error_type = "ProviderError"
     elif status == "error":
         error_type = "ResultVerificationFailed" if "Result structure failed" in error else "PipelineError"
         error_text = error
@@ -108,6 +124,7 @@ def to_stakeholder_record(
         "qm_llm_calls": metrics.get("llm_calls"),
         "qm_generation_calls": metrics.get("generation_calls"),
         "qm_calls_without_usage": calls_without_usage,
+        "qm_provider_errors": len(provider_errors),
         "qm_repair_count": state.get("repair_count", 0),
         "qm_first_sql": first_sql,
         "qm_first_attempt_ok": not any(
