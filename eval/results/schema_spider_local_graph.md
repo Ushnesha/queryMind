@@ -13,8 +13,8 @@ Backend: **Local graph (offline diagnostic)**. Cases: 10. Generation: disabled; 
 | FK-edge precision | 35.7% | 80.0% |
 | Complete required join path | 100.0% | 100.0% |
 | Mean context tokens/estimate | 269.80 | 135.00 |
-| Mean retrieval latency (ms) | 0.76 | 0.87 |
-| Median retrieval latency (ms) | 0.47 | 0.54 |
+| Mean retrieval latency (ms) | 0.29 | 0.35 |
+| Median retrieval latency (ms) | 0.26 | 0.30 |
 | SQL generation success | TBD (generation disabled) | TBD (generation disabled) |
 | Syntax/safety success | TBD (generation disabled) | TBD (generation disabled) |
 | Execution success | TBD (generation disabled) | TBD (generation disabled) |

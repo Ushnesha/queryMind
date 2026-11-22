@@ -214,3 +214,32 @@ def expand_join_paths(
 
     with _session(driver, database) as session:
         return session.execute_read(read)
+
+
+def expand_fk_neighbors(
+    *, driver: Any, schema_id: str, table_names: list[str], database: str | None = None
+) -> list[str]:
+    """Add every table one foreign key away from a seed, in either direction.
+
+    Covers the single-seed case, where pairwise shortest paths add nothing.
+    REFERENCES is matched undirected so a referenced table (``customers``)
+    also finds its referencing tables (``orders``). Only seeds are expanded,
+    by exactly one Table-HAS_COLUMN-Column-REFERENCES-Column hop.
+    """
+    seeds = sorted(set(table_names))
+    if not seeds:
+        return []
+
+    def read(tx: Any) -> list[str]:
+        records = tx.run(
+            "UNWIND $table_names AS seed_name "
+            "MATCH (seed:Table {schema_id: $schema_id, name: seed_name})"
+            "-[:HAS_COLUMN]->(:Column {schema_id: $schema_id})"
+            "-[:REFERENCES]-(other:Column {schema_id: $schema_id}) "
+            "RETURN DISTINCT other.table_name AS neighbor_name ORDER BY neighbor_name",
+            schema_id=schema_id, table_names=seeds,
+        )
+        return sorted(set(seeds).union(record["neighbor_name"] for record in records))
+
+    with _session(driver, database) as session:
+        return session.execute_read(read)

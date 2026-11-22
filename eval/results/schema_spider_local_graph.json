@@ -1,6 +1,6 @@
 {
   "manifest": {
-    "created_at_utc": "2026-11-05T23:01:56.197498+00:00",
+    "created_at_utc": "2026-11-20T23:56:22.247787+00:00",
     "backend": "local_graph",
     "diagnostic": true,
     "live_neo4j_measured": false,
@@ -406,7 +406,7 @@
       "schema_id": "student_transcripts_tracking:0e59af1063e4b0f4e14651e4a6d3790a34b4998788109fd41f774932dfd4fcd7",
       "sqlite_sha256": "5a1f4928a1fd36f6edb31c4f054203b2e2fab6b18e5951c4f5633628f82a8e56",
       "upload": null,
-      "setup_latency_ms": 37.69929218105972,
+      "setup_latency_ms": 1.0578748770058155,
       "included_in_retrieval_timing": false
     },
     {
@@ -414,7 +414,7 @@
       "schema_id": "dog_kennels:bb946ee63fe75498aa2df8d9327bfab0852003ac6a04b3dc11b3d61a7c5e7632",
       "sqlite_sha256": "ea5fbc6cf6aaf500371c5c121c339d9802ba6f5fbecd948a5274c0b487a9f486",
       "upload": null,
-      "setup_latency_ms": 4.001416033133864,
+      "setup_latency_ms": 0.6742081604897976,
       "included_in_retrieval_timing": false
     },
     {
@@ -422,7 +422,7 @@
       "schema_id": "car_1:d00584f3000252d705992cb23cb5b6a4f14f7b6ab0423011ae714ef2ee160d8c",
       "sqlite_sha256": "9d851e396e02997a1de073ae982fe1e4b1769fdffce2fac6e325857a3a938709",
       "upload": null,
-      "setup_latency_ms": 0.6630842108279467,
+      "setup_latency_ms": 0.5050827749073505,
       "included_in_retrieval_timing": false
     },
     {
@@ -430,7 +430,7 @@
       "schema_id": "concert_singer:bdaa6bba8859cab6c5585ac6ad3a2b00ac5342823b0596d6cfbf4fb97b6a4f3a",
       "sqlite_sha256": "4fa1ba5ab4577e895271088b1dc44aa94be88e25a54293317a67584112ef059d",
       "upload": null,
-      "setup_latency_ms": 1.2522500474005938,
+      "setup_latency_ms": 0.4443330690264702,
       "included_in_retrieval_timing": false
     },
     {
@@ -438,7 +438,7 @@
       "schema_id": "cre_Doc_Template_Mgt:b9a48a334b725c2557581c36854f3f3a6dd82c05ce560a5a83f7d18a4fe21004",
       "sqlite_sha256": "9c3fdd03d8795ecde60aae782ce50c4fb1d6c03de1401fcdd6dc177342a53df5",
       "upload": null,
-      "setup_latency_ms": 2.5220420211553574,
+      "setup_latency_ms": 0.42625004425644875,
       "included_in_retrieval_timing": false
     }
   ],
@@ -701,14 +701,14 @@
           },
           "context_characters": 2847,
           "retrieval_latencies_ms": [
-            4.998625023290515,
-            1.38945784419775,
-            1.6639160457998514
+            0.47783367335796356,
+            0.38958434015512466,
+            0.3800000995397568
           ],
           "instrumented_latencies_ms": [
-            4.9867089837789536,
-            1.3749590143561363,
-            1.656083157286048
+            0.47224992886185646,
+            0.3864159807562828,
+            0.37724990397691727
           ],
           "retrieval_samples": [
             {
@@ -909,8 +909,8 @@
               ],
               "backend": "flat",
               "schema_id": "student_transcripts_tracking:0e59af1063e4b0f4e14651e4a6d3790a34b4998788109fd41f774932dfd4fcd7",
-              "latency_ms": 4.998625023290515,
-              "instrumented_latency_ms": 4.9867089837789536
+              "latency_ms": 0.47783367335796356,
+              "instrumented_latency_ms": 0.47224992886185646
             },
             {
               "context": "TABLE Addresses (\n  address_id INTEGER PRIMARY KEY,\n  line_1 VARCHAR(255),\n  line_2 VARCHAR(255),\n  line_3 VARCHAR(255),\n  city VARCHAR(255),\n  zip_postcode VARCHAR(20),\n  state_province_county VARCHAR(255),\n  country VARCHAR(255),\n  other_address_details VARCHAR(255)\n)\n\nTABLE Courses (\n  course_id INTEGER PRIMARY KEY,\n  course_name VARCHAR(255),\n  course_description VARCHAR(255),\n  other_details VARCHAR(255)\n)\n\nTABLE Degree_Programs (\n  degree_program_id INTEGER PRIMARY KEY,\n  department_id INTEGER NOT NULL,\n  degree_summary_name VARCHAR(255),\n  degree_summary_description VARCHAR(255),\n  other_details VARCHAR(255),\n  FOREIGN KEY (department_id) REFERENCES Departments(department_id)\n)\n\nTABLE Departments (\n  department_id INTEGER PRIMARY KEY,\n  department_name VARCHAR(255),\n  department_description VARCHAR(255),\n  other_details VARCHAR(255)\n)\n\nTABLE Sections (\n  section_id INTEGER PRIMARY KEY,\n  course_id INTEGER NOT NULL,\n  section_name VARCHAR(255),\n  section_description VARCHAR(255),\n  other_details VARCHAR(255),\n  FOREIGN KEY (course_id) REFERENCES Courses(course_id)\n)\n\nTABLE Semesters (\n  semester_id INTEGER PRIMARY KEY,\n  semester_name VARCHAR(255),\n  semester_description VARCHAR(255),\n  other_details VARCHAR(255)\n)\n\nTABLE Student_Enrolment (\n  student_enrolment_id INTEGER PRIMARY KEY,\n  degree_program_id INTEGER NOT NULL,\n  semester_id INTEGER NOT NULL,\n  student_id INTEGER NOT NULL,\n  other_details VARCHAR(255),\n  FOREIGN KEY (student_id) REFERENCES Students(student_id),\n  FOREIGN KEY (semester_id) REFERENCES Semesters(semester_id),\n  FOREIGN KEY (degree_program_id) REFERENCES Degree_Programs(degree_program_id)\n)\n\nTABLE Student_Enrolment_Courses (\n  student_course_id INTEGER PRIMARY KEY,\n  course_id INTEGER NOT NULL,\n  student_enrolment_id INTEGER NOT NULL,\n  FOREIGN KEY (student_enrolment_id) REFERENCES Student_Enrolment(student_enrolment_id),\n  FOREIGN KEY (course_id) REFERENCES Courses(course_id)\n)\n\nTABLE Students (\n  student_id INTEGER PRIMARY KEY,\n  current_address_id INTEGER NOT NULL,\n  permanent_address_id INTEGER NOT NULL,\n  first_name VARCHAR(80),\n  middle_name VARCHAR(40),\n  last_name VARCHAR(40),\n  cell_mobile_number VARCHAR(40),\n  email_address VARCHAR(40),\n  ssn VARCHAR(40),\n  date_first_registered DATETIME,\n  date_left DATETIME,\n  other_student_details VARCHAR(255),\n  FOREIGN KEY (permanent_address_id) REFERENCES Addresses(address_id),\n  FOREIGN KEY (current_address_id) REFERENCES Addresses(address_id)\n)\n\nTABLE Transcript_Contents (\n  student_course_id INTEGER NOT NULL,\n  transcript_id INTEGER NOT NULL,\n  FOREIGN KEY (transcript_id) REFERENCES Transcripts(transcript_id),\n  FOREIGN KEY (student_course_id) REFERENCES Student_Enrolment_Courses(student_course_id)\n)\n\nTABLE Transcripts (\n  transcript_id INTEGER PRIMARY KEY,\n  transcript_date DATETIME,\n  other_details VARCHAR(255)\n)",
@@ -1110,8 +1110,8 @@
               ],
               "backend": "flat",
               "schema_id": "student_transcripts_tracking:0e59af1063e4b0f4e14651e4a6d3790a34b4998788109fd41f774932dfd4fcd7",
-              "latency_ms": 1.38945784419775,
-              "instrumented_latency_ms": 1.3749590143561363
+              "latency_ms": 0.38958434015512466,
+              "instrumented_latency_ms": 0.3864159807562828
             },
             {
               "context": "TABLE Addresses (\n  address_id INTEGER PRIMARY KEY,\n  line_1 VARCHAR(255),\n  line_2 VARCHAR(255),\n  line_3 VARCHAR(255),\n  city VARCHAR(255),\n  zip_postcode VARCHAR(20),\n  state_province_county VARCHAR(255),\n  country VARCHAR(255),\n  other_address_details VARCHAR(255)\n)\n\nTABLE Courses (\n  course_id INTEGER PRIMARY KEY,\n  course_name VARCHAR(255),\n  course_description VARCHAR(255),\n  other_details VARCHAR(255)\n)\n\nTABLE Degree_Programs (\n  degree_program_id INTEGER PRIMARY KEY,\n  department_id INTEGER NOT NULL,\n  degree_summary_name VARCHAR(255),\n  degree_summary_description VARCHAR(255),\n  other_details VARCHAR(255),\n  FOREIGN KEY (department_id) REFERENCES Departments(department_id)\n)\n\nTABLE Departments (\n  department_id INTEGER PRIMARY KEY,\n  department_name VARCHAR(255),\n  department_description VARCHAR(255),\n  other_details VARCHAR(255)\n)\n\nTABLE Sections (\n  section_id INTEGER PRIMARY KEY,\n  course_id INTEGER NOT NULL,\n  section_name VARCHAR(255),\n  section_description VARCHAR(255),\n  other_details VARCHAR(255),\n  FOREIGN KEY (course_id) REFERENCES Courses(course_id)\n)\n\nTABLE Semesters (\n  semester_id INTEGER PRIMARY KEY,\n  semester_name VARCHAR(255),\n  semester_description VARCHAR(255),\n  other_details VARCHAR(255)\n)\n\nTABLE Student_Enrolment (\n  student_enrolment_id INTEGER PRIMARY KEY,\n  degree_program_id INTEGER NOT NULL,\n  semester_id INTEGER NOT NULL,\n  student_id INTEGER NOT NULL,\n  other_details VARCHAR(255),\n  FOREIGN KEY (student_id) REFERENCES Students(student_id),\n  FOREIGN KEY (semester_id) REFERENCES Semesters(semester_id),\n  FOREIGN KEY (degree_program_id) REFERENCES Degree_Programs(degree_program_id)\n)\n\nTABLE Student_Enrolment_Courses (\n  student_course_id INTEGER PRIMARY KEY,\n  course_id INTEGER NOT NULL,\n  student_enrolment_id INTEGER NOT NULL,\n  FOREIGN KEY (student_enrolment_id) REFERENCES Student_Enrolment(student_enrolment_id),\n  FOREIGN KEY (course_id) REFERENCES Courses(course_id)\n)\n\nTABLE Students (\n  student_id INTEGER PRIMARY KEY,\n  current_address_id INTEGER NOT NULL,\n  permanent_address_id INTEGER NOT NULL,\n  first_name VARCHAR(80),\n  middle_name VARCHAR(40),\n  last_name VARCHAR(40),\n  cell_mobile_number VARCHAR(40),\n  email_address VARCHAR(40),\n  ssn VARCHAR(40),\n  date_first_registered DATETIME,\n  date_left DATETIME,\n  other_student_details VARCHAR(255),\n  FOREIGN KEY (permanent_address_id) REFERENCES Addresses(address_id),\n  FOREIGN KEY (current_address_id) REFERENCES Addresses(address_id)\n)\n\nTABLE Transcript_Contents (\n  student_course_id INTEGER NOT NULL,\n  transcript_id INTEGER NOT NULL,\n  FOREIGN KEY (transcript_id) REFERENCES Transcripts(transcript_id),\n  FOREIGN KEY (student_course_id) REFERENCES Student_Enrolment_Courses(student_course_id)\n)\n\nTABLE Transcripts (\n  transcript_id INTEGER PRIMARY KEY,\n  transcript_date DATETIME,\n  other_details VARCHAR(255)\n)",
@@ -1311,8 +1311,8 @@
               ],
               "backend": "flat",
               "schema_id": "student_transcripts_tracking:0e59af1063e4b0f4e14651e4a6d3790a34b4998788109fd41f774932dfd4fcd7",
-              "latency_ms": 1.6639160457998514,
-              "instrumented_latency_ms": 1.656083157286048
+              "latency_ms": 0.3800000995397568,
+              "instrumented_latency_ms": 0.37724990397691727
             }
           ],
           "metadata_stable_across_repetitions": true,
@@ -1409,14 +1409,14 @@
           },
           "context_characters": 939,
           "retrieval_latencies_ms": [
-            1.2818749528378248,
-            1.0590001475065947,
-            1.0769169311970472
+            0.5709580145776272,
+            0.47116586938500404,
+            0.4470418207347393
           ],
           "instrumented_latencies_ms": [
-            1.2734581250697374,
-            1.0505421087145805,
-            1.0690840426832438
+            0.5669579841196537,
+            0.4677921533584595,
+            0.4438753239810467
           ],
           "retrieval_samples": [
             {
@@ -1476,8 +1476,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "student_transcripts_tracking:0e59af1063e4b0f4e14651e4a6d3790a34b4998788109fd41f774932dfd4fcd7",
-              "latency_ms": 1.2818749528378248,
-              "instrumented_latency_ms": 1.2734581250697374
+              "latency_ms": 0.5709580145776272,
+              "instrumented_latency_ms": 0.5669579841196537
             },
             {
               "context": "TABLE Degree_Programs (\n  degree_program_id INTEGER PRIMARY KEY,\n  department_id INTEGER NOT NULL,\n  degree_summary_name VARCHAR(255),\n  degree_summary_description VARCHAR(255),\n  other_details VARCHAR(255)\n)\n\nTABLE Student_Enrolment (\n  student_enrolment_id INTEGER PRIMARY KEY,\n  degree_program_id INTEGER NOT NULL,\n  semester_id INTEGER NOT NULL,\n  student_id INTEGER NOT NULL,\n  other_details VARCHAR(255),\n  FOREIGN KEY (student_id) REFERENCES Students(student_id),\n  FOREIGN KEY (degree_program_id) REFERENCES Degree_Programs(degree_program_id)\n)\n\nTABLE Students (\n  student_id INTEGER PRIMARY KEY,\n  current_address_id INTEGER NOT NULL,\n  permanent_address_id INTEGER NOT NULL,\n  first_name VARCHAR(80),\n  middle_name VARCHAR(40),\n  last_name VARCHAR(40),\n  cell_mobile_number VARCHAR(40),\n  email_address VARCHAR(40),\n  ssn VARCHAR(40),\n  date_first_registered DATETIME,\n  date_left DATETIME,\n  other_student_details VARCHAR(255)\n)",
@@ -1536,8 +1536,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "student_transcripts_tracking:0e59af1063e4b0f4e14651e4a6d3790a34b4998788109fd41f774932dfd4fcd7",
-              "latency_ms": 1.0590001475065947,
-              "instrumented_latency_ms": 1.0505421087145805
+              "latency_ms": 0.47116586938500404,
+              "instrumented_latency_ms": 0.4677921533584595
             },
             {
               "context": "TABLE Degree_Programs (\n  degree_program_id INTEGER PRIMARY KEY,\n  department_id INTEGER NOT NULL,\n  degree_summary_name VARCHAR(255),\n  degree_summary_description VARCHAR(255),\n  other_details VARCHAR(255)\n)\n\nTABLE Student_Enrolment (\n  student_enrolment_id INTEGER PRIMARY KEY,\n  degree_program_id INTEGER NOT NULL,\n  semester_id INTEGER NOT NULL,\n  student_id INTEGER NOT NULL,\n  other_details VARCHAR(255),\n  FOREIGN KEY (student_id) REFERENCES Students(student_id),\n  FOREIGN KEY (degree_program_id) REFERENCES Degree_Programs(degree_program_id)\n)\n\nTABLE Students (\n  student_id INTEGER PRIMARY KEY,\n  current_address_id INTEGER NOT NULL,\n  permanent_address_id INTEGER NOT NULL,\n  first_name VARCHAR(80),\n  middle_name VARCHAR(40),\n  last_name VARCHAR(40),\n  cell_mobile_number VARCHAR(40),\n  email_address VARCHAR(40),\n  ssn VARCHAR(40),\n  date_first_registered DATETIME,\n  date_left DATETIME,\n  other_student_details VARCHAR(255)\n)",
@@ -1596,8 +1596,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "student_transcripts_tracking:0e59af1063e4b0f4e14651e4a6d3790a34b4998788109fd41f774932dfd4fcd7",
-              "latency_ms": 1.0769169311970472,
-              "instrumented_latency_ms": 1.0690840426832438
+              "latency_ms": 0.4470418207347393,
+              "instrumented_latency_ms": 0.4438753239810467
             }
           ],
           "metadata_stable_across_repetitions": true,
@@ -1878,14 +1878,14 @@
           },
           "context_characters": 2847,
           "retrieval_latencies_ms": [
-            0.8666252251714468,
-            0.8965828455984592,
-            0.9325840510427952
+            0.48520835116505623,
+            0.4221247509121895,
+            0.39029214531183243
           ],
           "instrumented_latencies_ms": [
-            0.8587080519646406,
-            0.8901248220354319,
-            0.9255839977413416
+            0.48075011000037193,
+            0.41791563853621483,
+            0.38741715252399445
           ],
           "retrieval_samples": [
             {
@@ -2086,8 +2086,8 @@
               ],
               "backend": "flat",
               "schema_id": "student_transcripts_tracking:0e59af1063e4b0f4e14651e4a6d3790a34b4998788109fd41f774932dfd4fcd7",
-              "latency_ms": 0.8666252251714468,
-              "instrumented_latency_ms": 0.8587080519646406
+              "latency_ms": 0.48520835116505623,
+              "instrumented_latency_ms": 0.48075011000037193
             },
             {
               "context": "TABLE Addresses (\n  address_id INTEGER PRIMARY KEY,\n  line_1 VARCHAR(255),\n  line_2 VARCHAR(255),\n  line_3 VARCHAR(255),\n  city VARCHAR(255),\n  zip_postcode VARCHAR(20),\n  state_province_county VARCHAR(255),\n  country VARCHAR(255),\n  other_address_details VARCHAR(255)\n)\n\nTABLE Courses (\n  course_id INTEGER PRIMARY KEY,\n  course_name VARCHAR(255),\n  course_description VARCHAR(255),\n  other_details VARCHAR(255)\n)\n\nTABLE Degree_Programs (\n  degree_program_id INTEGER PRIMARY KEY,\n  department_id INTEGER NOT NULL,\n  degree_summary_name VARCHAR(255),\n  degree_summary_description VARCHAR(255),\n  other_details VARCHAR(255),\n  FOREIGN KEY (department_id) REFERENCES Departments(department_id)\n)\n\nTABLE Departments (\n  department_id INTEGER PRIMARY KEY,\n  department_name VARCHAR(255),\n  department_description VARCHAR(255),\n  other_details VARCHAR(255)\n)\n\nTABLE Sections (\n  section_id INTEGER PRIMARY KEY,\n  course_id INTEGER NOT NULL,\n  section_name VARCHAR(255),\n  section_description VARCHAR(255),\n  other_details VARCHAR(255),\n  FOREIGN KEY (course_id) REFERENCES Courses(course_id)\n)\n\nTABLE Semesters (\n  semester_id INTEGER PRIMARY KEY,\n  semester_name VARCHAR(255),\n  semester_description VARCHAR(255),\n  other_details VARCHAR(255)\n)\n\nTABLE Student_Enrolment (\n  student_enrolment_id INTEGER PRIMARY KEY,\n  degree_program_id INTEGER NOT NULL,\n  semester_id INTEGER NOT NULL,\n  student_id INTEGER NOT NULL,\n  other_details VARCHAR(255),\n  FOREIGN KEY (student_id) REFERENCES Students(student_id),\n  FOREIGN KEY (semester_id) REFERENCES Semesters(semester_id),\n  FOREIGN KEY (degree_program_id) REFERENCES Degree_Programs(degree_program_id)\n)\n\nTABLE Student_Enrolment_Courses (\n  student_course_id INTEGER PRIMARY KEY,\n  course_id INTEGER NOT NULL,\n  student_enrolment_id INTEGER NOT NULL,\n  FOREIGN KEY (student_enrolment_id) REFERENCES Student_Enrolment(student_enrolment_id),\n  FOREIGN KEY (course_id) REFERENCES Courses(course_id)\n)\n\nTABLE Students (\n  student_id INTEGER PRIMARY KEY,\n  current_address_id INTEGER NOT NULL,\n  permanent_address_id INTEGER NOT NULL,\n  first_name VARCHAR(80),\n  middle_name VARCHAR(40),\n  last_name VARCHAR(40),\n  cell_mobile_number VARCHAR(40),\n  email_address VARCHAR(40),\n  ssn VARCHAR(40),\n  date_first_registered DATETIME,\n  date_left DATETIME,\n  other_student_details VARCHAR(255),\n  FOREIGN KEY (permanent_address_id) REFERENCES Addresses(address_id),\n  FOREIGN KEY (current_address_id) REFERENCES Addresses(address_id)\n)\n\nTABLE Transcript_Contents (\n  student_course_id INTEGER NOT NULL,\n  transcript_id INTEGER NOT NULL,\n  FOREIGN KEY (transcript_id) REFERENCES Transcripts(transcript_id),\n  FOREIGN KEY (student_course_id) REFERENCES Student_Enrolment_Courses(student_course_id)\n)\n\nTABLE Transcripts (\n  transcript_id INTEGER PRIMARY KEY,\n  transcript_date DATETIME,\n  other_details VARCHAR(255)\n)",
@@ -2287,8 +2287,8 @@
               ],
               "backend": "flat",
               "schema_id": "student_transcripts_tracking:0e59af1063e4b0f4e14651e4a6d3790a34b4998788109fd41f774932dfd4fcd7",
-              "latency_ms": 0.8965828455984592,
-              "instrumented_latency_ms": 0.8901248220354319
+              "latency_ms": 0.4221247509121895,
+              "instrumented_latency_ms": 0.41791563853621483
             },
             {
               "context": "TABLE Addresses (\n  address_id INTEGER PRIMARY KEY,\n  line_1 VARCHAR(255),\n  line_2 VARCHAR(255),\n  line_3 VARCHAR(255),\n  city VARCHAR(255),\n  zip_postcode VARCHAR(20),\n  state_province_county VARCHAR(255),\n  country VARCHAR(255),\n  other_address_details VARCHAR(255)\n)\n\nTABLE Courses (\n  course_id INTEGER PRIMARY KEY,\n  course_name VARCHAR(255),\n  course_description VARCHAR(255),\n  other_details VARCHAR(255)\n)\n\nTABLE Degree_Programs (\n  degree_program_id INTEGER PRIMARY KEY,\n  department_id INTEGER NOT NULL,\n  degree_summary_name VARCHAR(255),\n  degree_summary_description VARCHAR(255),\n  other_details VARCHAR(255),\n  FOREIGN KEY (department_id) REFERENCES Departments(department_id)\n)\n\nTABLE Departments (\n  department_id INTEGER PRIMARY KEY,\n  department_name VARCHAR(255),\n  department_description VARCHAR(255),\n  other_details VARCHAR(255)\n)\n\nTABLE Sections (\n  section_id INTEGER PRIMARY KEY,\n  course_id INTEGER NOT NULL,\n  section_name VARCHAR(255),\n  section_description VARCHAR(255),\n  other_details VARCHAR(255),\n  FOREIGN KEY (course_id) REFERENCES Courses(course_id)\n)\n\nTABLE Semesters (\n  semester_id INTEGER PRIMARY KEY,\n  semester_name VARCHAR(255),\n  semester_description VARCHAR(255),\n  other_details VARCHAR(255)\n)\n\nTABLE Student_Enrolment (\n  student_enrolment_id INTEGER PRIMARY KEY,\n  degree_program_id INTEGER NOT NULL,\n  semester_id INTEGER NOT NULL,\n  student_id INTEGER NOT NULL,\n  other_details VARCHAR(255),\n  FOREIGN KEY (student_id) REFERENCES Students(student_id),\n  FOREIGN KEY (semester_id) REFERENCES Semesters(semester_id),\n  FOREIGN KEY (degree_program_id) REFERENCES Degree_Programs(degree_program_id)\n)\n\nTABLE Student_Enrolment_Courses (\n  student_course_id INTEGER PRIMARY KEY,\n  course_id INTEGER NOT NULL,\n  student_enrolment_id INTEGER NOT NULL,\n  FOREIGN KEY (student_enrolment_id) REFERENCES Student_Enrolment(student_enrolment_id),\n  FOREIGN KEY (course_id) REFERENCES Courses(course_id)\n)\n\nTABLE Students (\n  student_id INTEGER PRIMARY KEY,\n  current_address_id INTEGER NOT NULL,\n  permanent_address_id INTEGER NOT NULL,\n  first_name VARCHAR(80),\n  middle_name VARCHAR(40),\n  last_name VARCHAR(40),\n  cell_mobile_number VARCHAR(40),\n  email_address VARCHAR(40),\n  ssn VARCHAR(40),\n  date_first_registered DATETIME,\n  date_left DATETIME,\n  other_student_details VARCHAR(255),\n  FOREIGN KEY (permanent_address_id) REFERENCES Addresses(address_id),\n  FOREIGN KEY (current_address_id) REFERENCES Addresses(address_id)\n)\n\nTABLE Transcript_Contents (\n  student_course_id INTEGER NOT NULL,\n  transcript_id INTEGER NOT NULL,\n  FOREIGN KEY (transcript_id) REFERENCES Transcripts(transcript_id),\n  FOREIGN KEY (student_course_id) REFERENCES Student_Enrolment_Courses(student_course_id)\n)\n\nTABLE Transcripts (\n  transcript_id INTEGER PRIMARY KEY,\n  transcript_date DATETIME,\n  other_details VARCHAR(255)\n)",
@@ -2488,8 +2488,8 @@
               ],
               "backend": "flat",
               "schema_id": "student_transcripts_tracking:0e59af1063e4b0f4e14651e4a6d3790a34b4998788109fd41f774932dfd4fcd7",
-              "latency_ms": 0.9325840510427952,
-              "instrumented_latency_ms": 0.9255839977413416
+              "latency_ms": 0.39029214531183243,
+              "instrumented_latency_ms": 0.38741715252399445
             }
           ],
           "metadata_stable_across_repetitions": true,
@@ -2561,14 +2561,14 @@
           },
           "context_characters": 437,
           "retrieval_latencies_ms": [
-            0.9630420245230198,
-            6.404084153473377,
-            1.2132080737501383
+            0.5916249938309193,
+            0.4655839875340462,
+            0.44579245150089264
           ],
           "instrumented_latencies_ms": [
-            0.9561250917613506,
-            6.392459152266383,
-            1.205249922350049
+            0.5865832790732384,
+            0.46174973249435425,
+            0.4424159415066242
           ],
           "retrieval_samples": [
             {
@@ -2603,8 +2603,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "student_transcripts_tracking:0e59af1063e4b0f4e14651e4a6d3790a34b4998788109fd41f774932dfd4fcd7",
-              "latency_ms": 0.9630420245230198,
-              "instrumented_latency_ms": 0.9561250917613506
+              "latency_ms": 0.5916249938309193,
+              "instrumented_latency_ms": 0.5865832790732384
             },
             {
               "context": "TABLE Degree_Programs (\n  degree_program_id INTEGER PRIMARY KEY,\n  department_id INTEGER NOT NULL,\n  degree_summary_name VARCHAR(255),\n  degree_summary_description VARCHAR(255),\n  other_details VARCHAR(255),\n  FOREIGN KEY (department_id) REFERENCES Departments(department_id)\n)\n\nTABLE Departments (\n  department_id INTEGER PRIMARY KEY,\n  department_name VARCHAR(255),\n  department_description VARCHAR(255),\n  other_details VARCHAR(255)\n)",
@@ -2638,8 +2638,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "student_transcripts_tracking:0e59af1063e4b0f4e14651e4a6d3790a34b4998788109fd41f774932dfd4fcd7",
-              "latency_ms": 6.404084153473377,
-              "instrumented_latency_ms": 6.392459152266383
+              "latency_ms": 0.4655839875340462,
+              "instrumented_latency_ms": 0.46174973249435425
             },
             {
               "context": "TABLE Degree_Programs (\n  degree_program_id INTEGER PRIMARY KEY,\n  department_id INTEGER NOT NULL,\n  degree_summary_name VARCHAR(255),\n  degree_summary_description VARCHAR(255),\n  other_details VARCHAR(255),\n  FOREIGN KEY (department_id) REFERENCES Departments(department_id)\n)\n\nTABLE Departments (\n  department_id INTEGER PRIMARY KEY,\n  department_name VARCHAR(255),\n  department_description VARCHAR(255),\n  other_details VARCHAR(255)\n)",
@@ -2673,8 +2673,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "student_transcripts_tracking:0e59af1063e4b0f4e14651e4a6d3790a34b4998788109fd41f774932dfd4fcd7",
-              "latency_ms": 1.2132080737501383,
-              "instrumented_latency_ms": 1.205249922350049
+              "latency_ms": 0.44579245150089264,
+              "instrumented_latency_ms": 0.4424159415066242
             }
           ],
           "metadata_stable_across_repetitions": true,
@@ -2910,14 +2910,14 @@
           },
           "context_characters": 2199,
           "retrieval_latencies_ms": [
-            0.7725420873612165,
-            0.6870839279145002,
-            0.6792501080781221
+            0.3648330457508564,
+            0.3308751620352268,
+            0.3304160200059414
           ],
           "instrumented_latencies_ms": [
-            0.7671660277992487,
-            0.6817919202148914,
-            0.6748340092599392
+            0.36070821806788445,
+            0.32799970358610153,
+            0.3277081996202469
           ],
           "retrieval_samples": [
             {
@@ -3064,8 +3064,8 @@
               ],
               "backend": "flat",
               "schema_id": "dog_kennels:bb946ee63fe75498aa2df8d9327bfab0852003ac6a04b3dc11b3d61a7c5e7632",
-              "latency_ms": 0.7725420873612165,
-              "instrumented_latency_ms": 0.7671660277992487
+              "latency_ms": 0.3648330457508564,
+              "instrumented_latency_ms": 0.36070821806788445
             },
             {
               "context": "TABLE Breeds (\n  breed_code VARCHAR(10) PRIMARY KEY,\n  breed_name VARCHAR(80)\n)\n\nUNIQUE INDEX sqlite_autoindex_Breeds_1 ON Breeds (breed_code)\n\nTABLE Charges (\n  charge_id INTEGER PRIMARY KEY,\n  charge_type VARCHAR(10),\n  charge_amount DECIMAL(19,4)\n)\n\nTABLE Dogs (\n  dog_id INTEGER PRIMARY KEY,\n  owner_id INTEGER NOT NULL,\n  abandoned_yn VARCHAR(1),\n  breed_code VARCHAR(10) NOT NULL,\n  size_code VARCHAR(10) NOT NULL,\n  name VARCHAR(50),\n  age VARCHAR(20),\n  date_of_birth DATETIME,\n  gender VARCHAR(1),\n  weight VARCHAR(20),\n  date_arrived DATETIME,\n  date_adopted DATETIME,\n  date_departed DATETIME,\n  FOREIGN KEY (owner_id) REFERENCES Owners(owner_id),\n  FOREIGN KEY (owner_id) REFERENCES Owners(owner_id),\n  FOREIGN KEY (size_code) REFERENCES Sizes(size_code),\n  FOREIGN KEY (breed_code) REFERENCES Breeds(breed_code)\n)\n\nTABLE Owners (\n  owner_id INTEGER PRIMARY KEY,\n  first_name VARCHAR(50),\n  last_name VARCHAR(50),\n  street VARCHAR(50),\n  city VARCHAR(50),\n  state VARCHAR(20),\n  zip_code VARCHAR(20),\n  email_address VARCHAR(50),\n  home_phone VARCHAR(20),\n  cell_number VARCHAR(20)\n)\n\nTABLE Professionals (\n  professional_id INTEGER PRIMARY KEY,\n  role_code VARCHAR(10) NOT NULL,\n  first_name VARCHAR(50),\n  street VARCHAR(50),\n  city VARCHAR(50),\n  state VARCHAR(20),\n  zip_code VARCHAR(20),\n  last_name VARCHAR(50),\n  email_address VARCHAR(50),\n  home_phone VARCHAR(20),\n  cell_number VARCHAR(20)\n)\n\nTABLE Sizes (\n  size_code VARCHAR(10) PRIMARY KEY,\n  size_description VARCHAR(80)\n)\n\nUNIQUE INDEX sqlite_autoindex_Sizes_1 ON Sizes (size_code)\n\nTABLE Treatment_Types (\n  treatment_type_code VARCHAR(10) PRIMARY KEY,\n  treatment_type_description VARCHAR(80)\n)\n\nUNIQUE INDEX sqlite_autoindex_Treatment_Types_1 ON Treatment_Types (treatment_type_code)\n\nTABLE Treatments (\n  treatment_id INTEGER PRIMARY KEY,\n  dog_id INTEGER NOT NULL,\n  professional_id INTEGER NOT NULL,\n  treatment_type_code VARCHAR(10) NOT NULL,\n  date_of_treatment DATETIME,\n  cost_of_treatment DECIMAL(19,4),\n  FOREIGN KEY (dog_id) REFERENCES Dogs(dog_id),\n  FOREIGN KEY (professional_id) REFERENCES Professionals(professional_id),\n  FOREIGN KEY (treatment_type_code) REFERENCES Treatment_Types(treatment_type_code)\n)",
@@ -3211,8 +3211,8 @@
               ],
               "backend": "flat",
               "schema_id": "dog_kennels:bb946ee63fe75498aa2df8d9327bfab0852003ac6a04b3dc11b3d61a7c5e7632",
-              "latency_ms": 0.6870839279145002,
-              "instrumented_latency_ms": 0.6817919202148914
+              "latency_ms": 0.3308751620352268,
+              "instrumented_latency_ms": 0.32799970358610153
             },
             {
               "context": "TABLE Breeds (\n  breed_code VARCHAR(10) PRIMARY KEY,\n  breed_name VARCHAR(80)\n)\n\nUNIQUE INDEX sqlite_autoindex_Breeds_1 ON Breeds (breed_code)\n\nTABLE Charges (\n  charge_id INTEGER PRIMARY KEY,\n  charge_type VARCHAR(10),\n  charge_amount DECIMAL(19,4)\n)\n\nTABLE Dogs (\n  dog_id INTEGER PRIMARY KEY,\n  owner_id INTEGER NOT NULL,\n  abandoned_yn VARCHAR(1),\n  breed_code VARCHAR(10) NOT NULL,\n  size_code VARCHAR(10) NOT NULL,\n  name VARCHAR(50),\n  age VARCHAR(20),\n  date_of_birth DATETIME,\n  gender VARCHAR(1),\n  weight VARCHAR(20),\n  date_arrived DATETIME,\n  date_adopted DATETIME,\n  date_departed DATETIME,\n  FOREIGN KEY (owner_id) REFERENCES Owners(owner_id),\n  FOREIGN KEY (owner_id) REFERENCES Owners(owner_id),\n  FOREIGN KEY (size_code) REFERENCES Sizes(size_code),\n  FOREIGN KEY (breed_code) REFERENCES Breeds(breed_code)\n)\n\nTABLE Owners (\n  owner_id INTEGER PRIMARY KEY,\n  first_name VARCHAR(50),\n  last_name VARCHAR(50),\n  street VARCHAR(50),\n  city VARCHAR(50),\n  state VARCHAR(20),\n  zip_code VARCHAR(20),\n  email_address VARCHAR(50),\n  home_phone VARCHAR(20),\n  cell_number VARCHAR(20)\n)\n\nTABLE Professionals (\n  professional_id INTEGER PRIMARY KEY,\n  role_code VARCHAR(10) NOT NULL,\n  first_name VARCHAR(50),\n  street VARCHAR(50),\n  city VARCHAR(50),\n  state VARCHAR(20),\n  zip_code VARCHAR(20),\n  last_name VARCHAR(50),\n  email_address VARCHAR(50),\n  home_phone VARCHAR(20),\n  cell_number VARCHAR(20)\n)\n\nTABLE Sizes (\n  size_code VARCHAR(10) PRIMARY KEY,\n  size_description VARCHAR(80)\n)\n\nUNIQUE INDEX sqlite_autoindex_Sizes_1 ON Sizes (size_code)\n\nTABLE Treatment_Types (\n  treatment_type_code VARCHAR(10) PRIMARY KEY,\n  treatment_type_description VARCHAR(80)\n)\n\nUNIQUE INDEX sqlite_autoindex_Treatment_Types_1 ON Treatment_Types (treatment_type_code)\n\nTABLE Treatments (\n  treatment_id INTEGER PRIMARY KEY,\n  dog_id INTEGER NOT NULL,\n  professional_id INTEGER NOT NULL,\n  treatment_type_code VARCHAR(10) NOT NULL,\n  date_of_treatment DATETIME,\n  cost_of_treatment DECIMAL(19,4),\n  FOREIGN KEY (dog_id) REFERENCES Dogs(dog_id),\n  FOREIGN KEY (professional_id) REFERENCES Professionals(professional_id),\n  FOREIGN KEY (treatment_type_code) REFERENCES Treatment_Types(treatment_type_code)\n)",
@@ -3358,8 +3358,8 @@
               ],
               "backend": "flat",
               "schema_id": "dog_kennels:bb946ee63fe75498aa2df8d9327bfab0852003ac6a04b3dc11b3d61a7c5e7632",
-              "latency_ms": 0.6792501080781221,
-              "instrumented_latency_ms": 0.6748340092599392
+              "latency_ms": 0.3304160200059414,
+              "instrumented_latency_ms": 0.3277081996202469
             }
           ],
           "metadata_stable_across_repetitions": true,
@@ -3488,14 +3488,14 @@
           },
           "context_characters": 1296,
           "retrieval_latencies_ms": [
-            0.8233340922743082,
-            0.7897499017417431,
-            0.7954169996082783
+            0.41858432814478874,
+            0.41562505066394806,
+            0.4353751428425312
           ],
           "instrumented_latencies_ms": [
-            0.8177920244634151,
-            0.7823749911040068,
-            0.7901669014245272
+            0.4154578782618046,
+            0.41058287024497986,
+            0.43179187923669815
           ],
           "retrieval_samples": [
             {
@@ -3587,8 +3587,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "dog_kennels:bb946ee63fe75498aa2df8d9327bfab0852003ac6a04b3dc11b3d61a7c5e7632",
-              "latency_ms": 0.8233340922743082,
-              "instrumented_latency_ms": 0.8177920244634151
+              "latency_ms": 0.41858432814478874,
+              "instrumented_latency_ms": 0.4154578782618046
             },
             {
               "context": "TABLE Dogs (\n  dog_id INTEGER PRIMARY KEY,\n  owner_id INTEGER NOT NULL,\n  abandoned_yn VARCHAR(1),\n  breed_code VARCHAR(10) NOT NULL,\n  size_code VARCHAR(10) NOT NULL,\n  name VARCHAR(50),\n  age VARCHAR(20),\n  date_of_birth DATETIME,\n  gender VARCHAR(1),\n  weight VARCHAR(20),\n  date_arrived DATETIME,\n  date_adopted DATETIME,\n  date_departed DATETIME,\n  FOREIGN KEY (owner_id) REFERENCES Owners(owner_id),\n  FOREIGN KEY (owner_id) REFERENCES Owners(owner_id)\n)\n\nTABLE Owners (\n  owner_id INTEGER PRIMARY KEY,\n  first_name VARCHAR(50),\n  last_name VARCHAR(50),\n  street VARCHAR(50),\n  city VARCHAR(50),\n  state VARCHAR(20),\n  zip_code VARCHAR(20),\n  email_address VARCHAR(50),\n  home_phone VARCHAR(20),\n  cell_number VARCHAR(20)\n)\n\nTABLE Treatment_Types (\n  treatment_type_code VARCHAR(10) PRIMARY KEY,\n  treatment_type_description VARCHAR(80)\n)\n\nUNIQUE INDEX sqlite_autoindex_Treatment_Types_1 ON Treatment_Types (treatment_type_code)\n\nTABLE Treatments (\n  treatment_id INTEGER PRIMARY KEY,\n  dog_id INTEGER NOT NULL,\n  professional_id INTEGER NOT NULL,\n  treatment_type_code VARCHAR(10) NOT NULL,\n  date_of_treatment DATETIME,\n  cost_of_treatment DECIMAL(19,4),\n  FOREIGN KEY (dog_id) REFERENCES Dogs(dog_id),\n  FOREIGN KEY (treatment_type_code) REFERENCES Treatment_Types(treatment_type_code)\n)",
@@ -3679,8 +3679,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "dog_kennels:bb946ee63fe75498aa2df8d9327bfab0852003ac6a04b3dc11b3d61a7c5e7632",
-              "latency_ms": 0.7897499017417431,
-              "instrumented_latency_ms": 0.7823749911040068
+              "latency_ms": 0.41562505066394806,
+              "instrumented_latency_ms": 0.41058287024497986
             },
             {
               "context": "TABLE Dogs (\n  dog_id INTEGER PRIMARY KEY,\n  owner_id INTEGER NOT NULL,\n  abandoned_yn VARCHAR(1),\n  breed_code VARCHAR(10) NOT NULL,\n  size_code VARCHAR(10) NOT NULL,\n  name VARCHAR(50),\n  age VARCHAR(20),\n  date_of_birth DATETIME,\n  gender VARCHAR(1),\n  weight VARCHAR(20),\n  date_arrived DATETIME,\n  date_adopted DATETIME,\n  date_departed DATETIME,\n  FOREIGN KEY (owner_id) REFERENCES Owners(owner_id),\n  FOREIGN KEY (owner_id) REFERENCES Owners(owner_id)\n)\n\nTABLE Owners (\n  owner_id INTEGER PRIMARY KEY,\n  first_name VARCHAR(50),\n  last_name VARCHAR(50),\n  street VARCHAR(50),\n  city VARCHAR(50),\n  state VARCHAR(20),\n  zip_code VARCHAR(20),\n  email_address VARCHAR(50),\n  home_phone VARCHAR(20),\n  cell_number VARCHAR(20)\n)\n\nTABLE Treatment_Types (\n  treatment_type_code VARCHAR(10) PRIMARY KEY,\n  treatment_type_description VARCHAR(80)\n)\n\nUNIQUE INDEX sqlite_autoindex_Treatment_Types_1 ON Treatment_Types (treatment_type_code)\n\nTABLE Treatments (\n  treatment_id INTEGER PRIMARY KEY,\n  dog_id INTEGER NOT NULL,\n  professional_id INTEGER NOT NULL,\n  treatment_type_code VARCHAR(10) NOT NULL,\n  date_of_treatment DATETIME,\n  cost_of_treatment DECIMAL(19,4),\n  FOREIGN KEY (dog_id) REFERENCES Dogs(dog_id),\n  FOREIGN KEY (treatment_type_code) REFERENCES Treatment_Types(treatment_type_code)\n)",
@@ -3771,8 +3771,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "dog_kennels:bb946ee63fe75498aa2df8d9327bfab0852003ac6a04b3dc11b3d61a7c5e7632",
-              "latency_ms": 0.7954169996082783,
-              "instrumented_latency_ms": 0.7901669014245272
+              "latency_ms": 0.4353751428425312,
+              "instrumented_latency_ms": 0.43179187923669815
             }
           ],
           "metadata_stable_across_repetitions": true,
@@ -4000,14 +4000,14 @@
           },
           "context_characters": 2199,
           "retrieval_latencies_ms": [
-            0.648832879960537,
-            0.6275000050663948,
-            0.7265831809490919
+            0.3420840948820114,
+            0.33079180866479874,
+            0.32899994403123856
           ],
           "instrumented_latencies_ms": [
-            0.6441669538617134,
-            0.6230829749256372,
-            0.7207088638097048
+            0.339374877512455,
+            0.32845931127667427,
+            0.3266250714659691
           ],
           "retrieval_samples": [
             {
@@ -4154,8 +4154,8 @@
               ],
               "backend": "flat",
               "schema_id": "dog_kennels:bb946ee63fe75498aa2df8d9327bfab0852003ac6a04b3dc11b3d61a7c5e7632",
-              "latency_ms": 0.648832879960537,
-              "instrumented_latency_ms": 0.6441669538617134
+              "latency_ms": 0.3420840948820114,
+              "instrumented_latency_ms": 0.339374877512455
             },
             {
               "context": "TABLE Breeds (\n  breed_code VARCHAR(10) PRIMARY KEY,\n  breed_name VARCHAR(80)\n)\n\nUNIQUE INDEX sqlite_autoindex_Breeds_1 ON Breeds (breed_code)\n\nTABLE Charges (\n  charge_id INTEGER PRIMARY KEY,\n  charge_type VARCHAR(10),\n  charge_amount DECIMAL(19,4)\n)\n\nTABLE Dogs (\n  dog_id INTEGER PRIMARY KEY,\n  owner_id INTEGER NOT NULL,\n  abandoned_yn VARCHAR(1),\n  breed_code VARCHAR(10) NOT NULL,\n  size_code VARCHAR(10) NOT NULL,\n  name VARCHAR(50),\n  age VARCHAR(20),\n  date_of_birth DATETIME,\n  gender VARCHAR(1),\n  weight VARCHAR(20),\n  date_arrived DATETIME,\n  date_adopted DATETIME,\n  date_departed DATETIME,\n  FOREIGN KEY (owner_id) REFERENCES Owners(owner_id),\n  FOREIGN KEY (owner_id) REFERENCES Owners(owner_id),\n  FOREIGN KEY (size_code) REFERENCES Sizes(size_code),\n  FOREIGN KEY (breed_code) REFERENCES Breeds(breed_code)\n)\n\nTABLE Owners (\n  owner_id INTEGER PRIMARY KEY,\n  first_name VARCHAR(50),\n  last_name VARCHAR(50),\n  street VARCHAR(50),\n  city VARCHAR(50),\n  state VARCHAR(20),\n  zip_code VARCHAR(20),\n  email_address VARCHAR(50),\n  home_phone VARCHAR(20),\n  cell_number VARCHAR(20)\n)\n\nTABLE Professionals (\n  professional_id INTEGER PRIMARY KEY,\n  role_code VARCHAR(10) NOT NULL,\n  first_name VARCHAR(50),\n  street VARCHAR(50),\n  city VARCHAR(50),\n  state VARCHAR(20),\n  zip_code VARCHAR(20),\n  last_name VARCHAR(50),\n  email_address VARCHAR(50),\n  home_phone VARCHAR(20),\n  cell_number VARCHAR(20)\n)\n\nTABLE Sizes (\n  size_code VARCHAR(10) PRIMARY KEY,\n  size_description VARCHAR(80)\n)\n\nUNIQUE INDEX sqlite_autoindex_Sizes_1 ON Sizes (size_code)\n\nTABLE Treatment_Types (\n  treatment_type_code VARCHAR(10) PRIMARY KEY,\n  treatment_type_description VARCHAR(80)\n)\n\nUNIQUE INDEX sqlite_autoindex_Treatment_Types_1 ON Treatment_Types (treatment_type_code)\n\nTABLE Treatments (\n  treatment_id INTEGER PRIMARY KEY,\n  dog_id INTEGER NOT NULL,\n  professional_id INTEGER NOT NULL,\n  treatment_type_code VARCHAR(10) NOT NULL,\n  date_of_treatment DATETIME,\n  cost_of_treatment DECIMAL(19,4),\n  FOREIGN KEY (dog_id) REFERENCES Dogs(dog_id),\n  FOREIGN KEY (professional_id) REFERENCES Professionals(professional_id),\n  FOREIGN KEY (treatment_type_code) REFERENCES Treatment_Types(treatment_type_code)\n)",
@@ -4301,8 +4301,8 @@
               ],
               "backend": "flat",
               "schema_id": "dog_kennels:bb946ee63fe75498aa2df8d9327bfab0852003ac6a04b3dc11b3d61a7c5e7632",
-              "latency_ms": 0.6275000050663948,
-              "instrumented_latency_ms": 0.6230829749256372
+              "latency_ms": 0.33079180866479874,
+              "instrumented_latency_ms": 0.32845931127667427
             },
             {
               "context": "TABLE Breeds (\n  breed_code VARCHAR(10) PRIMARY KEY,\n  breed_name VARCHAR(80)\n)\n\nUNIQUE INDEX sqlite_autoindex_Breeds_1 ON Breeds (breed_code)\n\nTABLE Charges (\n  charge_id INTEGER PRIMARY KEY,\n  charge_type VARCHAR(10),\n  charge_amount DECIMAL(19,4)\n)\n\nTABLE Dogs (\n  dog_id INTEGER PRIMARY KEY,\n  owner_id INTEGER NOT NULL,\n  abandoned_yn VARCHAR(1),\n  breed_code VARCHAR(10) NOT NULL,\n  size_code VARCHAR(10) NOT NULL,\n  name VARCHAR(50),\n  age VARCHAR(20),\n  date_of_birth DATETIME,\n  gender VARCHAR(1),\n  weight VARCHAR(20),\n  date_arrived DATETIME,\n  date_adopted DATETIME,\n  date_departed DATETIME,\n  FOREIGN KEY (owner_id) REFERENCES Owners(owner_id),\n  FOREIGN KEY (owner_id) REFERENCES Owners(owner_id),\n  FOREIGN KEY (size_code) REFERENCES Sizes(size_code),\n  FOREIGN KEY (breed_code) REFERENCES Breeds(breed_code)\n)\n\nTABLE Owners (\n  owner_id INTEGER PRIMARY KEY,\n  first_name VARCHAR(50),\n  last_name VARCHAR(50),\n  street VARCHAR(50),\n  city VARCHAR(50),\n  state VARCHAR(20),\n  zip_code VARCHAR(20),\n  email_address VARCHAR(50),\n  home_phone VARCHAR(20),\n  cell_number VARCHAR(20)\n)\n\nTABLE Professionals (\n  professional_id INTEGER PRIMARY KEY,\n  role_code VARCHAR(10) NOT NULL,\n  first_name VARCHAR(50),\n  street VARCHAR(50),\n  city VARCHAR(50),\n  state VARCHAR(20),\n  zip_code VARCHAR(20),\n  last_name VARCHAR(50),\n  email_address VARCHAR(50),\n  home_phone VARCHAR(20),\n  cell_number VARCHAR(20)\n)\n\nTABLE Sizes (\n  size_code VARCHAR(10) PRIMARY KEY,\n  size_description VARCHAR(80)\n)\n\nUNIQUE INDEX sqlite_autoindex_Sizes_1 ON Sizes (size_code)\n\nTABLE Treatment_Types (\n  treatment_type_code VARCHAR(10) PRIMARY KEY,\n  treatment_type_description VARCHAR(80)\n)\n\nUNIQUE INDEX sqlite_autoindex_Treatment_Types_1 ON Treatment_Types (treatment_type_code)\n\nTABLE Treatments (\n  treatment_id INTEGER PRIMARY KEY,\n  dog_id INTEGER NOT NULL,\n  professional_id INTEGER NOT NULL,\n  treatment_type_code VARCHAR(10) NOT NULL,\n  date_of_treatment DATETIME,\n  cost_of_treatment DECIMAL(19,4),\n  FOREIGN KEY (dog_id) REFERENCES Dogs(dog_id),\n  FOREIGN KEY (professional_id) REFERENCES Professionals(professional_id),\n  FOREIGN KEY (treatment_type_code) REFERENCES Treatment_Types(treatment_type_code)\n)",
@@ -4448,8 +4448,8 @@
               ],
               "backend": "flat",
               "schema_id": "dog_kennels:bb946ee63fe75498aa2df8d9327bfab0852003ac6a04b3dc11b3d61a7c5e7632",
-              "latency_ms": 0.7265831809490919,
-              "instrumented_latency_ms": 0.7207088638097048
+              "latency_ms": 0.32899994403123856,
+              "instrumented_latency_ms": 0.3266250714659691
             }
           ],
           "metadata_stable_across_repetitions": true,
@@ -4587,14 +4587,14 @@
           },
           "context_characters": 1398,
           "retrieval_latencies_ms": [
-            0.7816660217940807,
-            0.8913751225918531,
-            1.062791096046567
+            0.4488332197070122,
+            0.39725005626678467,
+            0.3903750330209732
           ],
           "instrumented_latencies_ms": [
-            0.7762499153614044,
-            0.8810830768197775,
-            1.0564159601926804
+            0.44512515887618065,
+            0.39445795118808746,
+            0.3877501003444195
           ],
           "retrieval_samples": [
             {
@@ -4695,8 +4695,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "dog_kennels:bb946ee63fe75498aa2df8d9327bfab0852003ac6a04b3dc11b3d61a7c5e7632",
-              "latency_ms": 0.7816660217940807,
-              "instrumented_latency_ms": 0.7762499153614044
+              "latency_ms": 0.4488332197070122,
+              "instrumented_latency_ms": 0.44512515887618065
             },
             {
               "context": "TABLE Dogs (\n  dog_id INTEGER PRIMARY KEY,\n  owner_id INTEGER NOT NULL,\n  abandoned_yn VARCHAR(1),\n  breed_code VARCHAR(10) NOT NULL,\n  size_code VARCHAR(10) NOT NULL,\n  name VARCHAR(50),\n  age VARCHAR(20),\n  date_of_birth DATETIME,\n  gender VARCHAR(1),\n  weight VARCHAR(20),\n  date_arrived DATETIME,\n  date_adopted DATETIME,\n  date_departed DATETIME,\n  FOREIGN KEY (owner_id) REFERENCES Owners(owner_id),\n  FOREIGN KEY (owner_id) REFERENCES Owners(owner_id)\n)\n\nTABLE Owners (\n  owner_id INTEGER PRIMARY KEY,\n  first_name VARCHAR(50),\n  last_name VARCHAR(50),\n  street VARCHAR(50),\n  city VARCHAR(50),\n  state VARCHAR(20),\n  zip_code VARCHAR(20),\n  email_address VARCHAR(50),\n  home_phone VARCHAR(20),\n  cell_number VARCHAR(20)\n)\n\nTABLE Professionals (\n  professional_id INTEGER PRIMARY KEY,\n  role_code VARCHAR(10) NOT NULL,\n  first_name VARCHAR(50),\n  street VARCHAR(50),\n  city VARCHAR(50),\n  state VARCHAR(20),\n  zip_code VARCHAR(20),\n  last_name VARCHAR(50),\n  email_address VARCHAR(50),\n  home_phone VARCHAR(20),\n  cell_number VARCHAR(20)\n)\n\nTABLE Treatments (\n  treatment_id INTEGER PRIMARY KEY,\n  dog_id INTEGER NOT NULL,\n  professional_id INTEGER NOT NULL,\n  treatment_type_code VARCHAR(10) NOT NULL,\n  date_of_treatment DATETIME,\n  cost_of_treatment DECIMAL(19,4),\n  FOREIGN KEY (dog_id) REFERENCES Dogs(dog_id),\n  FOREIGN KEY (professional_id) REFERENCES Professionals(professional_id)\n)",
@@ -4796,8 +4796,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "dog_kennels:bb946ee63fe75498aa2df8d9327bfab0852003ac6a04b3dc11b3d61a7c5e7632",
-              "latency_ms": 0.8913751225918531,
-              "instrumented_latency_ms": 0.8810830768197775
+              "latency_ms": 0.39725005626678467,
+              "instrumented_latency_ms": 0.39445795118808746
             },
             {
               "context": "TABLE Dogs (\n  dog_id INTEGER PRIMARY KEY,\n  owner_id INTEGER NOT NULL,\n  abandoned_yn VARCHAR(1),\n  breed_code VARCHAR(10) NOT NULL,\n  size_code VARCHAR(10) NOT NULL,\n  name VARCHAR(50),\n  age VARCHAR(20),\n  date_of_birth DATETIME,\n  gender VARCHAR(1),\n  weight VARCHAR(20),\n  date_arrived DATETIME,\n  date_adopted DATETIME,\n  date_departed DATETIME,\n  FOREIGN KEY (owner_id) REFERENCES Owners(owner_id),\n  FOREIGN KEY (owner_id) REFERENCES Owners(owner_id)\n)\n\nTABLE Owners (\n  owner_id INTEGER PRIMARY KEY,\n  first_name VARCHAR(50),\n  last_name VARCHAR(50),\n  street VARCHAR(50),\n  city VARCHAR(50),\n  state VARCHAR(20),\n  zip_code VARCHAR(20),\n  email_address VARCHAR(50),\n  home_phone VARCHAR(20),\n  cell_number VARCHAR(20)\n)\n\nTABLE Professionals (\n  professional_id INTEGER PRIMARY KEY,\n  role_code VARCHAR(10) NOT NULL,\n  first_name VARCHAR(50),\n  street VARCHAR(50),\n  city VARCHAR(50),\n  state VARCHAR(20),\n  zip_code VARCHAR(20),\n  last_name VARCHAR(50),\n  email_address VARCHAR(50),\n  home_phone VARCHAR(20),\n  cell_number VARCHAR(20)\n)\n\nTABLE Treatments (\n  treatment_id INTEGER PRIMARY KEY,\n  dog_id INTEGER NOT NULL,\n  professional_id INTEGER NOT NULL,\n  treatment_type_code VARCHAR(10) NOT NULL,\n  date_of_treatment DATETIME,\n  cost_of_treatment DECIMAL(19,4),\n  FOREIGN KEY (dog_id) REFERENCES Dogs(dog_id),\n  FOREIGN KEY (professional_id) REFERENCES Professionals(professional_id)\n)",
@@ -4897,8 +4897,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "dog_kennels:bb946ee63fe75498aa2df8d9327bfab0852003ac6a04b3dc11b3d61a7c5e7632",
-              "latency_ms": 1.062791096046567,
-              "instrumented_latency_ms": 1.0564159601926804
+              "latency_ms": 0.3903750330209732,
+              "instrumented_latency_ms": 0.3877501003444195
             }
           ],
           "metadata_stable_across_repetitions": true,
@@ -5094,14 +5094,14 @@
           },
           "context_characters": 911,
           "retrieval_latencies_ms": [
-            0.5861660465598106,
-            0.47149998135864735,
-            0.47016702592372894
+            0.2722078934311867,
+            0.26062503457069397,
+            0.24520792067050934
           ],
           "instrumented_latencies_ms": [
-            0.582332955673337,
-            0.46825013123452663,
-            0.46699983067810535
+            0.27033407241106033,
+            0.258750282227993,
+            0.24341698735952377
           ],
           "retrieval_samples": [
             {
@@ -5198,8 +5198,8 @@
               ],
               "backend": "flat",
               "schema_id": "car_1:d00584f3000252d705992cb23cb5b6a4f14f7b6ab0423011ae714ef2ee160d8c",
-              "latency_ms": 0.5861660465598106,
-              "instrumented_latency_ms": 0.582332955673337
+              "latency_ms": 0.2722078934311867,
+              "instrumented_latency_ms": 0.27033407241106033
             },
             {
               "context": "TABLE car_makers (\n  Id INTEGER PRIMARY KEY,\n  Maker TEXT,\n  FullName TEXT,\n  Country TEXT,\n  FOREIGN KEY (Country) REFERENCES countries(CountryId)\n)\n\nTABLE car_names (\n  MakeId INTEGER PRIMARY KEY,\n  Model TEXT,\n  Make TEXT,\n  FOREIGN KEY (Model) REFERENCES model_list(Model)\n)\n\nTABLE cars_data (\n  Id INTEGER PRIMARY KEY,\n  MPG TEXT,\n  Cylinders INTEGER,\n  Edispl REAL,\n  Horsepower TEXT,\n  Weight INTEGER,\n  Accelerate REAL,\n  Year INTEGER,\n  FOREIGN KEY (Id) REFERENCES car_names(MakeId)\n)\n\nTABLE continents (\n  ContId INTEGER PRIMARY KEY,\n  Continent TEXT\n)\n\nTABLE countries (\n  CountryId INTEGER PRIMARY KEY,\n  CountryName TEXT,\n  Continent INTEGER,\n  FOREIGN KEY (Continent) REFERENCES continents(ContId)\n)\n\nTABLE model_list (\n  ModelId INTEGER PRIMARY KEY,\n  Maker INTEGER,\n  Model TEXT,\n  FOREIGN KEY (Maker) REFERENCES car_makers(Id)\n)\n\nUNIQUE INDEX sqlite_autoindex_model_list_1 ON model_list (Model)",
@@ -5295,8 +5295,8 @@
               ],
               "backend": "flat",
               "schema_id": "car_1:d00584f3000252d705992cb23cb5b6a4f14f7b6ab0423011ae714ef2ee160d8c",
-              "latency_ms": 0.47149998135864735,
-              "instrumented_latency_ms": 0.46825013123452663
+              "latency_ms": 0.26062503457069397,
+              "instrumented_latency_ms": 0.258750282227993
             },
             {
               "context": "TABLE car_makers (\n  Id INTEGER PRIMARY KEY,\n  Maker TEXT,\n  FullName TEXT,\n  Country TEXT,\n  FOREIGN KEY (Country) REFERENCES countries(CountryId)\n)\n\nTABLE car_names (\n  MakeId INTEGER PRIMARY KEY,\n  Model TEXT,\n  Make TEXT,\n  FOREIGN KEY (Model) REFERENCES model_list(Model)\n)\n\nTABLE cars_data (\n  Id INTEGER PRIMARY KEY,\n  MPG TEXT,\n  Cylinders INTEGER,\n  Edispl REAL,\n  Horsepower TEXT,\n  Weight INTEGER,\n  Accelerate REAL,\n  Year INTEGER,\n  FOREIGN KEY (Id) REFERENCES car_names(MakeId)\n)\n\nTABLE continents (\n  ContId INTEGER PRIMARY KEY,\n  Continent TEXT\n)\n\nTABLE countries (\n  CountryId INTEGER PRIMARY KEY,\n  CountryName TEXT,\n  Continent INTEGER,\n  FOREIGN KEY (Continent) REFERENCES continents(ContId)\n)\n\nTABLE model_list (\n  ModelId INTEGER PRIMARY KEY,\n  Maker INTEGER,\n  Model TEXT,\n  FOREIGN KEY (Maker) REFERENCES car_makers(Id)\n)\n\nUNIQUE INDEX sqlite_autoindex_model_list_1 ON model_list (Model)",
@@ -5392,8 +5392,8 @@
               ],
               "backend": "flat",
               "schema_id": "car_1:d00584f3000252d705992cb23cb5b6a4f14f7b6ab0423011ae714ef2ee160d8c",
-              "latency_ms": 0.47016702592372894,
-              "instrumented_latency_ms": 0.46699983067810535
+              "latency_ms": 0.24520792067050934,
+              "instrumented_latency_ms": 0.24341698735952377
             }
           ],
           "metadata_stable_across_repetitions": true,
@@ -5498,14 +5498,14 @@
           },
           "context_characters": 634,
           "retrieval_latencies_ms": [
-            0.5847499705851078,
-            0.5629169754683971,
-            0.5238750018179417
+            0.2970830537378788,
+            0.29741600155830383,
+            0.3144168294966221
           ],
           "instrumented_latencies_ms": [
-            0.5811250302940607,
-            0.5595001857727766,
-            0.5205420311540365
+            0.29512494802474976,
+            0.2954998053610325,
+            0.31233299523591995
           ],
           "retrieval_samples": [
             {
@@ -5573,8 +5573,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "car_1:d00584f3000252d705992cb23cb5b6a4f14f7b6ab0423011ae714ef2ee160d8c",
-              "latency_ms": 0.5847499705851078,
-              "instrumented_latency_ms": 0.5811250302940607
+              "latency_ms": 0.2970830537378788,
+              "instrumented_latency_ms": 0.29512494802474976
             },
             {
               "context": "TABLE car_makers (\n  Id INTEGER PRIMARY KEY,\n  Maker TEXT,\n  FullName TEXT,\n  Country TEXT\n)\n\nTABLE car_names (\n  MakeId INTEGER PRIMARY KEY,\n  Model TEXT,\n  Make TEXT,\n  FOREIGN KEY (Model) REFERENCES model_list(Model)\n)\n\nTABLE cars_data (\n  Id INTEGER PRIMARY KEY,\n  MPG TEXT,\n  Cylinders INTEGER,\n  Edispl REAL,\n  Horsepower TEXT,\n  Weight INTEGER,\n  Accelerate REAL,\n  Year INTEGER,\n  FOREIGN KEY (Id) REFERENCES car_names(MakeId)\n)\n\nTABLE model_list (\n  ModelId INTEGER PRIMARY KEY,\n  Maker INTEGER,\n  Model TEXT,\n  FOREIGN KEY (Maker) REFERENCES car_makers(Id)\n)\n\nUNIQUE INDEX sqlite_autoindex_model_list_1 ON model_list (Model)",
@@ -5641,8 +5641,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "car_1:d00584f3000252d705992cb23cb5b6a4f14f7b6ab0423011ae714ef2ee160d8c",
-              "latency_ms": 0.5629169754683971,
-              "instrumented_latency_ms": 0.5595001857727766
+              "latency_ms": 0.29741600155830383,
+              "instrumented_latency_ms": 0.2954998053610325
             },
             {
               "context": "TABLE car_makers (\n  Id INTEGER PRIMARY KEY,\n  Maker TEXT,\n  FullName TEXT,\n  Country TEXT\n)\n\nTABLE car_names (\n  MakeId INTEGER PRIMARY KEY,\n  Model TEXT,\n  Make TEXT,\n  FOREIGN KEY (Model) REFERENCES model_list(Model)\n)\n\nTABLE cars_data (\n  Id INTEGER PRIMARY KEY,\n  MPG TEXT,\n  Cylinders INTEGER,\n  Edispl REAL,\n  Horsepower TEXT,\n  Weight INTEGER,\n  Accelerate REAL,\n  Year INTEGER,\n  FOREIGN KEY (Id) REFERENCES car_names(MakeId)\n)\n\nTABLE model_list (\n  ModelId INTEGER PRIMARY KEY,\n  Maker INTEGER,\n  Model TEXT,\n  FOREIGN KEY (Maker) REFERENCES car_makers(Id)\n)\n\nUNIQUE INDEX sqlite_autoindex_model_list_1 ON model_list (Model)",
@@ -5709,8 +5709,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "car_1:d00584f3000252d705992cb23cb5b6a4f14f7b6ab0423011ae714ef2ee160d8c",
-              "latency_ms": 0.5238750018179417,
-              "instrumented_latency_ms": 0.5205420311540365
+              "latency_ms": 0.3144168294966221,
+              "instrumented_latency_ms": 0.31233299523591995
             }
           ],
           "metadata_stable_across_repetitions": true,
@@ -5887,14 +5887,14 @@
           },
           "context_characters": 911,
           "retrieval_latencies_ms": [
-            0.46237511560320854,
-            0.4645420704036951,
-            0.45620789751410484
+            0.2566669136285782,
+            0.2722092904150486,
+            0.24066632613539696
           ],
           "instrumented_latencies_ms": [
-            0.4592081531882286,
-            0.46166591346263885,
-            0.4530409350991249
+            0.254875048995018,
+            0.2704998478293419,
+            0.2389173023402691
           ],
           "retrieval_samples": [
             {
@@ -5991,8 +5991,8 @@
               ],
               "backend": "flat",
               "schema_id": "car_1:d00584f3000252d705992cb23cb5b6a4f14f7b6ab0423011ae714ef2ee160d8c",
-              "latency_ms": 0.46237511560320854,
-              "instrumented_latency_ms": 0.4592081531882286
+              "latency_ms": 0.2566669136285782,
+              "instrumented_latency_ms": 0.254875048995018
             },
             {
               "context": "TABLE car_makers (\n  Id INTEGER PRIMARY KEY,\n  Maker TEXT,\n  FullName TEXT,\n  Country TEXT,\n  FOREIGN KEY (Country) REFERENCES countries(CountryId)\n)\n\nTABLE car_names (\n  MakeId INTEGER PRIMARY KEY,\n  Model TEXT,\n  Make TEXT,\n  FOREIGN KEY (Model) REFERENCES model_list(Model)\n)\n\nTABLE cars_data (\n  Id INTEGER PRIMARY KEY,\n  MPG TEXT,\n  Cylinders INTEGER,\n  Edispl REAL,\n  Horsepower TEXT,\n  Weight INTEGER,\n  Accelerate REAL,\n  Year INTEGER,\n  FOREIGN KEY (Id) REFERENCES car_names(MakeId)\n)\n\nTABLE continents (\n  ContId INTEGER PRIMARY KEY,\n  Continent TEXT\n)\n\nTABLE countries (\n  CountryId INTEGER PRIMARY KEY,\n  CountryName TEXT,\n  Continent INTEGER,\n  FOREIGN KEY (Continent) REFERENCES continents(ContId)\n)\n\nTABLE model_list (\n  ModelId INTEGER PRIMARY KEY,\n  Maker INTEGER,\n  Model TEXT,\n  FOREIGN KEY (Maker) REFERENCES car_makers(Id)\n)\n\nUNIQUE INDEX sqlite_autoindex_model_list_1 ON model_list (Model)",
@@ -6088,8 +6088,8 @@
               ],
               "backend": "flat",
               "schema_id": "car_1:d00584f3000252d705992cb23cb5b6a4f14f7b6ab0423011ae714ef2ee160d8c",
-              "latency_ms": 0.4645420704036951,
-              "instrumented_latency_ms": 0.46166591346263885
+              "latency_ms": 0.2722092904150486,
+              "instrumented_latency_ms": 0.2704998478293419
             },
             {
               "context": "TABLE car_makers (\n  Id INTEGER PRIMARY KEY,\n  Maker TEXT,\n  FullName TEXT,\n  Country TEXT,\n  FOREIGN KEY (Country) REFERENCES countries(CountryId)\n)\n\nTABLE car_names (\n  MakeId INTEGER PRIMARY KEY,\n  Model TEXT,\n  Make TEXT,\n  FOREIGN KEY (Model) REFERENCES model_list(Model)\n)\n\nTABLE cars_data (\n  Id INTEGER PRIMARY KEY,\n  MPG TEXT,\n  Cylinders INTEGER,\n  Edispl REAL,\n  Horsepower TEXT,\n  Weight INTEGER,\n  Accelerate REAL,\n  Year INTEGER,\n  FOREIGN KEY (Id) REFERENCES car_names(MakeId)\n)\n\nTABLE continents (\n  ContId INTEGER PRIMARY KEY,\n  Continent TEXT\n)\n\nTABLE countries (\n  CountryId INTEGER PRIMARY KEY,\n  CountryName TEXT,\n  Continent INTEGER,\n  FOREIGN KEY (Continent) REFERENCES continents(ContId)\n)\n\nTABLE model_list (\n  ModelId INTEGER PRIMARY KEY,\n  Maker INTEGER,\n  Model TEXT,\n  FOREIGN KEY (Maker) REFERENCES car_makers(Id)\n)\n\nUNIQUE INDEX sqlite_autoindex_model_list_1 ON model_list (Model)",
@@ -6185,8 +6185,8 @@
               ],
               "backend": "flat",
               "schema_id": "car_1:d00584f3000252d705992cb23cb5b6a4f14f7b6ab0423011ae714ef2ee160d8c",
-              "latency_ms": 0.45620789751410484,
-              "instrumented_latency_ms": 0.4530409350991249
+              "latency_ms": 0.24066632613539696,
+              "instrumented_latency_ms": 0.2389173023402691
             }
           ],
           "metadata_stable_across_repetitions": true,
@@ -6254,14 +6254,14 @@
           },
           "context_characters": 218,
           "retrieval_latencies_ms": [
-            0.5166660994291306,
-            0.49329199828207493,
-            0.549625139683485
+            0.29454194009304047,
+            0.2739587798714638,
+            0.27250032871961594
           ],
           "instrumented_latencies_ms": [
-            0.5129999481141567,
-            0.48945797607302666,
-            0.5461671389639378
+            0.2921666018664837,
+            0.27175014838576317,
+            0.2704579383134842
           ],
           "retrieval_samples": [
             {
@@ -6292,8 +6292,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "car_1:d00584f3000252d705992cb23cb5b6a4f14f7b6ab0423011ae714ef2ee160d8c",
-              "latency_ms": 0.5166660994291306,
-              "instrumented_latency_ms": 0.5129999481141567
+              "latency_ms": 0.29454194009304047,
+              "instrumented_latency_ms": 0.2921666018664837
             },
             {
               "context": "TABLE continents (\n  ContId INTEGER PRIMARY KEY,\n  Continent TEXT\n)\n\nTABLE countries (\n  CountryId INTEGER PRIMARY KEY,\n  CountryName TEXT,\n  Continent INTEGER,\n  FOREIGN KEY (Continent) REFERENCES continents(ContId)\n)",
@@ -6323,8 +6323,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "car_1:d00584f3000252d705992cb23cb5b6a4f14f7b6ab0423011ae714ef2ee160d8c",
-              "latency_ms": 0.49329199828207493,
-              "instrumented_latency_ms": 0.48945797607302666
+              "latency_ms": 0.2739587798714638,
+              "instrumented_latency_ms": 0.27175014838576317
             },
             {
               "context": "TABLE continents (\n  ContId INTEGER PRIMARY KEY,\n  Continent TEXT\n)\n\nTABLE countries (\n  CountryId INTEGER PRIMARY KEY,\n  CountryName TEXT,\n  Continent INTEGER,\n  FOREIGN KEY (Continent) REFERENCES continents(ContId)\n)",
@@ -6354,8 +6354,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "car_1:d00584f3000252d705992cb23cb5b6a4f14f7b6ab0423011ae714ef2ee160d8c",
-              "latency_ms": 0.549625139683485,
-              "instrumented_latency_ms": 0.5461671389639378
+              "latency_ms": 0.27250032871961594,
+              "instrumented_latency_ms": 0.2704579383134842
             }
           ],
           "metadata_stable_across_repetitions": true,
@@ -6516,14 +6516,14 @@
           },
           "context_characters": 962,
           "retrieval_latencies_ms": [
-            0.47104107216000557,
-            0.5006249994039536,
-            0.44479197822511196
+            0.2560000866651535,
+            0.22758310660719872,
+            0.22849999368190765
           ],
           "instrumented_latencies_ms": [
-            0.4679171834141016,
-            0.4974999465048313,
-            0.4418750759214163
+            0.25408295914530754,
+            0.22579217329621315,
+            0.2267090603709221
           ],
           "retrieval_samples": [
             {
@@ -6594,8 +6594,8 @@
               ],
               "backend": "flat",
               "schema_id": "concert_singer:bdaa6bba8859cab6c5585ac6ad3a2b00ac5342823b0596d6cfbf4fb97b6a4f3a",
-              "latency_ms": 0.47104107216000557,
-              "instrumented_latency_ms": 0.4679171834141016
+              "latency_ms": 0.2560000866651535,
+              "instrumented_latency_ms": 0.25408295914530754
             },
             {
               "context": "TABLE concert (\n  concert_ID INT PRIMARY KEY,\n  concert_Name TEXT,\n  Theme TEXT,\n  Stadium_ID TEXT,\n  Year TEXT,\n  FOREIGN KEY (Stadium_ID) REFERENCES stadium(Stadium_ID)\n)\n\nUNIQUE INDEX sqlite_autoindex_concert_1 ON concert (concert_ID)\n\nTABLE singer (\n  Singer_ID INT PRIMARY KEY,\n  Name TEXT,\n  Country TEXT,\n  Song_Name TEXT,\n  Song_release_year TEXT,\n  Age INT,\n  Is_male bool\n)\n\nUNIQUE INDEX sqlite_autoindex_singer_1 ON singer (Singer_ID)\n\nTABLE singer_in_concert (\n  concert_ID INT,\n  Singer_ID TEXT,\n  PRIMARY KEY (concert_ID, Singer_ID),\n  FOREIGN KEY (Singer_ID) REFERENCES singer(Singer_ID),\n  FOREIGN KEY (concert_ID) REFERENCES concert(concert_ID)\n)\n\nUNIQUE INDEX sqlite_autoindex_singer_in_concert_1 ON singer_in_concert (concert_ID, Singer_ID)\n\nTABLE stadium (\n  Stadium_ID INT PRIMARY KEY,\n  Location TEXT,\n  Name TEXT,\n  Capacity INT,\n  Highest INT,\n  Lowest INT,\n  Average INT\n)\n\nUNIQUE INDEX sqlite_autoindex_stadium_1 ON stadium (Stadium_ID)",
@@ -6665,8 +6665,8 @@
               ],
               "backend": "flat",
               "schema_id": "concert_singer:bdaa6bba8859cab6c5585ac6ad3a2b00ac5342823b0596d6cfbf4fb97b6a4f3a",
-              "latency_ms": 0.5006249994039536,
-              "instrumented_latency_ms": 0.4974999465048313
+              "latency_ms": 0.22758310660719872,
+              "instrumented_latency_ms": 0.22579217329621315
             },
             {
               "context": "TABLE concert (\n  concert_ID INT PRIMARY KEY,\n  concert_Name TEXT,\n  Theme TEXT,\n  Stadium_ID TEXT,\n  Year TEXT,\n  FOREIGN KEY (Stadium_ID) REFERENCES stadium(Stadium_ID)\n)\n\nUNIQUE INDEX sqlite_autoindex_concert_1 ON concert (concert_ID)\n\nTABLE singer (\n  Singer_ID INT PRIMARY KEY,\n  Name TEXT,\n  Country TEXT,\n  Song_Name TEXT,\n  Song_release_year TEXT,\n  Age INT,\n  Is_male bool\n)\n\nUNIQUE INDEX sqlite_autoindex_singer_1 ON singer (Singer_ID)\n\nTABLE singer_in_concert (\n  concert_ID INT,\n  Singer_ID TEXT,\n  PRIMARY KEY (concert_ID, Singer_ID),\n  FOREIGN KEY (Singer_ID) REFERENCES singer(Singer_ID),\n  FOREIGN KEY (concert_ID) REFERENCES concert(concert_ID)\n)\n\nUNIQUE INDEX sqlite_autoindex_singer_in_concert_1 ON singer_in_concert (concert_ID, Singer_ID)\n\nTABLE stadium (\n  Stadium_ID INT PRIMARY KEY,\n  Location TEXT,\n  Name TEXT,\n  Capacity INT,\n  Highest INT,\n  Lowest INT,\n  Average INT\n)\n\nUNIQUE INDEX sqlite_autoindex_stadium_1 ON stadium (Stadium_ID)",
@@ -6736,8 +6736,8 @@
               ],
               "backend": "flat",
               "schema_id": "concert_singer:bdaa6bba8859cab6c5585ac6ad3a2b00ac5342823b0596d6cfbf4fb97b6a4f3a",
-              "latency_ms": 0.44479197822511196,
-              "instrumented_latency_ms": 0.4418750759214163
+              "latency_ms": 0.22849999368190765,
+              "instrumented_latency_ms": 0.2267090603709221
             }
           ],
           "metadata_stable_across_repetitions": true,
@@ -6826,14 +6826,14 @@
           },
           "context_characters": 700,
           "retrieval_latencies_ms": [
-            0.496583990752697,
-            0.4965828265994787,
-            0.48620812594890594
+            0.2692500129342079,
+            0.27070799842476845,
+            0.2548331394791603
           ],
           "instrumented_latencies_ms": [
-            0.49320817925035954,
-            0.49337511882185936,
-            0.48291683197021484
+            0.2671666443347931,
+            0.2688332460820675,
+            0.2527502365410328
           ],
           "retrieval_samples": [
             {
@@ -6885,8 +6885,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "concert_singer:bdaa6bba8859cab6c5585ac6ad3a2b00ac5342823b0596d6cfbf4fb97b6a4f3a",
-              "latency_ms": 0.496583990752697,
-              "instrumented_latency_ms": 0.49320817925035954
+              "latency_ms": 0.2692500129342079,
+              "instrumented_latency_ms": 0.2671666443347931
             },
             {
               "context": "TABLE concert (\n  concert_ID INT PRIMARY KEY,\n  concert_Name TEXT,\n  Theme TEXT,\n  Stadium_ID TEXT,\n  Year TEXT\n)\n\nUNIQUE INDEX sqlite_autoindex_concert_1 ON concert (concert_ID)\n\nTABLE singer (\n  Singer_ID INT PRIMARY KEY,\n  Name TEXT,\n  Country TEXT,\n  Song_Name TEXT,\n  Song_release_year TEXT,\n  Age INT,\n  Is_male bool\n)\n\nUNIQUE INDEX sqlite_autoindex_singer_1 ON singer (Singer_ID)\n\nTABLE singer_in_concert (\n  concert_ID INT,\n  Singer_ID TEXT,\n  PRIMARY KEY (concert_ID, Singer_ID),\n  FOREIGN KEY (Singer_ID) REFERENCES singer(Singer_ID),\n  FOREIGN KEY (concert_ID) REFERENCES concert(concert_ID)\n)\n\nUNIQUE INDEX sqlite_autoindex_singer_in_concert_1 ON singer_in_concert (concert_ID, Singer_ID)",
@@ -6937,8 +6937,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "concert_singer:bdaa6bba8859cab6c5585ac6ad3a2b00ac5342823b0596d6cfbf4fb97b6a4f3a",
-              "latency_ms": 0.4965828265994787,
-              "instrumented_latency_ms": 0.49337511882185936
+              "latency_ms": 0.27070799842476845,
+              "instrumented_latency_ms": 0.2688332460820675
             },
             {
               "context": "TABLE concert (\n  concert_ID INT PRIMARY KEY,\n  concert_Name TEXT,\n  Theme TEXT,\n  Stadium_ID TEXT,\n  Year TEXT\n)\n\nUNIQUE INDEX sqlite_autoindex_concert_1 ON concert (concert_ID)\n\nTABLE singer (\n  Singer_ID INT PRIMARY KEY,\n  Name TEXT,\n  Country TEXT,\n  Song_Name TEXT,\n  Song_release_year TEXT,\n  Age INT,\n  Is_male bool\n)\n\nUNIQUE INDEX sqlite_autoindex_singer_1 ON singer (Singer_ID)\n\nTABLE singer_in_concert (\n  concert_ID INT,\n  Singer_ID TEXT,\n  PRIMARY KEY (concert_ID, Singer_ID),\n  FOREIGN KEY (Singer_ID) REFERENCES singer(Singer_ID),\n  FOREIGN KEY (concert_ID) REFERENCES concert(concert_ID)\n)\n\nUNIQUE INDEX sqlite_autoindex_singer_in_concert_1 ON singer_in_concert (concert_ID, Singer_ID)",
@@ -6989,8 +6989,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "concert_singer:bdaa6bba8859cab6c5585ac6ad3a2b00ac5342823b0596d6cfbf4fb97b6a4f3a",
-              "latency_ms": 0.48620812594890594,
-              "instrumented_latency_ms": 0.48291683197021484
+              "latency_ms": 0.2548331394791603,
+              "instrumented_latency_ms": 0.2527502365410328
             }
           ],
           "metadata_stable_across_repetitions": true,
@@ -7141,14 +7141,14 @@
           },
           "context_characters": 962,
           "retrieval_latencies_ms": [
-            0.4407500382512808,
-            0.439041992649436,
-            0.43704104609787464
+            0.22695818915963173,
+            0.2310420386493206,
+            0.23462483659386635
           ],
           "instrumented_latencies_ms": [
-            0.43762498535215855,
-            0.43583312071859837,
-            0.43404102325439453
+            0.22508390247821808,
+            0.2293330617249012,
+            0.23258337751030922
           ],
           "retrieval_samples": [
             {
@@ -7219,8 +7219,8 @@
               ],
               "backend": "flat",
               "schema_id": "concert_singer:bdaa6bba8859cab6c5585ac6ad3a2b00ac5342823b0596d6cfbf4fb97b6a4f3a",
-              "latency_ms": 0.4407500382512808,
-              "instrumented_latency_ms": 0.43762498535215855
+              "latency_ms": 0.22695818915963173,
+              "instrumented_latency_ms": 0.22508390247821808
             },
             {
               "context": "TABLE concert (\n  concert_ID INT PRIMARY KEY,\n  concert_Name TEXT,\n  Theme TEXT,\n  Stadium_ID TEXT,\n  Year TEXT,\n  FOREIGN KEY (Stadium_ID) REFERENCES stadium(Stadium_ID)\n)\n\nUNIQUE INDEX sqlite_autoindex_concert_1 ON concert (concert_ID)\n\nTABLE singer (\n  Singer_ID INT PRIMARY KEY,\n  Name TEXT,\n  Country TEXT,\n  Song_Name TEXT,\n  Song_release_year TEXT,\n  Age INT,\n  Is_male bool\n)\n\nUNIQUE INDEX sqlite_autoindex_singer_1 ON singer (Singer_ID)\n\nTABLE singer_in_concert (\n  concert_ID INT,\n  Singer_ID TEXT,\n  PRIMARY KEY (concert_ID, Singer_ID),\n  FOREIGN KEY (Singer_ID) REFERENCES singer(Singer_ID),\n  FOREIGN KEY (concert_ID) REFERENCES concert(concert_ID)\n)\n\nUNIQUE INDEX sqlite_autoindex_singer_in_concert_1 ON singer_in_concert (concert_ID, Singer_ID)\n\nTABLE stadium (\n  Stadium_ID INT PRIMARY KEY,\n  Location TEXT,\n  Name TEXT,\n  Capacity INT,\n  Highest INT,\n  Lowest INT,\n  Average INT\n)\n\nUNIQUE INDEX sqlite_autoindex_stadium_1 ON stadium (Stadium_ID)",
@@ -7290,8 +7290,8 @@
               ],
               "backend": "flat",
               "schema_id": "concert_singer:bdaa6bba8859cab6c5585ac6ad3a2b00ac5342823b0596d6cfbf4fb97b6a4f3a",
-              "latency_ms": 0.439041992649436,
-              "instrumented_latency_ms": 0.43583312071859837
+              "latency_ms": 0.2310420386493206,
+              "instrumented_latency_ms": 0.2293330617249012
             },
             {
               "context": "TABLE concert (\n  concert_ID INT PRIMARY KEY,\n  concert_Name TEXT,\n  Theme TEXT,\n  Stadium_ID TEXT,\n  Year TEXT,\n  FOREIGN KEY (Stadium_ID) REFERENCES stadium(Stadium_ID)\n)\n\nUNIQUE INDEX sqlite_autoindex_concert_1 ON concert (concert_ID)\n\nTABLE singer (\n  Singer_ID INT PRIMARY KEY,\n  Name TEXT,\n  Country TEXT,\n  Song_Name TEXT,\n  Song_release_year TEXT,\n  Age INT,\n  Is_male bool\n)\n\nUNIQUE INDEX sqlite_autoindex_singer_1 ON singer (Singer_ID)\n\nTABLE singer_in_concert (\n  concert_ID INT,\n  Singer_ID TEXT,\n  PRIMARY KEY (concert_ID, Singer_ID),\n  FOREIGN KEY (Singer_ID) REFERENCES singer(Singer_ID),\n  FOREIGN KEY (concert_ID) REFERENCES concert(concert_ID)\n)\n\nUNIQUE INDEX sqlite_autoindex_singer_in_concert_1 ON singer_in_concert (concert_ID, Singer_ID)\n\nTABLE stadium (\n  Stadium_ID INT PRIMARY KEY,\n  Location TEXT,\n  Name TEXT,\n  Capacity INT,\n  Highest INT,\n  Lowest INT,\n  Average INT\n)\n\nUNIQUE INDEX sqlite_autoindex_stadium_1 ON stadium (Stadium_ID)",
@@ -7361,8 +7361,8 @@
               ],
               "backend": "flat",
               "schema_id": "concert_singer:bdaa6bba8859cab6c5585ac6ad3a2b00ac5342823b0596d6cfbf4fb97b6a4f3a",
-              "latency_ms": 0.43704104609787464,
-              "instrumented_latency_ms": 0.43404102325439453
+              "latency_ms": 0.23462483659386635,
+              "instrumented_latency_ms": 0.23258337751030922
             }
           ],
           "metadata_stable_across_repetitions": true,
@@ -7451,14 +7451,14 @@
           },
           "context_characters": 698,
           "retrieval_latencies_ms": [
-            0.5049998871982098,
-            0.4812090191990137,
-            0.48750010319054127
+            0.2688751555979252,
+            0.26912521570920944,
+            0.26687467470765114
           ],
           "instrumented_latencies_ms": [
-            0.501750037074089,
-            0.4777088761329651,
-            0.4841249901801348
+            0.26683323085308075,
+            0.267083290964365,
+            0.2649170346558094
           ],
           "retrieval_samples": [
             {
@@ -7510,8 +7510,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "concert_singer:bdaa6bba8859cab6c5585ac6ad3a2b00ac5342823b0596d6cfbf4fb97b6a4f3a",
-              "latency_ms": 0.5049998871982098,
-              "instrumented_latency_ms": 0.501750037074089
+              "latency_ms": 0.2688751555979252,
+              "instrumented_latency_ms": 0.26683323085308075
             },
             {
               "context": "TABLE concert (\n  concert_ID INT PRIMARY KEY,\n  concert_Name TEXT,\n  Theme TEXT,\n  Stadium_ID TEXT,\n  Year TEXT,\n  FOREIGN KEY (Stadium_ID) REFERENCES stadium(Stadium_ID)\n)\n\nUNIQUE INDEX sqlite_autoindex_concert_1 ON concert (concert_ID)\n\nTABLE singer_in_concert (\n  concert_ID INT,\n  Singer_ID TEXT,\n  PRIMARY KEY (concert_ID, Singer_ID),\n  FOREIGN KEY (concert_ID) REFERENCES concert(concert_ID)\n)\n\nUNIQUE INDEX sqlite_autoindex_singer_in_concert_1 ON singer_in_concert (concert_ID, Singer_ID)\n\nTABLE stadium (\n  Stadium_ID INT PRIMARY KEY,\n  Location TEXT,\n  Name TEXT,\n  Capacity INT,\n  Highest INT,\n  Lowest INT,\n  Average INT\n)\n\nUNIQUE INDEX sqlite_autoindex_stadium_1 ON stadium (Stadium_ID)",
@@ -7562,8 +7562,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "concert_singer:bdaa6bba8859cab6c5585ac6ad3a2b00ac5342823b0596d6cfbf4fb97b6a4f3a",
-              "latency_ms": 0.4812090191990137,
-              "instrumented_latency_ms": 0.4777088761329651
+              "latency_ms": 0.26912521570920944,
+              "instrumented_latency_ms": 0.267083290964365
             },
             {
               "context": "TABLE concert (\n  concert_ID INT PRIMARY KEY,\n  concert_Name TEXT,\n  Theme TEXT,\n  Stadium_ID TEXT,\n  Year TEXT,\n  FOREIGN KEY (Stadium_ID) REFERENCES stadium(Stadium_ID)\n)\n\nUNIQUE INDEX sqlite_autoindex_concert_1 ON concert (concert_ID)\n\nTABLE singer_in_concert (\n  concert_ID INT,\n  Singer_ID TEXT,\n  PRIMARY KEY (concert_ID, Singer_ID),\n  FOREIGN KEY (concert_ID) REFERENCES concert(concert_ID)\n)\n\nUNIQUE INDEX sqlite_autoindex_singer_in_concert_1 ON singer_in_concert (concert_ID, Singer_ID)\n\nTABLE stadium (\n  Stadium_ID INT PRIMARY KEY,\n  Location TEXT,\n  Name TEXT,\n  Capacity INT,\n  Highest INT,\n  Lowest INT,\n  Average INT\n)\n\nUNIQUE INDEX sqlite_autoindex_stadium_1 ON stadium (Stadium_ID)",
@@ -7614,8 +7614,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "concert_singer:bdaa6bba8859cab6c5585ac6ad3a2b00ac5342823b0596d6cfbf4fb97b6a4f3a",
-              "latency_ms": 0.48750010319054127,
-              "instrumented_latency_ms": 0.4841249901801348
+              "latency_ms": 0.26687467470765114,
+              "instrumented_latency_ms": 0.2649170346558094
             }
           ],
           "metadata_stable_across_repetitions": true,
@@ -7771,14 +7771,14 @@
           },
           "context_characters": 1023,
           "retrieval_latencies_ms": [
-            0.41816593147814274,
-            0.3924998454749584,
-            0.3903340548276901
+            0.22970791906118393,
+            0.2139592543244362,
+            0.20466698333621025
           ],
           "instrumented_latencies_ms": [
-            0.41545904241502285,
-            0.3898339346051216,
-            0.3877920098602772
+            0.22787461057305336,
+            0.21224981173872948,
+            0.20304182544350624
           ],
           "retrieval_samples": [
             {
@@ -7845,8 +7845,8 @@
               ],
               "backend": "flat",
               "schema_id": "cre_Doc_Template_Mgt:b9a48a334b725c2557581c36854f3f3a6dd82c05ce560a5a83f7d18a4fe21004",
-              "latency_ms": 0.41816593147814274,
-              "instrumented_latency_ms": 0.41545904241502285
+              "latency_ms": 0.22970791906118393,
+              "instrumented_latency_ms": 0.22787461057305336
             },
             {
               "context": "TABLE Documents (\n  Document_ID INTEGER PRIMARY KEY NOT NULL,\n  Template_ID INTEGER,\n  Document_Name VARCHAR(255),\n  Document_Description VARCHAR(255),\n  Other_Details VARCHAR(255),\n  FOREIGN KEY (Template_ID) REFERENCES Templates(Template_ID)\n)\n\nTABLE Paragraphs (\n  Paragraph_ID INTEGER PRIMARY KEY NOT NULL,\n  Document_ID INTEGER NOT NULL,\n  Paragraph_Text VARCHAR(255),\n  Other_Details VARCHAR(255),\n  FOREIGN KEY (Document_ID) REFERENCES Documents(Document_ID)\n)\n\nTABLE Ref_Template_Types (\n  Template_Type_Code CHAR(15) PRIMARY KEY NOT NULL,\n  Template_Type_Description VARCHAR(255) NOT NULL\n)\n\nUNIQUE INDEX sqlite_autoindex_Ref_Template_Types_1 ON Ref_Template_Types (Template_Type_Code)\n\nTABLE Templates (\n  Template_ID INTEGER PRIMARY KEY NOT NULL,\n  Version_Number INTEGER NOT NULL,\n  Template_Type_Code CHAR(15) NOT NULL,\n  Date_Effective_From DATETIME,\n  Date_Effective_To DATETIME,\n  Template_Details VARCHAR(255) NOT NULL,\n  FOREIGN KEY (Template_Type_Code) REFERENCES Ref_Template_Types(Template_Type_Code)\n)",
@@ -7912,8 +7912,8 @@
               ],
               "backend": "flat",
               "schema_id": "cre_Doc_Template_Mgt:b9a48a334b725c2557581c36854f3f3a6dd82c05ce560a5a83f7d18a4fe21004",
-              "latency_ms": 0.3924998454749584,
-              "instrumented_latency_ms": 0.3898339346051216
+              "latency_ms": 0.2139592543244362,
+              "instrumented_latency_ms": 0.21224981173872948
             },
             {
               "context": "TABLE Documents (\n  Document_ID INTEGER PRIMARY KEY NOT NULL,\n  Template_ID INTEGER,\n  Document_Name VARCHAR(255),\n  Document_Description VARCHAR(255),\n  Other_Details VARCHAR(255),\n  FOREIGN KEY (Template_ID) REFERENCES Templates(Template_ID)\n)\n\nTABLE Paragraphs (\n  Paragraph_ID INTEGER PRIMARY KEY NOT NULL,\n  Document_ID INTEGER NOT NULL,\n  Paragraph_Text VARCHAR(255),\n  Other_Details VARCHAR(255),\n  FOREIGN KEY (Document_ID) REFERENCES Documents(Document_ID)\n)\n\nTABLE Ref_Template_Types (\n  Template_Type_Code CHAR(15) PRIMARY KEY NOT NULL,\n  Template_Type_Description VARCHAR(255) NOT NULL\n)\n\nUNIQUE INDEX sqlite_autoindex_Ref_Template_Types_1 ON Ref_Template_Types (Template_Type_Code)\n\nTABLE Templates (\n  Template_ID INTEGER PRIMARY KEY NOT NULL,\n  Version_Number INTEGER NOT NULL,\n  Template_Type_Code CHAR(15) NOT NULL,\n  Date_Effective_From DATETIME,\n  Date_Effective_To DATETIME,\n  Template_Details VARCHAR(255) NOT NULL,\n  FOREIGN KEY (Template_Type_Code) REFERENCES Ref_Template_Types(Template_Type_Code)\n)",
@@ -7979,8 +7979,8 @@
               ],
               "backend": "flat",
               "schema_id": "cre_Doc_Template_Mgt:b9a48a334b725c2557581c36854f3f3a6dd82c05ce560a5a83f7d18a4fe21004",
-              "latency_ms": 0.3903340548276901,
-              "instrumented_latency_ms": 0.3877920098602772
+              "latency_ms": 0.20466698333621025,
+              "instrumented_latency_ms": 0.20304182544350624
             }
           ],
           "metadata_stable_across_repetitions": true,
@@ -8068,14 +8068,14 @@
           },
           "context_characters": 801,
           "retrieval_latencies_ms": [
-            0.4547080025076866,
-            0.4569168668240309,
-            0.4492499865591526
+            0.25287503376603127,
+            0.249417033046484,
+            0.23841625079512596
           ],
           "instrumented_latencies_ms": [
-            0.4517908673733473,
-            0.454082852229476,
-            0.4465831443667412
+            0.2509169280529022,
+            0.24745799601078033,
+            0.2366253174841404
           ],
           "retrieval_samples": [
             {
@@ -8126,8 +8126,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "cre_Doc_Template_Mgt:b9a48a334b725c2557581c36854f3f3a6dd82c05ce560a5a83f7d18a4fe21004",
-              "latency_ms": 0.4547080025076866,
-              "instrumented_latency_ms": 0.4517908673733473
+              "latency_ms": 0.25287503376603127,
+              "instrumented_latency_ms": 0.2509169280529022
             },
             {
               "context": "TABLE Documents (\n  Document_ID INTEGER PRIMARY KEY NOT NULL,\n  Template_ID INTEGER,\n  Document_Name VARCHAR(255),\n  Document_Description VARCHAR(255),\n  Other_Details VARCHAR(255),\n  FOREIGN KEY (Template_ID) REFERENCES Templates(Template_ID)\n)\n\nTABLE Ref_Template_Types (\n  Template_Type_Code CHAR(15) PRIMARY KEY NOT NULL,\n  Template_Type_Description VARCHAR(255) NOT NULL\n)\n\nUNIQUE INDEX sqlite_autoindex_Ref_Template_Types_1 ON Ref_Template_Types (Template_Type_Code)\n\nTABLE Templates (\n  Template_ID INTEGER PRIMARY KEY NOT NULL,\n  Version_Number INTEGER NOT NULL,\n  Template_Type_Code CHAR(15) NOT NULL,\n  Date_Effective_From DATETIME,\n  Date_Effective_To DATETIME,\n  Template_Details VARCHAR(255) NOT NULL,\n  FOREIGN KEY (Template_Type_Code) REFERENCES Ref_Template_Types(Template_Type_Code)\n)",
@@ -8177,8 +8177,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "cre_Doc_Template_Mgt:b9a48a334b725c2557581c36854f3f3a6dd82c05ce560a5a83f7d18a4fe21004",
-              "latency_ms": 0.4569168668240309,
-              "instrumented_latency_ms": 0.454082852229476
+              "latency_ms": 0.249417033046484,
+              "instrumented_latency_ms": 0.24745799601078033
             },
             {
               "context": "TABLE Documents (\n  Document_ID INTEGER PRIMARY KEY NOT NULL,\n  Template_ID INTEGER,\n  Document_Name VARCHAR(255),\n  Document_Description VARCHAR(255),\n  Other_Details VARCHAR(255),\n  FOREIGN KEY (Template_ID) REFERENCES Templates(Template_ID)\n)\n\nTABLE Ref_Template_Types (\n  Template_Type_Code CHAR(15) PRIMARY KEY NOT NULL,\n  Template_Type_Description VARCHAR(255) NOT NULL\n)\n\nUNIQUE INDEX sqlite_autoindex_Ref_Template_Types_1 ON Ref_Template_Types (Template_Type_Code)\n\nTABLE Templates (\n  Template_ID INTEGER PRIMARY KEY NOT NULL,\n  Version_Number INTEGER NOT NULL,\n  Template_Type_Code CHAR(15) NOT NULL,\n  Date_Effective_From DATETIME,\n  Date_Effective_To DATETIME,\n  Template_Details VARCHAR(255) NOT NULL,\n  FOREIGN KEY (Template_Type_Code) REFERENCES Ref_Template_Types(Template_Type_Code)\n)",
@@ -8228,8 +8228,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "cre_Doc_Template_Mgt:b9a48a334b725c2557581c36854f3f3a6dd82c05ce560a5a83f7d18a4fe21004",
-              "latency_ms": 0.4492499865591526,
-              "instrumented_latency_ms": 0.4465831443667412
+              "latency_ms": 0.23841625079512596,
+              "instrumented_latency_ms": 0.2366253174841404
             }
           ],
           "metadata_stable_across_repetitions": true,
@@ -8376,14 +8376,14 @@
           },
           "context_characters": 1023,
           "retrieval_latencies_ms": [
-            0.38920808583498,
-            0.3903750330209732,
-            0.38841599598526955
+            0.2043331041932106,
+            0.20124996080994606,
+            0.2087499015033245
           ],
           "instrumented_latencies_ms": [
-            0.38650003261864185,
-            0.3877920098602772,
-            0.385708874091506
+            0.2027922309935093,
+            0.19970769062638283,
+            0.2071247436106205
           ],
           "retrieval_samples": [
             {
@@ -8450,8 +8450,8 @@
               ],
               "backend": "flat",
               "schema_id": "cre_Doc_Template_Mgt:b9a48a334b725c2557581c36854f3f3a6dd82c05ce560a5a83f7d18a4fe21004",
-              "latency_ms": 0.38920808583498,
-              "instrumented_latency_ms": 0.38650003261864185
+              "latency_ms": 0.2043331041932106,
+              "instrumented_latency_ms": 0.2027922309935093
             },
             {
               "context": "TABLE Documents (\n  Document_ID INTEGER PRIMARY KEY NOT NULL,\n  Template_ID INTEGER,\n  Document_Name VARCHAR(255),\n  Document_Description VARCHAR(255),\n  Other_Details VARCHAR(255),\n  FOREIGN KEY (Template_ID) REFERENCES Templates(Template_ID)\n)\n\nTABLE Paragraphs (\n  Paragraph_ID INTEGER PRIMARY KEY NOT NULL,\n  Document_ID INTEGER NOT NULL,\n  Paragraph_Text VARCHAR(255),\n  Other_Details VARCHAR(255),\n  FOREIGN KEY (Document_ID) REFERENCES Documents(Document_ID)\n)\n\nTABLE Ref_Template_Types (\n  Template_Type_Code CHAR(15) PRIMARY KEY NOT NULL,\n  Template_Type_Description VARCHAR(255) NOT NULL\n)\n\nUNIQUE INDEX sqlite_autoindex_Ref_Template_Types_1 ON Ref_Template_Types (Template_Type_Code)\n\nTABLE Templates (\n  Template_ID INTEGER PRIMARY KEY NOT NULL,\n  Version_Number INTEGER NOT NULL,\n  Template_Type_Code CHAR(15) NOT NULL,\n  Date_Effective_From DATETIME,\n  Date_Effective_To DATETIME,\n  Template_Details VARCHAR(255) NOT NULL,\n  FOREIGN KEY (Template_Type_Code) REFERENCES Ref_Template_Types(Template_Type_Code)\n)",
@@ -8517,8 +8517,8 @@
               ],
               "backend": "flat",
               "schema_id": "cre_Doc_Template_Mgt:b9a48a334b725c2557581c36854f3f3a6dd82c05ce560a5a83f7d18a4fe21004",
-              "latency_ms": 0.3903750330209732,
-              "instrumented_latency_ms": 0.3877920098602772
+              "latency_ms": 0.20124996080994606,
+              "instrumented_latency_ms": 0.19970769062638283
             },
             {
               "context": "TABLE Documents (\n  Document_ID INTEGER PRIMARY KEY NOT NULL,\n  Template_ID INTEGER,\n  Document_Name VARCHAR(255),\n  Document_Description VARCHAR(255),\n  Other_Details VARCHAR(255),\n  FOREIGN KEY (Template_ID) REFERENCES Templates(Template_ID)\n)\n\nTABLE Paragraphs (\n  Paragraph_ID INTEGER PRIMARY KEY NOT NULL,\n  Document_ID INTEGER NOT NULL,\n  Paragraph_Text VARCHAR(255),\n  Other_Details VARCHAR(255),\n  FOREIGN KEY (Document_ID) REFERENCES Documents(Document_ID)\n)\n\nTABLE Ref_Template_Types (\n  Template_Type_Code CHAR(15) PRIMARY KEY NOT NULL,\n  Template_Type_Description VARCHAR(255) NOT NULL\n)\n\nUNIQUE INDEX sqlite_autoindex_Ref_Template_Types_1 ON Ref_Template_Types (Template_Type_Code)\n\nTABLE Templates (\n  Template_ID INTEGER PRIMARY KEY NOT NULL,\n  Version_Number INTEGER NOT NULL,\n  Template_Type_Code CHAR(15) NOT NULL,\n  Date_Effective_From DATETIME,\n  Date_Effective_To DATETIME,\n  Template_Details VARCHAR(255) NOT NULL,\n  FOREIGN KEY (Template_Type_Code) REFERENCES Ref_Template_Types(Template_Type_Code)\n)",
@@ -8584,8 +8584,8 @@
               ],
               "backend": "flat",
               "schema_id": "cre_Doc_Template_Mgt:b9a48a334b725c2557581c36854f3f3a6dd82c05ce560a5a83f7d18a4fe21004",
-              "latency_ms": 0.38841599598526955,
-              "instrumented_latency_ms": 0.385708874091506
+              "latency_ms": 0.2087499015033245,
+              "instrumented_latency_ms": 0.2071247436106205
             }
           ],
           "metadata_stable_across_repetitions": true,
@@ -8673,14 +8673,14 @@
           },
           "context_characters": 801,
           "retrieval_latencies_ms": [
-            0.46220910735428333,
-            0.43720798566937447,
-            0.45108399353921413
+            0.25137513875961304,
+            0.26679225265979767,
+            0.24579092860221863
           ],
           "instrumented_latencies_ms": [
-            0.459291972219944,
-            0.43441704474389553,
-            0.4483340308070183
+            0.24962471798062325,
+            0.264833215624094,
+            0.2438751980662346
           ],
           "retrieval_samples": [
             {
@@ -8731,8 +8731,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "cre_Doc_Template_Mgt:b9a48a334b725c2557581c36854f3f3a6dd82c05ce560a5a83f7d18a4fe21004",
-              "latency_ms": 0.46220910735428333,
-              "instrumented_latency_ms": 0.459291972219944
+              "latency_ms": 0.25137513875961304,
+              "instrumented_latency_ms": 0.24962471798062325
             },
             {
               "context": "TABLE Documents (\n  Document_ID INTEGER PRIMARY KEY NOT NULL,\n  Template_ID INTEGER,\n  Document_Name VARCHAR(255),\n  Document_Description VARCHAR(255),\n  Other_Details VARCHAR(255),\n  FOREIGN KEY (Template_ID) REFERENCES Templates(Template_ID)\n)\n\nTABLE Ref_Template_Types (\n  Template_Type_Code CHAR(15) PRIMARY KEY NOT NULL,\n  Template_Type_Description VARCHAR(255) NOT NULL\n)\n\nUNIQUE INDEX sqlite_autoindex_Ref_Template_Types_1 ON Ref_Template_Types (Template_Type_Code)\n\nTABLE Templates (\n  Template_ID INTEGER PRIMARY KEY NOT NULL,\n  Version_Number INTEGER NOT NULL,\n  Template_Type_Code CHAR(15) NOT NULL,\n  Date_Effective_From DATETIME,\n  Date_Effective_To DATETIME,\n  Template_Details VARCHAR(255) NOT NULL,\n  FOREIGN KEY (Template_Type_Code) REFERENCES Ref_Template_Types(Template_Type_Code)\n)",
@@ -8782,8 +8782,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "cre_Doc_Template_Mgt:b9a48a334b725c2557581c36854f3f3a6dd82c05ce560a5a83f7d18a4fe21004",
-              "latency_ms": 0.43720798566937447,
-              "instrumented_latency_ms": 0.43441704474389553
+              "latency_ms": 0.26679225265979767,
+              "instrumented_latency_ms": 0.264833215624094
             },
             {
               "context": "TABLE Documents (\n  Document_ID INTEGER PRIMARY KEY NOT NULL,\n  Template_ID INTEGER,\n  Document_Name VARCHAR(255),\n  Document_Description VARCHAR(255),\n  Other_Details VARCHAR(255),\n  FOREIGN KEY (Template_ID) REFERENCES Templates(Template_ID)\n)\n\nTABLE Ref_Template_Types (\n  Template_Type_Code CHAR(15) PRIMARY KEY NOT NULL,\n  Template_Type_Description VARCHAR(255) NOT NULL\n)\n\nUNIQUE INDEX sqlite_autoindex_Ref_Template_Types_1 ON Ref_Template_Types (Template_Type_Code)\n\nTABLE Templates (\n  Template_ID INTEGER PRIMARY KEY NOT NULL,\n  Version_Number INTEGER NOT NULL,\n  Template_Type_Code CHAR(15) NOT NULL,\n  Date_Effective_From DATETIME,\n  Date_Effective_To DATETIME,\n  Template_Details VARCHAR(255) NOT NULL,\n  FOREIGN KEY (Template_Type_Code) REFERENCES Ref_Template_Types(Template_Type_Code)\n)",
@@ -8833,8 +8833,8 @@
               ],
               "backend": "local_graph",
               "schema_id": "cre_Doc_Template_Mgt:b9a48a334b725c2557581c36854f3f3a6dd82c05ce560a5a83f7d18a4fe21004",
-              "latency_ms": 0.45108399353921413,
-              "instrumented_latency_ms": 0.4483340308070183
+              "latency_ms": 0.24579092860221863,
+              "instrumented_latency_ms": 0.2438751980662346
             }
           ],
           "metadata_stable_across_repetitions": true,
@@ -8883,8 +8883,8 @@
       "join_path_coverage": 1,
       "mean_context_tokens": 269.8,
       "context_token_method": "lexical_regex_estimate_words_and_punctuation",
-      "mean_retrieval_latency_ms": 0.763427714506785,
-      "median_retrieval_latency_ms": 0.47127052675932646,
+      "mean_retrieval_latency_ms": 0.29293340630829334,
+      "median_retrieval_latency_ms": 0.2586459740996361,
       "generation_attempts": 0,
       "sql_generation_success_rate": null,
       "syntax_success_rate": null,
@@ -8905,8 +8905,8 @@
       "join_path_coverage": 1,
       "mean_context_tokens": 135,
       "context_token_method": "lexical_regex_estimate_words_and_punctuation",
-      "mean_retrieval_latency_ms": 0.8679348199317852,
-      "median_retrieval_latency_ms": 0.5367500707507133,
+      "mean_retrieval_latency_ms": 0.34508199120561284,
+      "median_retrieval_latency_ms": 0.29581249691545963,
       "generation_attempts": 0,
       "sql_generation_success_rate": null,
       "syntax_success_rate": null,

@@ -10,8 +10,10 @@ from src.schema.build_graph import build_schema_graph
 from src.schema.context import retrieval_result
 from src.schema.flat_retriever import FlatSchemaRetriever
 from src.schema.interface import RetrievalResult
-from src.schema.neo4j_store import expand_join_paths, load_schema_graph, open_driver_from_env
-from src.schema.relevance import expand_local_join_paths, rank_tables
+from src.schema.neo4j_store import (
+    expand_fk_neighbors, expand_join_paths, load_schema_graph, open_driver_from_env,
+)
+from src.schema.relevance import expand_local_join_paths, fk_neighbors, rank_tables, unconnected_seeds
 
 
 class Neo4jUnavailableError(RuntimeError):
@@ -21,7 +23,12 @@ class Neo4jUnavailableError(RuntimeError):
 class Neo4jSchemaRetriever:
     """Rank question/schema identifiers and expand paths through the Neo4j graph.
 
-    ``top_k`` limits seed tables, not intermediate bridge tables. All columns of
+    Seed tables are joined along shortest FK paths between each pair. Seeds
+    that still join no other retrieved table (always the case for a single
+    seed) also gain their direct FK neighbours (one hop, either direction), so
+    a lone matching table still brings in the tables it joins to; connected
+    seeds gain nothing extra, which keeps multi-table precision. ``top_k``
+    limits seed tables only, not bridge or neighbour tables. All columns of
     selected tables are retained. No model, gold SQL or benchmark annotations are
     consulted. ``backend='local_graph'`` is an explicitly labeled offline
     diagnostic of the ranking/path algorithm, not a Neo4j measurement.
@@ -58,7 +65,12 @@ class Neo4jSchemaRetriever:
             raise ValueError("The SQLite database has no user tables to retrieve.")
         if self.backend == "local_graph":
             seeds = rank_tables(payload, question, top_k)
-            tables = expand_local_join_paths(payload, seeds) if seeds else [t["name"] for t in payload["tables"]]
+            if seeds:
+                joined = expand_local_join_paths(payload, seeds)
+                lonely = unconnected_seeds(payload, seeds, joined)
+                tables = sorted(set(joined) | set(fk_neighbors(payload, lonely)))
+            else:
+                tables = [t["name"] for t in payload["tables"]]
             self.last_result = retrieval_result(
                 payload, tables, backend="local_graph", started=started, seed_tables=seeds,
                 fallback_reason="No identifier matches; returned the full schema." if not seeds else "",
@@ -75,8 +87,16 @@ class Neo4jSchemaRetriever:
                 driver = open_driver_from_env()
             stored = load_schema_graph(driver=driver, schema_id=payload["schema_id"], database=self.database)
             seeds = rank_tables(stored, question, top_k)
-            tables = expand_join_paths(driver=driver, schema_id=payload["schema_id"], table_names=seeds,
-                                       database=self.database) if seeds else [t["name"] for t in stored["tables"]]
+            if seeds:
+                expand_args = dict(driver=driver, schema_id=payload["schema_id"], table_names=seeds,
+                                   database=self.database)
+                joined = expand_join_paths(**expand_args)
+                # Reuse the relationships already loaded in ``stored``; no extra query.
+                lonely = unconnected_seeds(stored, seeds, joined)
+                neighbors = expand_fk_neighbors(**{**expand_args, "table_names": lonely}) if lonely else []
+                tables = sorted(set(joined) | set(neighbors))
+            else:
+                tables = [t["name"] for t in stored["tables"]]
             self.last_result = retrieval_result(
                 stored, tables, backend="neo4j", started=started, seed_tables=seeds,
                 fallback_reason="No identifier matches; returned the full graph schema." if not seeds else "",
