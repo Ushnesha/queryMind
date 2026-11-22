@@ -1,0 +1,63 @@
+# Second-annotator template (Task 2). THIS FILE HAS NO REAL LABELS YET.
+#
+# Assumed labeling scheme (not yet confirmed by Member 2): for each ambiguous question, name the
+# main thing the question leaves undefined.
+#   measure    what to compute (revenue vs orders vs customers, "active", "best-selling")
+#   time       which period or date anchor ("recently", "last quarter", granularity)
+#   threshold  where to draw a line ("early", "high spender", "underperforming")
+#
+# How to use:
+#   1. Fill in `label` yourself, WITHOUT looking at the first annotator's labels or at the
+#      `undefined_terms` in the question files. Independence is the whole point of Task 2.
+#      (Rule-based hint labels were removed from this file on purpose.)
+#   2. Only after labeling, compare with the first annotator:
+#        python scripts/annotation_agreement.py --a eval/annotations/member4_ambiguous.yaml --b <first annotator file> --field label
+#
+# Known gap: the plan says 10 ambiguous questions; these 9 are the ones found in the question
+# files so far (stakeholder 4, Member 1: 2, Member 2: 1, Member 4: 1, Member 5: 1).
+# Ask Member 2 for the 10th, or for the final list.
+
+- id: H1
+  question: Show sales trends over time.
+  label: time
+  annotator: samyogita
+
+- id: H2
+  question: Which customers signed up early but never became high spenders?
+  label: threshold
+  annotator: samyogita
+
+- id: A1
+  question: Who are our most active customers?
+  label: measure
+  annotator: samyogita
+
+- id: A2
+  question: How did we perform last quarter?
+  label: measure
+  annotator: samyogita
+
+- id: M1-A1
+  question: Which products are underperforming?
+  label: threshold
+  annotator: samyogita
+
+- id: M1-A2
+  question: What were our best-selling products recently?
+  label: measure
+  annotator: samyogita
+
+- id: M2-A1
+  question: Which region is growing the fastest?
+  label: measure
+  annotator: samyogita
+
+- id: M4-A1
+  question: Which region is our biggest?
+  label: measure
+  annotator: samyogita
+
+- id: M5_A1
+  question: Who are the recent customers?
+  label: time
+  annotator: samyogita
