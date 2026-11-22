@@ -288,21 +288,21 @@ Rates are run r1 with 95% Wilson intervals (stakeholder `score.wilson`).
 
 ## spider
 
-| Metric | b0 (frozen single call) | b1 (b0 + refusal sentence) | QueryMind (Neo4j schema) | QueryMind, flat schema (diagnostic) |
-|---|---:|---:|---:|---:|
-| Execution accuracy, all | 39/50 (78%; CI 65–87) | 37/50 (74%; CI 60–84) | 33/50 (66%; CI 52–78) | 36/50 (72%; CI 58–83) |
-| Execution accuracy, single-table | 23/25 (92%; CI 75–98) | 23/25 (92%; CI 75–98) | 23/25 (92%; CI 75–98) | 23/25 (92%; CI 75–98) |
-| Execution accuracy, multi-table/nested | 16/25 (64%; CI 45–80) | 14/25 (56%; CI 37–73) | 10/25 (40%; CI 23–59) | 13/25 (52%; CI 33–70) |
-| Over-refusal (refused an answerable question) | 0/50 (0%; CI 0–7) | 2/50 (4%; CI 1–13) | 9/50 (18%; CI 10–31) | 6/50 (12%; CI 6–24) |
-| Execution success (all questions) | 49/50 (98%; CI 90–100) | 47/50 (94%; CI 84–98) | 41/50 (82%; CI 69–90) | 44/50 (88%; CI 76–94) |
-| Execution success when an answer was attempted | 49/50 (98%; CI 90–100) | 47/48 (98%; CI 89–100) | 41/41 (100%; CI 91–100) | 44/44 (100%; CI 92–100) |
-| Write attempts in generated SQL | 0 | 0 | 0 | 0 |
-| p50 / p95 end-to-end latency (s) | 2.25 / 4.97 | 2.22 / 4.22 | 8.47 / 21.47 | 8.70 / 19.05 |
-| p50 latency, answered questions only (s) | 2.25 | 2.23 | 9.24 | 9.26 |
-| Questions over 15 s | 0/50 | 0/50 | 6/50 | 8/50 |
-| LLM calls / question (mean) | 1.00 | 1.00 | 3.70 | 3.90 |
-| Tokens / question (prompt+completion, mean) | 371 | 413 | 1290 | 1671 |
-| Gateway errors remaining after retries | 0 | 0 | 0 | 0 |
+| Metric | b0 (frozen single call) | b1 (b0 + refusal sentence) | b2 (k=3 samples, result vote) | QueryMind (Neo4j schema) | QueryMind, flat schema (diagnostic) |
+|---|---:|---:|---:|---:|---:|
+| Execution accuracy, all | 39/50 (78%; CI 65–87) | 37/50 (74%; CI 60–84) | 31/50 (62%; CI 48–74) | 36/50 (72%; CI 58–83) | 36/50 (72%; CI 58–83) |
+| Execution accuracy, single-table | 23/25 (92%; CI 75–98) | 23/25 (92%; CI 75–98) | 22/25 (88%; CI 70–96) | 23/25 (92%; CI 75–98) | 23/25 (92%; CI 75–98) |
+| Execution accuracy, multi-table/nested | 16/25 (64%; CI 45–80) | 14/25 (56%; CI 37–73) | 9/25 (36%; CI 20–55) | 13/25 (52%; CI 33–70) | 13/25 (52%; CI 33–70) |
+| Over-refusal (refused an answerable question) | 0/50 (0%; CI 0–7) | 1/50 (2%; CI 0–10) | 14/50 (28%; CI 17–42) | 3/50 (6%; CI 2–16) | 6/50 (12%; CI 6–24) |
+| Execution success (all questions) | 49/50 (98%; CI 90–100) | 48/50 (96%; CI 87–99) | 36/50 (72%; CI 58–83) | 47/50 (94%; CI 84–98) | 44/50 (88%; CI 76–94) |
+| Execution success when an answer was attempted | 49/50 (98%; CI 90–100) | 48/49 (98%; CI 89–100) | 36/36 (100%; CI 90–100) | 47/47 (100%; CI 92–100) | 44/44 (100%; CI 92–100) |
+| Write attempts in generated SQL | 0 | 0 | 0 | 0 | 0 |
+| p50 / p95 end-to-end latency (s) | 2.12 / 4.57 | 2.11 / 4.15 | 3.89 / 8.91 | 8.83 / 15.38 | 8.18 / 14.01 |
+| p50 latency, answered questions only (s) | 2.11 | 2.11 | 4.13 | 8.90 | 8.56 |
+| Questions over 15 s | 0/50 | 0/50 | 0/50 | 3/50 | 2/50 |
+| LLM calls / question (mean) | 1.00 | 1.00 | 3.00 | 4.18 | 3.86 |
+| Tokens / question (prompt+completion, mean) | 371 | 414 | 1443 | 1709 | 1730 |
+| Gateway errors remaining after retries | 0 | 0 | 0 | 0 | 0 |
 
 Rates are run r1 with 95% Wilson intervals (stakeholder `score.wilson`).
 
@@ -311,89 +311,91 @@ Rates are run r1 with 95% Wilson intervals (stakeholder `score.wilson`).
 | Pair (A vs B) | Questions | Only A correct | Only B correct | p |
 |---|---:|---:|---:|---:|
 | b0 vs b1 | 50 | 2 | 0 | 0.500 |
-| querymind vs b1 | 50 | 0 | 4 | 0.125 |
+| b2 vs b1 | 50 | 1 | 7 | 0.070 |
+| querymind vs b1 | 50 | 1 | 2 | 1.000 |
 | querymind-flat vs b1 | 50 | 1 | 2 | 1.000 |
-| querymind vs b0 | 50 | 0 | 6 | 0.031 |
-| querymind vs querymind-flat | 50 | 1 | 4 | 0.375 |
+| querymind vs b0 | 50 | 1 | 4 | 0.375 |
+| querymind vs b2 | 50 | 7 | 2 | 0.180 |
+| querymind vs querymind-flat | 50 | 1 | 1 | 1.000 |
 
 ### Per-question verdicts (r1)
 
-| Question | Set | Kind | b0 | b1 | querymind | querymind-flat |
-|---|---|---|---|---|---|---|
-| S0493 (battle_death) | single | reference | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) |
-| S0499 (battle_death) | multi | reference | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) |
-| S0506 (battle_death) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
-| S0099 (car_1) | multi | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | FAIL: mismatch: row count 22 != reference 11 | PASS: matches reference: columns [0] (unordered) |
-| S0102 (car_1) | multi | reference | FAIL: mismatch: row count 1 != reference 35 | FAIL: mismatch: row count 1 != reference 35 | FAIL: mismatch: row count 1 != reference 35 | FAIL: mismatch: row count 1 != reference 35 |
-| S0035 (concert_singer) | multi | reference | FAIL: mismatch: row count 6 != reference 5 | FAIL: mismatch: row count 6 != reference 5 | FAIL: mismatch: row count 6 != reference 5 | FAIL: mismatch: row count 6 != reference 5 |
-| S0381 (course_teach) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
-| S0384 (course_teach) | single | reference | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) |
-| S0390 (course_teach) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
-| S0304 (cre_Doc_Template_Mgt) | single | reference | PASS: matches reference: columns [0, 1, 2] (unordered) | PASS: matches reference: columns [0, 1, 2] (unordered) | PASS: matches reference: columns [0, 1, 2] (unordered) | PASS: matches reference: columns [0, 1, 2] (unordered) |
-| S0319 (cre_Doc_Template_Mgt) | single | reference | PASS: matches reference: columns [0, 1, 2] (unordered) | PASS: matches reference: columns [0, 1, 2] (unordered) | PASS: matches reference: columns [0, 1, 2] (unordered) | PASS: matches reference: columns [0, 1, 2] (unordered) |
-| S0328 (cre_Doc_Template_Mgt) | single | reference | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) |
-| S0331 (cre_Doc_Template_Mgt) | single | reference | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) |
-| S0359 (cre_Doc_Template_Mgt) | multi | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
-| S0361 (cre_Doc_Template_Mgt) | single | reference | FAIL: mismatch: row count 0 != reference 2 | FAIL: mismatch: row count 0 != reference 2 | FAIL: mismatch: row count 0 != reference 2 | FAIL: mismatch: row count 0 != reference 2 |
-| S0376 (cre_Doc_Template_Mgt) | single | reference | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) |
-| S0943 (dog_kennels) | multi | reference | FAIL: mismatch: row count 4 != reference 6 | FAIL: refused an answerable question (over-refusal) | FAIL: refused an answerable question (over-refusal) | FAIL: refused an answerable question (over-refusal) |
-| S0993 (dog_kennels) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
-| S0995 (dog_kennels) | single | reference | PASS: matches reference: columns [0, 1, 2] (unordered) | PASS: matches reference: columns [0, 1, 2] (unordered) | PASS: matches reference: columns [0, 1, 2] (unordered) | PASS: matches reference: columns [0, 1, 2] (unordered) |
-| S0261 (employee_hire_evaluation) | single | reference | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) |
-| S0210 (flight_2) | multi | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
-| S0211 (flight_2) | multi | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | FAIL: refused an answerable question (over-refusal) |
-| S0214 (flight_2) | multi | reference | FAIL: mismatch: no column mapping reproduces the reference rows | FAIL: mismatch: no column mapping reproduces the reference rows | FAIL: refused an answerable question (over-refusal) | FAIL: mismatch: no column mapping reproduces the reference rows |
-| S0220 (flight_2) | multi | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
-| S0231 (flight_2) | multi | reference | PASS: matches reference: columns [0, 1] (order enforced) | FAIL: mismatch: no column mapping reproduces the reference rows | FAIL: mismatch: no column mapping reproduces the reference rows | FAIL: mismatch: no column mapping reproduces the reference rows |
-| S0889 (network_1) | multi | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | FAIL: refused an answerable question (over-refusal) | PASS: matches reference: columns [0] (unordered) |
-| S0892 (network_1) | multi | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | FAIL: refused an answerable question (over-refusal) | PASS: matches reference: columns [0] (unordered) |
-| S0846 (orchestra) | multi | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
-| S0648 (poker_player) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
-| S0654 (poker_player) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
-| S1023 (singer) | multi | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
-| S0537 (student_transcripts_tracking) | multi | reference | FAIL: mismatch: no column mapping reproduces the reference rows | FAIL: mismatch: no column mapping reproduces the reference rows | FAIL: refused an answerable question (over-refusal) | PASS: matches reference: columns [0] (order enforced) |
-| S0561 (student_transcripts_tracking) | multi | reference | PASS: matches reference: columns [0, 1, 2] (order enforced) | FAIL: refused an answerable question (over-refusal) | FAIL: refused an answerable question (over-refusal) | FAIL: refused an answerable question (over-refusal) |
-| S0610 (tvshow) | multi | reference | FAIL: mismatch: row count 0 != reference 1 | FAIL: mismatch: row count 0 != reference 1 | FAIL: mismatch: row count 0 != reference 1 | FAIL: mismatch: row count 0 != reference 1 |
-| S0629 (tvshow) | single | reference | PASS: matches reference: columns [0, 1] (order enforced) | PASS: matches reference: columns [0, 1] (order enforced) | PASS: matches reference: columns [0, 1] (order enforced) | PASS: matches reference: columns [0, 1] (order enforced) |
-| S0636 (tvshow) | multi | reference | FAIL: mismatch: row count 3 != reference 1 | FAIL: mismatch: row count 3 != reference 1 | FAIL: refused an answerable question (over-refusal) | FAIL: refused an answerable question (over-refusal) |
-| S0692 (voter_1) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
-| S0706 (world_1) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
-| S0710 (world_1) | multi | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
-| S0733 (world_1) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
-| S0735 (world_1) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
-| S0742 (world_1) | multi | reference | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) | FAIL: refused an answerable question (over-refusal) | FAIL: refused an answerable question (over-refusal) |
-| S0771 (world_1) | multi | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
-| S0774 (world_1) | multi | reference | FAIL: execution failed: OperationalError | FAIL: execution failed: OperationalError | FAIL: refused an answerable question (over-refusal) | FAIL: refused an answerable question (over-refusal) |
-| S0783 (world_1) | multi | reference | FAIL: mismatch: row count 49 != reference 69 | FAIL: mismatch: row count 49 != reference 69 | FAIL: mismatch: row count 49 != reference 69 | FAIL: mismatch: row count 49 != reference 69 |
-| S0795 (world_1) | multi | reference | PASS: matches reference: columns [1, 0] (unordered) | PASS: matches reference: columns [1, 0] (unordered) | PASS: matches reference: columns [1, 0] (unordered) | PASS: matches reference: columns [1, 0] (unordered) |
-| S0800 (world_1) | single | reference | PASS: matches reference: columns [0, 1] (order enforced) | PASS: matches reference: columns [0, 1] (order enforced) | PASS: matches reference: columns [0, 1] (order enforced) | PASS: matches reference: columns [0, 1] (order enforced) |
-| S0813 (world_1) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
-| S0446 (wta_1) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
-| S0458 (wta_1) | single | reference | FAIL: mismatch: 1 columns cannot cover reference's 2 | FAIL: mismatch: 1 columns cannot cover reference's 2 | FAIL: mismatch: row count 0 != reference 487 | FAIL: mismatch: 1 columns cannot cover reference's 2 |
+| Question | Set | Kind | b0 | b1 | b2 | querymind | querymind-flat |
+|---|---|---|---|---|---|---|---|
+| S0493 (battle_death) | single | reference | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) |
+| S0499 (battle_death) | multi | reference | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) |
+| S0506 (battle_death) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
+| S0099 (car_1) | multi | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | FAIL: mismatch: row count 22 != reference 11 | PASS: matches reference: columns [0] (unordered) |
+| S0102 (car_1) | multi | reference | FAIL: mismatch: row count 1 != reference 35 | FAIL: mismatch: row count 1 != reference 35 | FAIL: refused an answerable question (over-refusal) | FAIL: mismatch: row count 1 != reference 35 | FAIL: mismatch: row count 1 != reference 35 |
+| S0035 (concert_singer) | multi | reference | FAIL: mismatch: row count 6 != reference 5 | FAIL: mismatch: row count 6 != reference 5 | FAIL: mismatch: row count 6 != reference 5 | FAIL: mismatch: row count 6 != reference 5 | FAIL: mismatch: row count 6 != reference 5 |
+| S0381 (course_teach) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
+| S0384 (course_teach) | single | reference | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) |
+| S0390 (course_teach) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
+| S0304 (cre_Doc_Template_Mgt) | single | reference | PASS: matches reference: columns [0, 1, 2] (unordered) | PASS: matches reference: columns [0, 1, 2] (unordered) | PASS: matches reference: columns [0, 1, 2] (unordered) | PASS: matches reference: columns [0, 1, 2] (unordered) | PASS: matches reference: columns [0, 1, 2] (unordered) |
+| S0319 (cre_Doc_Template_Mgt) | single | reference | PASS: matches reference: columns [0, 1, 2] (unordered) | PASS: matches reference: columns [0, 1, 2] (unordered) | PASS: matches reference: columns [0, 1, 2] (unordered) | PASS: matches reference: columns [0, 1, 2] (unordered) | PASS: matches reference: columns [0, 1, 2] (unordered) |
+| S0328 (cre_Doc_Template_Mgt) | single | reference | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) | PASS: matches reference: columns [0, 1] (unordered) |
+| S0331 (cre_Doc_Template_Mgt) | single | reference | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) |
+| S0359 (cre_Doc_Template_Mgt) | multi | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
+| S0361 (cre_Doc_Template_Mgt) | single | reference | FAIL: mismatch: row count 0 != reference 2 | FAIL: mismatch: row count 0 != reference 2 | FAIL: mismatch: row count 0 != reference 2 | FAIL: mismatch: row count 0 != reference 2 | FAIL: mismatch: row count 0 != reference 2 |
+| S0376 (cre_Doc_Template_Mgt) | single | reference | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) | FAIL: refused an answerable question (over-refusal) | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) |
+| S0943 (dog_kennels) | multi | reference | FAIL: mismatch: row count 4 != reference 6 | FAIL: mismatch: row count 4 != reference 6 | FAIL: refused an answerable question (over-refusal) | FAIL: refused an answerable question (over-refusal) | FAIL: refused an answerable question (over-refusal) |
+| S0993 (dog_kennels) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
+| S0995 (dog_kennels) | single | reference | PASS: matches reference: columns [0, 1, 2] (unordered) | PASS: matches reference: columns [0, 1, 2] (unordered) | PASS: matches reference: columns [0, 1, 2] (unordered) | PASS: matches reference: columns [0, 1, 2] (unordered) | PASS: matches reference: columns [0, 1, 2] (unordered) |
+| S0261 (employee_hire_evaluation) | single | reference | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) |
+| S0210 (flight_2) | multi | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | FAIL: refused an answerable question (over-refusal) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
+| S0211 (flight_2) | multi | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | FAIL: refused an answerable question (over-refusal) | PASS: matches reference: columns [0] (unordered) | FAIL: refused an answerable question (over-refusal) |
+| S0214 (flight_2) | multi | reference | FAIL: mismatch: no column mapping reproduces the reference rows | FAIL: mismatch: no column mapping reproduces the reference rows | FAIL: refused an answerable question (over-refusal) | FAIL: mismatch: no column mapping reproduces the reference rows | FAIL: mismatch: no column mapping reproduces the reference rows |
+| S0220 (flight_2) | multi | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
+| S0231 (flight_2) | multi | reference | PASS: matches reference: columns [0, 1] (order enforced) | FAIL: mismatch: no column mapping reproduces the reference rows | FAIL: refused an answerable question (over-refusal) | FAIL: mismatch: no column mapping reproduces the reference rows | FAIL: mismatch: no column mapping reproduces the reference rows |
+| S0889 (network_1) | multi | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | FAIL: refused an answerable question (over-refusal) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
+| S0892 (network_1) | multi | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | FAIL: refused an answerable question (over-refusal) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
+| S0846 (orchestra) | multi | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
+| S0648 (poker_player) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
+| S0654 (poker_player) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
+| S1023 (singer) | multi | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
+| S0537 (student_transcripts_tracking) | multi | reference | FAIL: mismatch: no column mapping reproduces the reference rows | FAIL: mismatch: no column mapping reproduces the reference rows | FAIL: refused an answerable question (over-refusal) | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) |
+| S0561 (student_transcripts_tracking) | multi | reference | PASS: matches reference: columns [0, 1, 2] (order enforced) | FAIL: refused an answerable question (over-refusal) | PASS: matches reference: columns [0, 1, 2] (order enforced) | FAIL: refused an answerable question (over-refusal) | FAIL: refused an answerable question (over-refusal) |
+| S0610 (tvshow) | multi | reference | FAIL: mismatch: row count 0 != reference 1 | FAIL: mismatch: row count 0 != reference 1 | FAIL: mismatch: row count 0 != reference 1 | FAIL: mismatch: row count 0 != reference 1 | FAIL: mismatch: row count 0 != reference 1 |
+| S0629 (tvshow) | single | reference | PASS: matches reference: columns [0, 1] (order enforced) | PASS: matches reference: columns [0, 1] (order enforced) | PASS: matches reference: columns [0, 1] (order enforced) | PASS: matches reference: columns [0, 1] (order enforced) | PASS: matches reference: columns [0, 1] (order enforced) |
+| S0636 (tvshow) | multi | reference | FAIL: mismatch: row count 3 != reference 1 | FAIL: mismatch: row count 3 != reference 1 | FAIL: refused an answerable question (over-refusal) | FAIL: mismatch: row count 3 != reference 1 | FAIL: refused an answerable question (over-refusal) |
+| S0692 (voter_1) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
+| S0706 (world_1) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
+| S0710 (world_1) | multi | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
+| S0733 (world_1) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
+| S0735 (world_1) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
+| S0742 (world_1) | multi | reference | PASS: matches reference: columns [0] (order enforced) | PASS: matches reference: columns [0] (order enforced) | FAIL: refused an answerable question (over-refusal) | FAIL: refused an answerable question (over-refusal) | FAIL: refused an answerable question (over-refusal) |
+| S0771 (world_1) | multi | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | FAIL: refused an answerable question (over-refusal) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
+| S0774 (world_1) | multi | reference | FAIL: execution failed: OperationalError | FAIL: execution failed: OperationalError | FAIL: refused an answerable question (over-refusal) | FAIL: mismatch: row count 5 != reference 58 | FAIL: refused an answerable question (over-refusal) |
+| S0783 (world_1) | multi | reference | FAIL: mismatch: row count 49 != reference 69 | FAIL: mismatch: row count 49 != reference 69 | FAIL: mismatch: row count 49 != reference 69 | FAIL: mismatch: row count 49 != reference 69 | FAIL: mismatch: row count 49 != reference 69 |
+| S0795 (world_1) | multi | reference | PASS: matches reference: columns [1, 0] (unordered) | PASS: matches reference: columns [1, 0] (unordered) | PASS: matches reference: columns [1, 0] (unordered) | PASS: matches reference: columns [1, 0] (unordered) | PASS: matches reference: columns [1, 0] (unordered) |
+| S0800 (world_1) | single | reference | PASS: matches reference: columns [0, 1] (order enforced) | PASS: matches reference: columns [0, 1] (order enforced) | PASS: matches reference: columns [0, 1] (order enforced) | PASS: matches reference: columns [0, 1] (order enforced) | PASS: matches reference: columns [0, 1] (order enforced) |
+| S0813 (world_1) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
+| S0446 (wta_1) | single | reference | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) | PASS: matches reference: columns [0] (unordered) |
+| S0458 (wta_1) | single | reference | FAIL: mismatch: 1 columns cannot cover reference's 2 | FAIL: mismatch: 1 columns cannot cover reference's 2 | FAIL: mismatch: 1 columns cannot cover reference's 2 | FAIL: mismatch: row count 0 != reference 487 | FAIL: mismatch: 1 columns cannot cover reference's 2 |
 
 ### QueryMind (Neo4j schema) behaviour (all runs)
 
 ```json
 {
   "runs": 50,
-  "first_attempt_verification_failures": 1,
-  "runs_with_repairs": 1,
-  "repairs_recovered_to_execution": 1,
+  "first_attempt_verification_failures": 2,
+  "runs_with_repairs": 2,
+  "repairs_recovered_to_execution": 2,
   "repairs_recovered_correct": 1,
   "error_types": {},
-  "optimizer_invoked": 41,
-  "optimizer_rewrites_applied": 2,
-  "optimizer_rewrites_result_equal": 2,
+  "optimizer_invoked": 47,
+  "optimizer_rewrites_applied": 1,
+  "optimizer_rewrites_result_equal": 1,
   "schema_backend": {
     "neo4j": 50
   },
   "semantic_judge_unavailable": 0,
   "llm_calls_distribution": {
-    "1": 9,
+    "2": 3,
     "3": 2,
-    "4": 27,
-    "5": 10,
-    "6": 2
+    "4": 29,
+    "5": 15,
+    "6": 1
   },
   "calls_without_token_usage": 0
 }
@@ -410,8 +412,8 @@ Rates are run r1 with 95% Wilson intervals (stakeholder `score.wilson`).
   "repairs_recovered_correct": 1,
   "error_types": {},
   "optimizer_invoked": 44,
-  "optimizer_rewrites_applied": 2,
-  "optimizer_rewrites_result_equal": 2,
+  "optimizer_rewrites_applied": 1,
+  "optimizer_rewrites_result_equal": 1,
   "schema_backend": {
     "flat": 50
   },
@@ -420,8 +422,7 @@ Rates are run r1 with 95% Wilson intervals (stakeholder `score.wilson`).
     "1": 6,
     "3": 2,
     "4": 29,
-    "5": 11,
-    "6": 2
+    "5": 13
   },
   "calls_without_token_usage": 0
 }
