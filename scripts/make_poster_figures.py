@@ -34,7 +34,24 @@ from scripts.poster_style import (  # noqa: E402
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SUMMARY = PROJECT_ROOT / "eval/results/report/summary.json"
 OUT_DIR = PROJECT_ROOT / "eval/results/poster"
-DATASET_LABEL = {"stakeholder60": "60-question set", "stakeholder": "17-question set", "spider": "Spider pilot"}
+QUESTIONS_60 = PROJECT_ROOT / "eval/questions_60.yaml"
+
+
+def question_count(path: Path) -> int | None:
+    """Number of questions in a question file, so labels follow the frozen set."""
+    try:
+        import yaml
+
+        return len(yaml.safe_load(path.read_text(encoding="utf-8")) or [])
+    except (OSError, ImportError, ValueError):
+        return None
+
+
+# "stakeholder60" is the dataset's name; the set itself is smaller than 60 (see
+# the header of eval/questions_60.yaml), so the label counts the actual questions.
+_N60 = question_count(QUESTIONS_60)
+DATASET_LABEL = {"stakeholder60": f"{_N60}-question set" if _N60 else "extended question set",
+                 "stakeholder": "17-question set", "spider": "Spider pilot"}
 
 # Stakeholder targets (external/agentic-sql-analyst/PROPOSAL.md section 6).
 # (metric key, short label, direction, target as a fraction or callable of n, target text)

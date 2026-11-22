@@ -151,7 +151,7 @@ def main(argv: list[str] | None = None) -> int:
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out / "latency_summary.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     text = markdown(result, "Milestone 2" if args.before == DEFAULT_BEFORE else "before",
-                    "60-question set" if args.after == DEFAULT_AFTER else "after")
+                    f"{result['after_all']['questions']}-question set" if args.after == DEFAULT_AFTER else "after")
     (args.out / "latency.md").write_text(text, encoding="utf-8")
     print(text)
     return 0

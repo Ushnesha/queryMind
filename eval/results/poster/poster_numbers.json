@@ -144,7 +144,7 @@
         "+6 / −4, p=0.75"
       ]
     ],
-    "caption": "60-question set, run r1, one model (devstral2-123b). k/n (%; 95% Wilson CI). Scored by the stakeholder's unmodified scorer."
+    "caption": "50-question set, run r1, one model (devstral2-123b). k/n (%; 95% Wilson CI). Scored by the stakeholder's unmodified scorer."
   },
   "chart": {
     "rates": {

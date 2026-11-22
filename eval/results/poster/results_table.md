@@ -1,4 +1,4 @@
-60-question set, run r1, one model (devstral2-123b). k/n (%; 95% Wilson CI). Scored by the stakeholder's unmodified scorer.
+50-question set, run r1, one model (devstral2-123b). k/n (%; 95% Wilson CI). Scored by the stakeholder's unmodified scorer.
 
 | Metric (run r1) | b0 | b1 | b2 (k=3 vote) | QueryMind | QueryMind (flat) |
 |---|---:|---:|---:|---:|---:|

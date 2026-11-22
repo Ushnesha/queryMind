@@ -1,6 +1,6 @@
 # R6 latency: before vs after
 
-| Metric | Before (Milestone 2) | After, same questions | After, all (60-question set) |
+| Metric | Before (Milestone 2) | After, same questions | After, all (50-question set) |
 |---|---:|---:|---:|
 | Runs | 51 | 51 | 150 |
 | Questions | 17 | 17 | 50 |

@@ -1,4 +1,4 @@
-**Honest results (60-question set, run r1)**
+**Honest results (50-question set, run r1)**
 
 *Where QueryMind beats b1*
 - Hard accuracy: 10/17 vs 9/17
